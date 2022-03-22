@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "neos-react-scripts build",
+    "watch": "neos-react-scripts watch"
+  },
+  "main": "./src/index.js",
+  "devDependencies": {
+    "@neos-project/neos-ui-extensibility": "^7.3"
+  },
+  "neos": {
+    "buildTargetDirectory": "../../Public/Plugin"
+  }
+}

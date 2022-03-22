@@ -1,0 +1,14 @@
+Neos:
+  Neos:
+    Ui:
+      resources:
+        javascript:
+          'Carbon.CodeEditor:Plugin':
+            resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.js'
+#        stylesheets:
+#          'Carbon.CodeEditor:Plugin':
+#            resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.css'
+
+#      frontendConfiguration:
+#        'Carbon.CodeEditor':
+#          optionA: true
