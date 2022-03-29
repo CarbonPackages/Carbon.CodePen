@@ -5,10 +5,7 @@ Neos:
         javascript:
           'Carbon.CodeEditor:Plugin':
             resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.js'
-#        stylesheets:
-#          'Carbon.CodeEditor:Plugin':
-#            resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.css'
 
-#      frontendConfiguration:
-#        'Carbon.CodeEditor':
-#          optionA: true
+      frontendConfiguration:
+        'Carbon.CodeEditor':
+          MonacoEditorInclude: ${StaticResource.uri('Carbon.CodeEditor', 'Public/Monaco/index.js')}
