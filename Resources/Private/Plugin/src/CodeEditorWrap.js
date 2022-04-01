@@ -83,6 +83,18 @@ export default class CodeEditorWrap extends PureComponent {
             theme: 'vs-dark'
         });
 
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd, () => {
+            editor.trigger('keyboard', 'editor.action.fontZoomIn', {})
+        });
+
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadSubtract, () => {
+            editor.trigger('keyboard', 'editor.action.fontZoomOut', {})
+        });
+
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Numpad0, () => {
+            editor.trigger('keyboard', 'editor.action.fontZoomReset', {})
+        });
+
         editor.onDidChangeModelContent(() => {
             this.props.onChange(editor.getValue())
         })
