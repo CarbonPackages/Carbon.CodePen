@@ -30,43 +30,14 @@ build({
     format: 'esm',
     banner: {
         //
-        // Required Js to initiate the workers created above.
-        // Also injects the style.css
+        // Injects the style.css
         //
         js: `
         (function () {
-
-            function dirname(path) {
-                const match = path.match(/.*\\//);
-                if (match === null) {
-                    return '';
-                }
-                return match[0];
-            }
-
-            const currentFolder = dirname(import.meta.url);
             const link = document.createElement('link')
             link.rel = "stylesheet"
-            link.href = currentFolder + "index.css"
+            link.href = (new URL("index.css", import.meta.url)).href
             document.head.append(link)
-
-            window.MonacoEnvironment = {
-                getWorkerUrl: function (moduleId, label) {
-                    if (label === 'json') {
-                        return currentFolder + 'vs/language/json/json.worker.js';
-                    }
-                    if (label === 'css' || label === 'scss' || label === 'less') {
-                         return currentFolder + 'vs/language/css/css.worker.js';
-                    }
-                    if (label === 'html' || label === 'handlebars' || label === 'razor') {
-                        return currentFolder + 'vs/language/html/html.worker.js';
-                    }
-                    if (label === 'typescript' || label === 'javascript') {
-                        return currentFolder + 'vs/language/typescript/ts.worker.js';
-                    }
-                    return currentFolder + 'vs/editor/editor.worker.js';
-                }
-            };
         })();
     `,
     },
