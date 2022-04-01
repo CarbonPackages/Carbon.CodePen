@@ -12,6 +12,7 @@ import { emmetHTML as monacoEmmetHTML } from 'emmet-monaco-es'
 export default class CodeEditorWrap extends PureComponent {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
+        onSave: PropTypes.func.isRequired,
         value: PropTypes.string,
         language: PropTypes.string,
         monacoEditorInclude: PropTypes.string.isRequired,
@@ -93,6 +94,10 @@ export default class CodeEditorWrap extends PureComponent {
 
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Numpad0, () => {
             editor.trigger('keyboard', 'editor.action.fontZoomReset', {})
+        });
+
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+            this.props.onSave()
         });
 
         editor.onDidChangeModelContent(() => {

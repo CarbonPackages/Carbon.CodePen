@@ -12,6 +12,7 @@ export default class CodeEditor extends PureComponent {
         identifier: PropTypes.string.isRequired,
         renderSecondaryInspector: PropTypes.func.isRequired,
         commit: PropTypes.func.isRequired,
+        onEnterKey: PropTypes.func.isRequired,
         value: PropTypes.string,
         secondaryEditorsRegistry: PropTypes.object.isRequired,
         options: PropTypes.object,
@@ -25,6 +26,7 @@ export default class CodeEditor extends PureComponent {
             <CodeEditorWrap
                 value={this.props.value}
                 onChange={value => this.props.commit(value)}
+                onSave={ this.props.onEnterKey}
                 language={this.props.options.language}
             />
         );
