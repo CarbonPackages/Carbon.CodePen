@@ -10,5 +10,8 @@
   },
   "neos": {
     "buildTargetDirectory": "../../Public/Plugin"
+  },
+  "dependencies": {
+    "emmet-monaco-es": "^5.1.0"
   }
 }

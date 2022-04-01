@@ -1,6 +1,7 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {neos} from '@neos-project/neos-ui-decorators';
+import { emmetHTML as monacoEmmetHTML } from 'emmet-monaco-es'
 
 @neos(globalRegistry => {
     const config = globalRegistry.get('frontendConfiguration').get('Carbon.CodeEditor')
@@ -22,6 +23,11 @@ export default class CodeEditorWrap extends PureComponent {
         }
 
         const {default: monaco} = await import(/* webpackIgnore: true */this.props.monacoEditorInclude)
+
+        const dispose = monacoEmmetHTML(
+            monaco,
+            ['html', 'php'],
+        )
 
         const editor = monaco.editor.create(this.monacoContainer, {
             value: this.props.value,
