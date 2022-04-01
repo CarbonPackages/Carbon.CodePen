@@ -81,7 +81,8 @@ export default class CodeEditorWrap extends PureComponent {
             roundedSelection: false,
             scrollBeyondLastLine: false,
             readOnly: false,
-            theme: 'vs-dark'
+            theme: 'vs-dark',
+            automaticLayout: true
         });
 
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd, () => {
@@ -99,11 +100,6 @@ export default class CodeEditorWrap extends PureComponent {
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
             this.props.onSave()
         });
-
-        const resizeObserver = new ResizeObserver(entries => {
-            editor.layout()
-        });
-        resizeObserver.observe(this.monacoContainer);
 
         editor.addCommand(monaco.KeyCode.F11, () => {
             this.monacoContainer.requestFullscreen();
