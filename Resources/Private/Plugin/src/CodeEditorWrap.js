@@ -81,8 +81,7 @@ export default class CodeEditorWrap extends PureComponent {
             roundedSelection: false,
             scrollBeyondLastLine: false,
             readOnly: false,
-            theme: 'vs-dark',
-            automaticLayout: true
+            theme: 'vs-dark'
         });
 
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd, () => {
@@ -113,6 +112,11 @@ export default class CodeEditorWrap extends PureComponent {
                 this.monacoContainer.requestFullscreen()
             }
         });
+
+        const resizeEditor = () => editor.layout()
+
+        this.monacoContainer.addEventListener('fullscreenchange', resizeEditor);
+        window.addEventListener('resize', resizeEditor)
 
         editor.onDidChangeModelContent(() => {
             this.props.onChange(editor.getValue())
