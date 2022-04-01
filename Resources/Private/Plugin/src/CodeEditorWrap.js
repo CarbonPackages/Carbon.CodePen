@@ -101,8 +101,17 @@ export default class CodeEditorWrap extends PureComponent {
             this.props.onSave()
         });
 
-        editor.addCommand(monaco.KeyCode.F11, () => {
-            this.monacoContainer.requestFullscreen();
+        editor.addAction({
+            id: 'carbon.fullscreen',
+            label: 'Fullscreen',
+            keybindings: [
+                monaco.KeyCode.F11,
+            ],
+            contextMenuGroupId: 'navigation',
+            contextMenuOrder: 1.5,
+            run: () => {
+                this.monacoContainer.requestFullscreen()
+            }
         });
 
         editor.onDidChangeModelContent(() => {
