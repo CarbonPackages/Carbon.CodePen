@@ -100,6 +100,15 @@ export default class CodeEditorWrap extends PureComponent {
             this.props.onSave()
         });
 
+        const resizeObserver = new ResizeObserver(entries => {
+            editor.layout()
+        });
+        resizeObserver.observe(this.monacoContainer);
+
+        editor.addCommand(monaco.KeyCode.F11, () => {
+            this.monacoContainer.requestFullscreen();
+        });
+
         editor.onDidChangeModelContent(() => {
             this.props.onChange(editor.getValue())
         })
