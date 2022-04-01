@@ -31,10 +31,10 @@ export default class CodeEditorWrap extends PureComponent {
         )
 
         const afxSnippets = {
-            'Neos.Fusion:Loop': `<Neos.Fusion:Loop items={}></Neos.Fusion:Loop>`,
-            'Neos.Fusion:Value': `<Neos.Fusion:Value value={}/>`,
-            'Neos.Fusion:Join': `<Neos.Fusion:Join></Neos.Fusion:Join>`,
-            'Neos.Fusion:Tag': `<Neos.Fusion:Tag tagName="" attributes.class=""></Neos.Fusion:Tag>`,
+            'Neos.Fusion:Loop': '<Neos.Fusion:Loop items={${1:items}}>\n\t$0\n</Neos.Fusion:Loop>',
+            'Neos.Fusion:Value': '<Neos.Fusion:Value value={${1:value}}/>',
+            'Neos.Fusion:Join': '<Neos.Fusion:Join>\n\t$0\n</Neos.Fusion:Join>',
+            'Neos.Fusion:Tag': '<Neos.Fusion:Tag tagName="${1:h1}" attributes.class="${2:fancy}">\n\t$0\n</Neos.Fusion:Tag>',
         }
 
         monaco.languages.registerCompletionItemProvider('html', {
@@ -69,6 +69,7 @@ export default class CodeEditorWrap extends PureComponent {
                         label,
                         range,
                         insertText: prepareSnippet(snippet),
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
                         kind: monaco.languages.CompletionItemKind.Snippet,
                     }))
                 };
