@@ -1,7 +1,6 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {neos} from '@neos-project/neos-ui-decorators';
-import loadMonaco from './loadMonaco';
 
 @neos(globalRegistry => {
     const config = globalRegistry.get('frontendConfiguration').get('Carbon.CodeEditor')
@@ -22,7 +21,7 @@ export default class CodeEditorWrap extends PureComponent {
             return;
         }
 
-        const monaco = await loadMonaco(this.props.monacoEditorInclude);
+        const {default: monaco} = await import(/* webpackIgnore: true */this.props.monacoEditorInclude)
 
         const editor = monaco.editor.create(this.monacoContainer, {
             value: this.props.value,

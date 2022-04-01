@@ -27,7 +27,7 @@ build({
     minify: true,
     entryPoints: ['src/index.js'],
     bundle: true,
-    format: 'iife',
+    format: 'esm',
     banner: {
         //
         // Required Js to initiate the workers created above.
@@ -44,7 +44,7 @@ build({
                 return match[0];
             }
 
-            currentFolder = dirname(document.currentScript.src);
+            const currentFolder = dirname(import.meta.url);
             const link = document.createElement('link')
             link.rel = "stylesheet"
             link.href = currentFolder + "index.css"
