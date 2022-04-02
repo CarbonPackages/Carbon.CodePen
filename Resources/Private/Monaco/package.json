@@ -1,6 +1,12 @@
 {
+  "private": true,
+  "scripts": {
+    "build": "rm -rf ../../Public/Monaco && node build.js"
+  },
   "dependencies": {
     "esbuild": "^0.14.28",
-    "monaco-editor": "^0.33.0"
+    "monaco-editor": "^0.33.0",
+    "monaco-tailwindcss": "link:../../../../../monaco-tailwindcss/",
+    "path-browserify": "^1.0.1"
   }
 }

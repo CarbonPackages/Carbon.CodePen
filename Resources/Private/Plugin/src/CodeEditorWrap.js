@@ -23,7 +23,9 @@ export default class CodeEditorWrap extends PureComponent {
             return;
         }
 
-        const {default: monaco} = await import(/* webpackIgnore: true */this.props.monacoEditorInclude);
+        const {monaco, monacoTailwindCss} = await import(/* webpackIgnore: true */this.props.monacoEditorInclude);
+
+        monacoTailwindCss(monaco)
 
         const dispose = monacoEmmetHTML(
             monaco,

@@ -1,38 +1,76 @@
-//@ts-check
-
-const esbuild = require('esbuild');
+ const esbuild = require('esbuild');
 const path = require('path');
-const fs = require('fs');
 
-removeDir('../../Public/Monaco');
+const outputDir = path.join(__dirname, '../../Public/Monaco')
 
 const workerEntryPoints = [
-    'vs/language/json/json.worker.js',
-    'vs/language/css/css.worker.js',
-    'vs/language/html/html.worker.js',
-    'vs/language/typescript/ts.worker.js',
-    'vs/editor/editor.worker.js'
+  'language/json/json.worker.js',
+  'language/css/css.worker.js',
+  'language/html/html.worker.js',
+  'language/typescript/ts.worker.js',
+  'editor/editor.worker.js'
 ];
 
 build({
-    entryPoints: workerEntryPoints.map((entry) => `node_modules/monaco-editor/esm/${entry}`),
-    bundle: true,
-    format: 'iife',
-    outbase: 'node_modules/monaco-editor/esm/',
-    outdir: path.join(__dirname, '../../Public/Monaco'),
-    minify: true
+  entryPoints: workerEntryPoints.map(entry => require.resolve(`monaco-editor/esm/vs/${entry}`)),
+  outdir: outputDir,
+  bundle: true,
+  format: 'iife',
+  minify: true
+});
+
+const replaceNodeBuiltIns = () => {
+  const replace = {
+    'path': require.resolve('path-browserify'),
+    'fs': require.resolve('./src/mocked/fs.cjs'),
+    'util': require.resolve('./src/mocked/util.cjs'),
+    'url': require.resolve('url/'),
+    'vscode-emmet-helper-bundled': require.resolve('./src/mocked/noop.cjs')
+  }
+  const filter = RegExp(`^(${Object.keys(replace).join("|")})$`);
+  return {
+    name: "replaceNodeBuiltIns",
+    setup(build) {
+      build.onResolve({ filter }, arg => ({
+        path: replace[arg.path],
+      }));
+    },
+  };
+}
+
+build({
+  // watch: true,
+  entryPoints: [require.resolve('monaco-tailwindcss/src/tailwindcss.worker.ts')],
+  outfile: path.join(outputDir, 'monaco-tailwindcss/tailwindcss.worker.js'),
+  bundle: true,
+  sourcemap: 'inline',
+  format: 'iife',
+  minify: false,
+  define: {
+    'process.env.DEBUG': 'undefined',
+    'process.env.NODE_DEBUG': 'undefined',
+    'process.env.JEST_WORKER_ID': 'undefined',
+    'process.env.TAILWIND_MODE': JSON.stringify('build'),
+    'process.env.TAILWIND_DISABLE_TOUCH': 'true',
+    '__dirname': '"/"',
+    '__filename': '"/index.js"',
+  },
+  plugins: [
+    replaceNodeBuiltIns()
+  ],
 });
 
 build({
-    minify: true,
-    entryPoints: ['src/index.js'],
-    bundle: true,
-    format: 'esm',
-    banner: {
-        //
-        // Injects the style.css
-        //
-        js: `
+  // watch: true,
+  minify: true,
+  entryPoints: ['src/index.js'],
+  bundle: true,
+  format: 'esm',
+  // format: 'iife', // then we must use document.currentScript.src instead of import.meta.src
+  // splitting: true, // optional and only works for esm
+  banner: {
+    // dirtily injects the style.css - todo find a better way.
+    js: `
         (function () {
             const link = document.createElement('link')
             link.rel = "stylesheet"
@@ -40,41 +78,24 @@ build({
             document.head.append(link)
         })();
     `,
-    },
-    outdir: path.join(__dirname, '../../Public/Monaco'),
-    loader: {
-        '.ttf': 'file'
-    }
+  },
+  outdir: outputDir,
+  loader: {
+    '.ttf': 'file'
+  }
 });
 
 /**
  * @param {import ('esbuild').BuildOptions} opts
  */
 function build(opts) {
-    esbuild.build(opts).then((result) => {
-        if (result.errors.length > 0) {
-            console.error(result.errors);
-        }
-        if (result.warnings.length > 0) {
-            console.error(result.warnings);
-        }
-        console.info("build done")
-    });
-}
-
-/**
- * Remove a directory and all its contents.
- * @param {string} _dirPath
- */
-function removeDir(_dirPath) {
-    const dirPath = path.join(__dirname, _dirPath);
-    if (!fs.existsSync(dirPath)) {
-        return;
+  esbuild.build(opts).then((result) => {
+    if (result.errors.length > 0) {
+      console.error(result.errors);
     }
-    fs.rm(dirPath, { recursive: true }, (err) => {
-        if (err) {
-            throw err;
-        }
-        console.info(`removed ${_dirPath}`)
-    })
+    if (result.warnings.length > 0) {
+      console.error(result.warnings);
+    }
+    console.info("build done")
+  });
 }
