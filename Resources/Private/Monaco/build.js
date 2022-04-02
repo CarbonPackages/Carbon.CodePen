@@ -36,7 +36,7 @@ build({
         (function () {
             const link = document.createElement('link')
             link.rel = "stylesheet"
-            link.href = (new URL("index.css", import.meta.url)).href
+            link.href = (new URL("index.css", import.meta.url)).pathname
             document.head.append(link)
         })();
     `,
