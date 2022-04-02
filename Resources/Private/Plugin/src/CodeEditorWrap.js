@@ -7,6 +7,7 @@ import { emmetHTML as monacoEmmetHTML } from 'emmet-monaco-es'
     const config = globalRegistry.get('frontendConfiguration').get('Carbon.CodeEditor')
     return {
         monacoEditorInclude: config.MonacoEditorInclude,
+        clientTailwindConfig: config.clientTailwindConfig,
     }
 })
 export default class CodeEditorWrap extends PureComponent {
@@ -16,6 +17,7 @@ export default class CodeEditorWrap extends PureComponent {
         value: PropTypes.string,
         language: PropTypes.string,
         monacoEditorInclude: PropTypes.string.isRequired,
+        clientTailwindConfig: PropTypes.string,
     };
 
     async componentDidMount() {
@@ -25,7 +27,17 @@ export default class CodeEditorWrap extends PureComponent {
 
         const {monaco, monacoTailwindCss} = await import(/* webpackIgnore: true */this.props.monacoEditorInclude);
 
-        monacoTailwindCss(monaco)
+        let monacoTailwindcssOptions = {
+            languageSelector: ['javascript', 'html'],
+            config: {}
+        }
+
+        if (this.props.clientTailwindConfig) {
+            console.log(JSON.parse(this.props.clientTailwindConfig))
+            monacoTailwindcssOptions = {...monacoTailwindcssOptions, config: JSON.parse(this.props.clientTailwindConfig)}
+        }
+
+        monacoTailwindCss(monaco, monacoTailwindcssOptions)
 
         const dispose = monacoEmmetHTML(
             monaco,

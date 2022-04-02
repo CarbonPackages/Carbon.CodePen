@@ -9,3 +9,4 @@ Neos:
       frontendConfiguration:
         'Carbon.CodeEditor':
           MonacoEditorInclude: ${StaticResource.uri('Carbon.CodeEditor', 'Public/Monaco/index.js')}
+          clientTailwindConfig: "${Configuration.setting('Carbon.CodeEditor.clientTailwindConfig')}"
