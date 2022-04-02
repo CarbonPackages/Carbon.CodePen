@@ -23,7 +23,36 @@ export default class CodeEditorWrap extends PureComponent {
             return;
         }
 
-        const {default: monaco} = await import(/* webpackIgnore: true */this.props.monacoEditorInclude)
+        const loadScript = src => {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script')
+                script.type = 'text/javascript'
+                script.onload = resolve
+                script.onerror = reject
+                script.src = src
+                document.head.append(script)
+            })
+        }
+
+        async function getMonaco(scriptName) {
+            if (window.monaco !== undefined) {
+                return window.monaco
+            }
+            await loadScript(scriptName)
+            return window.monaco
+        }
+
+        // const foo = await import(/* webpackIgnore: true */this.props.monacoEditorInclude)
+
+        const foo = await getMonaco(this.props.monacoEditorInclude)
+        // const foo = __webpack_require__(this.props.monacoEditorInclude)
+        // const foo = require('../../Monaco/src/index.js')
+
+        // const foo = await import('../../../Public/Monaco/index.js')
+        // const foo = await import('../../Monaco/src/index.js')
+
+        console.log(foo)
+        const {default: monaco} = foo;
 
         const dispose = monacoEmmetHTML(
             monaco,
