@@ -5,8 +5,12 @@ Neos:
         javascript:
           'Carbon.CodeEditor:Plugin':
             resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.js'
+            # TODO add `type` option in Neos ui
+            type: 'module'
+        stylesheets:
+          'Carbon.CodeEditor:Plugin':
+            resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.css'
 
       frontendConfiguration:
         'Carbon.CodeEditor':
-          MonacoEditorInclude: ${StaticResource.uri('Carbon.CodeEditor', 'Public/Monaco/index.js')}
           clientTailwindConfig: "${Configuration.setting('Carbon.CodeEditor.clientTailwindConfig')}"

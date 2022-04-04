@@ -30,20 +30,34 @@ const neosUiConsumerApi = {
     '@neos-project/utils-redux': '@neos-project/neos-ui-extensibility/src/shims/neosProjectPackages/utils-redux/index'
 }
 
+const outdir = path.join(__dirname, '../../Public/Plugin')
+
+const handleBuild = result => {
+    if (result.errors.length > 0) {
+        console.error(result.errors);
+    }
+    if (result.warnings.length > 0) {
+        console.error(result.warnings);
+    }
+    console.info("build done")
+}
+
 esbuild.build({
     watch: process.argv.includes('--watch'),
     logLevel: "info",
-    // sourcemap: true,
     minify: true,
     bundle: true,
-    format: 'iife',
+    splitting: true,
+    format: 'esm',
     entryPoints: {
         'Plugin': 'src/index.js'
     },
-    outdir: path.join(__dirname, '../../Public/Plugin'),
+    outdir,
     loader: {
         // we use tsx to get the decorators from typescript + jsx support
         '.js': 'tsx',
+        // monaco icon font
+        '.ttf': 'file'
     },
     plugins: [
         {
@@ -57,12 +71,23 @@ esbuild.build({
             },
         }
     ],
-}).then((result) => {
-    if (result.errors.length > 0) {
-        console.error(result.errors);
-    }
-    if (result.warnings.length > 0) {
-        console.error(result.warnings);
-    }
-    console.info("build done")
-})
+}).then(handleBuild)
+
+const workerEntryPoints = [
+    'language/json/json.worker.js',
+    'language/css/css.worker.js',
+    'language/html/html.worker.js',
+    'language/typescript/ts.worker.js',
+    'editor/editor.worker.js'
+];
+
+esbuild.build({
+    entryPoints: [
+        ...workerEntryPoints.map(entry => require.resolve(`monaco-editor/esm/vs/${entry}`)),
+        require.resolve('monaco-tailwindcss/tailwindcss.worker.js')
+    ],
+    outdir,
+    bundle: true,
+    format: 'iife',
+    minify: true
+}).then(handleBuild)
