@@ -1,6 +1,7 @@
 
 const esbuild = require('esbuild');
 const {join} = require('path');
+const {languages} = require('monaco-editor/esm/metadata.js');
 
 const neosUiConsumerApi = {
     'react': '@neos-project/neos-ui-extensibility/src/shims/vendor/react/index',
@@ -70,17 +71,15 @@ esbuild.build({
                     );
                 })
 
-                // following code is optional, and is non breaking when upstream changes (eg. we then just include all languages again)
+                // following code is optional, and is non breaking when upstream changes (eg. we would then just include all languages again)
                 const includedLanguages = [
                     'javascript', 'css', 'html'
                 ]
-                // all languages imports will look like: './html/html.contribution.js'
-                // since golang doesnt support a negative lookahead, we resolve the wanted languages ourselves, and dump the rest.
-                onResolve({ filter: RegExp(`^\\.\\/(${includedLanguages.join('|')})\\/[a-z]+\\.contribution\\.js$`) }, ({path, resolveDir}) => ({
-                    path: join(resolveDir, path),
-                    sideEffects: false,
-                }));
-                onResolve({ filter: RegExp(`^\\.\\/[a-zA-Z0-9-]+\\/[a-zA-Z0-9-]+\\.contribution\\.js$`) }, ({ path }) => ({
+                const basicLanguages = languages.map(({label}) => label)
+                const basicLanguagesToExclude = basicLanguages.filter(language => includedLanguages.includes(language) === false)
+
+                // all languages imports will look like: './html/html.contribution.js' -> and those who are not in `includedLanguages` will be ignored
+                onResolve({ filter: RegExp(`^\\.\\/(${basicLanguagesToExclude.join('|')})\\/(${basicLanguagesToExclude.join('|')})\\.contribution\\.js$`) }, ({path}) => ({
                     path,
                     external: true,
                     sideEffects: false,
