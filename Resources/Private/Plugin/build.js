@@ -73,19 +73,15 @@ esbuild.build({
     ],
 }).then(handleBuild)
 
-const workerEntryPoints = [
-    'language/json/json.worker.js',
-    'language/css/css.worker.js',
-    'language/html/html.worker.js',
-    'language/typescript/ts.worker.js',
-    'editor/editor.worker.js'
-];
-
 esbuild.build({
-    entryPoints: [
-        ...workerEntryPoints.map(entry => require.resolve(`monaco-editor/esm/vs/${entry}`)),
-        require.resolve('monaco-tailwindcss/tailwindcss.worker.js')
-    ],
+    entryPoints: Object.fromEntries(Object.entries({
+        'json.worker': 'monaco-editor/esm/vs/language/json/json.worker.js',
+        'css.worker': 'monaco-editor/esm/vs/language/css/css.worker.js',
+        'html.worker': 'monaco-editor/esm/vs/language/html/html.worker.js',
+        'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker.js',
+        'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
+        'tailwindcss.worker': 'monaco-tailwindcss/tailwindcss.worker.js'
+    }).map(([outfile, entry]) => [outfile, require.resolve(entry)])),
     outdir,
     bundle: true,
     format: 'iife',

@@ -10,22 +10,22 @@ window.MonacoEnvironment = {
     getWorkerUrl: (moduleId, label) => {
         switch (label) {
             case 'json':
-                return new URL('language/json/json.worker.js', import.meta.url).pathname
+                return new URL('json.worker.js', import.meta.url).pathname
             case 'css':
             case 'scss':
             case 'less':
-                return new URL('language/css/css.worker.js', import.meta.url).pathname
+                return new URL('css.worker.js', import.meta.url).pathname
             case 'html':
             case 'handlebars':
             case 'razor':
-                return new URL('language/html/html.worker.js', import.meta.url).pathname
+                return new URL('html.worker.js', import.meta.url).pathname
             case 'typescript':
             case 'javascript':
-                return new URL('language/typescript/ts.worker.js', import.meta.url).pathname
+                return new URL('ts.worker.js', import.meta.url).pathname
             case 'editorWorkerService':
-                return new URL('editor/editor.worker.js', import.meta.url).pathname
+                return new URL('editor.worker.js', import.meta.url).pathname
             case 'tailwindcss':
-                return new URL('monaco-tailwindcss/tailwindcss.worker.js', import.meta.url).pathname
+                return new URL('tailwindcss.worker.js', import.meta.url).pathname
             default:
                 throw new Error(`Unknown label ${label}`);
         }
