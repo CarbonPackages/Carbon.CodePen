@@ -65,11 +65,11 @@ esbuild.build({
             name: 'carbonMagic',
             setup({ onResolve, resolve }) {
                 // neos ui consumer api:
-                Object.entries(neosUiConsumerApi).forEach(([path, alias]) => {
-                    onResolve({ filter: RegExp(`^${path}/?$`) }, ({ path, ...options }) =>
-                        resolve(alias, options)
-                    );
-                })
+                // trailing slash / will be tolerated -> as did the webpack impl.
+                const paths = Object.keys(neosUiConsumerApi)
+                onResolve({ filter: RegExp(`^(${paths.join('|')})/?$`) }, ({ path, ...options }) =>
+                    resolve(neosUiConsumerApi[path.replace(/\/$/, '')], options)
+                );
 
                 // following code is optional, and is non breaking when upstream changes (eg. we would then just include all languages again)
                 const includedLanguages = [
