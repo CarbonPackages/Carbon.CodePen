@@ -1,12 +1,13 @@
 {
   "private": true,
   "scripts": {
-    "build": "neos-react-scripts build",
-    "watch": "neos-react-scripts watch"
+    "build": "rm -rf ../../Public/Plugin && node build.js",
+    "watch": "rm -rf ../../Public/Plugin && node build.js --watch"
   },
   "main": "./src/index.js",
   "devDependencies": {
-    "@neos-project/neos-ui-extensibility": "^7.3"
+    "@neos-project/neos-ui-extensibility": "^7.3",
+    "esbuild": "^0.14.31"
   },
   "neos": {
     "buildTargetDirectory": "../../Public/Plugin"
