@@ -1,6 +1,6 @@
 
 const esbuild = require('esbuild');
-const path = require('path');
+const {join} = require('path');
 
 const neosUiConsumerApi = {
     'react': '@neos-project/neos-ui-extensibility/src/shims/vendor/react/index',
@@ -30,7 +30,7 @@ const neosUiConsumerApi = {
     '@neos-project/utils-redux': '@neos-project/neos-ui-extensibility/src/shims/neosProjectPackages/utils-redux/index'
 }
 
-const outdir = path.join(__dirname, '../../Public/Plugin')
+const outdir = join(__dirname, '../../Public/Plugin')
 
 const handleBuild = result => {
     if (result.errors.length > 0) {
@@ -61,13 +61,30 @@ esbuild.build({
     },
     plugins: [
         {
-            name: 'neosUiConsumerApi',
+            name: 'carbonMagic',
             setup({ onResolve, resolve }) {
+                // neos ui consumer api:
                 Object.entries(neosUiConsumerApi).forEach(([path, alias]) => {
                     onResolve({ filter: RegExp(`^${path}/?$`) }, ({ path, ...options }) =>
                         resolve(alias, options)
                     );
                 })
+
+                // following code is optional, and is non breaking when upstream changes (eg. we then just include all languages again)
+                const includedLanguages = [
+                    'javascript', 'css', 'html'
+                ]
+                // all languages imports will look like: './html/html.contribution.js'
+                // since golang doesnt support a negative lookahead, we resolve the wanted languages ourselves, and dump the rest.
+                onResolve({ filter: RegExp(`^\\.\\/(${includedLanguages.join('|')})\\/[a-z]+\\.contribution\\.js$`) }, ({path, resolveDir}) => ({
+                    path: join(resolveDir, path),
+                    sideEffects: false,
+                }));
+                onResolve({ filter: RegExp(`^\\.\\/[a-zA-Z0-9-]+\\/[a-zA-Z0-9-]+\\.contribution\\.js$`) }, ({ path }) => ({
+                    path,
+                    external: true,
+                    sideEffects: false,
+                }));
             },
         }
     ],
