@@ -2,13 +2,20 @@ import React, {PureComponent} from 'react';
 import {neos} from '@neos-project/neos-ui-decorators';
 import PropTypes from 'prop-types';
 import {Button, Icon, Label} from '@neos-project/react-ui-components/';
+import {$transform} from "plow-js";
+import {connect} from 'react-redux';
+import {selectors} from '@neos-project/neos-ui-redux-store';
 
 @neos(globalRegistry => ({
     secondaryEditorsRegistry: globalRegistry.get('inspector').get('secondaryEditors')
 }))
+@connect($transform({
+    node: selectors.CR.Nodes.focusedSelector
+}))
 export default class CodeEditor extends PureComponent {
 
     static propTypes = {
+        node: PropTypes.object.isRequired,
         identifier: PropTypes.string.isRequired,
         renderSecondaryInspector: PropTypes.func.isRequired,
         commit: PropTypes.func.isRequired,
@@ -24,6 +31,7 @@ export default class CodeEditor extends PureComponent {
 
         renderSecondaryInspector('CARBON_CODEEDITOR_EDIT', () =>
             <CodeEditorWrap
+                id={this.props.node.contextPath + this.props.identifier}
                 value={this.props.value}
                 onChange={value => this.props.commit(value)}
                 onSave={ this.props.onEnterKey}

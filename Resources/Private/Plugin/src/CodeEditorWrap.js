@@ -34,6 +34,8 @@ window.MonacoEnvironment = {
 
 let initialized = false;
 
+let activeModelsByContextPathAndProperty = {};
+
 @neos(globalRegistry => {
     const config = globalRegistry.get('frontendConfiguration').get('Carbon.CodeEditor')
     return {
@@ -49,6 +51,7 @@ export default class CodeEditorWrap extends PureComponent {
         language: PropTypes.string,
         monacoEditorInclude: PropTypes.string.isRequired,
         clientTailwindConfig: PropTypes.string,
+        id: PropTypes.string.isRequired,
     };
 
     editor;
@@ -126,13 +129,25 @@ export default class CodeEditorWrap extends PureComponent {
             });
         }
 
+        let model;
+        if (model = activeModelsByContextPathAndProperty[this.props.id]) {
+            if (this.props.value !== model.getValue()) {
+                model.pushEditOperations([], [{
+                    range: model.getFullModelRange(),
+                    text: this.props.value,
+                }]);
+            }
+        } else {
+            model = monaco.editor.createModel(this.props.value, this.props.language);
+            activeModelsByContextPathAndProperty[this.props.id] = model;
+        }
+
         const editor = this.editor = monaco.editor.create(this.monacoContainer, {
-            value: this.props.value,
-            language: this.props.language,
             roundedSelection: false,
             scrollBeyondLastLine: false,
             readOnly: false,
-            theme: 'vs-dark'
+            theme: 'vs-dark',
+            model: model,
         });
 
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd, () => {
@@ -180,10 +195,10 @@ export default class CodeEditorWrap extends PureComponent {
 
     componentWillUnmount() {
         this.editor.dispose()
-        const model = this.editor.getModel()
-        if (model) {
-            model.dispose()
-        }
+        // const model = this.editor.getModel()
+        // if (model) {
+        //     model.dispose()
+        // }
         this.disposables.map(dispose => dispose())
     }
 
