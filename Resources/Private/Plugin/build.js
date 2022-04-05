@@ -91,6 +91,12 @@ esbuild.build({
 
 esbuild.build({
     entryPoints: Object.fromEntries(Object.entries({
+        // type="module" is not supported by the NeosUi plugin includes:
+        // Neos.Neos.Ui.resources.javascript.'Carbon.CodeEditor:Plugin'.type: 'module'
+        // so we roll ourselves
+        // 'esm-plugin.loader': './src/esm-plugin.loader.js',
+        'esm-plugin.loader': './src/esm-plugin.loader.js',
+
         'json.worker': 'monaco-editor/esm/vs/language/json/json.worker.js',
         'css.worker': 'monaco-editor/esm/vs/language/css/css.worker.js',
         'html.worker': 'monaco-editor/esm/vs/language/html/html.worker.js',
