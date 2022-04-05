@@ -4,8 +4,9 @@ Neos:
       resources:
         javascript:
           'Carbon.CodeEditor:Plugin':
-            resource: 'resource://Carbon.CodeEditor/Public/Plugin/esm-plugin.loader.js'
-            position: 'before Neos.Neos.UI:Vendor'
+            resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.js'
+            # TODO add `type` option in Neos ui
+            type: 'module'
         stylesheets:
           'Carbon.CodeEditor:Plugin':
             resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.css'
