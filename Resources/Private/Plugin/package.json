@@ -5,7 +5,7 @@
     "watch": "rm -rf ../../Public/Plugin && node build.js --watch"
   },
   "devDependencies": {
-    "@neos-project/neos-ui-extensibility": "^7.3",
+    "@mhsdesign/esbuild-neos-ui-extensibility": "^0.1.2-beta.1",
     "esbuild": "^0.14.31"
   },
   "dependencies": {
