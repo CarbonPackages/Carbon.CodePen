@@ -25,7 +25,7 @@ export default class CodeEditor extends PureComponent {
         options: PropTypes.object,
     };
 
-    handleOpenCodeEditor = () => {
+    handleToggleCodeEditor = () => {
         const {secondaryEditorsRegistry, renderSecondaryInspector} = this.props;
         const {component: CodeEditorWrap} = secondaryEditorsRegistry.get('Carbon.CodeEditor/CodeEditorWrap');
 
@@ -35,6 +35,7 @@ export default class CodeEditor extends PureComponent {
                 value={this.props.value}
                 onChange={value => this.props.commit(value)}
                 onSave={ this.props.onEnterKey}
+                onToggleEditor={this.handleToggleCodeEditor}
                 language={this.props.options.language}
             />
         );
@@ -44,7 +45,7 @@ export default class CodeEditor extends PureComponent {
         return (
             <div>
                 <Label>
-                    <Button onClick={this.handleOpenCodeEditor}>
+                    <Button  onClick={this.handleToggleCodeEditor}>
                         <Icon icon="pencil" padded="right" title="Edit"/>
                         edit code
                     </Button>

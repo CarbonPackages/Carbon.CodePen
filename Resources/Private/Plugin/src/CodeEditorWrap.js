@@ -6,6 +6,7 @@ let activeModelsByContextPathAndProperty = {};
 export default class CodeEditorWrap extends PureComponent {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
+        onToggleEditor: PropTypes.func.isRequired,
         onSave: PropTypes.func.isRequired,
         value: PropTypes.string,
         language: PropTypes.string,
@@ -61,6 +62,10 @@ export default class CodeEditorWrap extends PureComponent {
 
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
             this.props.onSave()
+        });
+
+        editor.addCommand(monaco.KeyCode.Escape, () => {
+            this.props.onToggleEditor()
         });
 
         editor.addAction({
