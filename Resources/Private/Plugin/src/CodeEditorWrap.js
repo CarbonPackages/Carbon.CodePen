@@ -13,8 +13,6 @@ export default class CodeEditorWrap extends PureComponent {
         id: PropTypes.string.isRequired,
     };
 
-    editor;
-
     monacoContainer;
 
     disposables = [];
@@ -40,12 +38,13 @@ export default class CodeEditorWrap extends PureComponent {
             activeModelsByContextPathAndProperty[this.props.id] = model;
         }
 
-        const editor = this.editor = monaco.editor.create(this.monacoContainer, {
+        const editor = monaco.editor.create(this.monacoContainer, {
             roundedSelection: false,
             scrollBeyondLastLine: false,
             readOnly: false,
             theme: 'vs-dark',
             model: model,
+            automaticLayout: true
         });
 
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd, () => {
@@ -81,27 +80,17 @@ export default class CodeEditorWrap extends PureComponent {
             }
         });
 
-        const resizeEditor = () => editor.layout()
-
-        this.monacoContainer.addEventListener('fullscreenchange', resizeEditor);
-        window.addEventListener('resize', resizeEditor)
-
-        this.disposables.push(() => this.monacoContainer.removeEventListener('fullscreenchange', resizeEditor))
-        this.disposables.push(() => window.removeEventListener('resize', resizeEditor))
-
-        const onDidChangeModelContentDisposable = editor.onDidChangeModelContent(() => {
-            this.props.onChange(editor.getValue())
-        })
-        this.disposables.push(() => onDidChangeModelContentDisposable.dispose())
+        this.disposables = [
+            ...this.disposables,
+            editor,
+            editor.onDidChangeModelContent(() => {
+                this.props.onChange(editor.getValue())
+            })
+        ]
     }
 
     componentWillUnmount() {
-        this.editor.dispose()
-        // const model = this.editor.getModel()
-        // if (model) {
-        //     model.dispose()
-        // }
-        this.disposables.map(dispose => dispose())
+        this.disposables.forEach(dispose => dispose.dispose())
     }
 
     render() {
