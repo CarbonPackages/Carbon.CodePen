@@ -1,7 +1,7 @@
 import { getPackageFrontendConfiguration } from './manifest'
 import * as monaco from 'monaco-editor';
 import { configureMonacoTailwindcss } from 'monaco-tailwindcss';
-import { emmetHTML as monacoEmmetHTML } from 'emmet-monaco-es'
+import { emmetHTML, emmetCSS } from 'emmet-monaco-es'
 
 // Required Js to initiate the workers created above.
 window.MonacoEnvironment = {
@@ -14,8 +14,6 @@ window.MonacoEnvironment = {
             case 'less':
                 return new URL('css.worker.js', import.meta.url).pathname
             case 'html':
-            case 'handlebars':
-            case 'razor':
                 return new URL('html.worker.js', import.meta.url).pathname
             case 'typescript':
             case 'javascript':
@@ -30,27 +28,44 @@ window.MonacoEnvironment = {
     }
 };
 
+const initializeTailwind = (packageConfig, languageSelector) => {
+    const clientTailwindConfig = packageConfig.clientTailwindConfig;
+    if (typeof clientTailwindConfig !== "string" && clientTailwindConfig.length === 0) {
+        return
+    }
+    // enable tailwind support.
+    let config;
+    try {
+        config = JSON.parse(clientTailwindConfig)
+        if (typeof config !== "object" || config === null) {
+            throw Error("Config is not a JS object.");
+        }
+    } catch (e) {
+        console.error(`Carbon.CodeEditor: 'clientTailwindConfig' is not valid JSON object. ${e.message}`)
+        console.warn(clientTailwindConfig)
+        return
+    }
+    const monacoTailwindcssOptions = {
+        languageSelector,
+        config
+    }
+    configureMonacoTailwindcss(monacoTailwindcssOptions)
+}
+
 let initialized = false;
 
 export const initializeMonaco = () => {
     if (initialized) {
         return monaco;
     }
+    initialized = true;
 
     const packageConfig = getPackageFrontendConfiguration();
 
-    let monacoTailwindcssOptions = {
-        languageSelector: ['html', 'javascript'],
-        config: {}
-    }
+    initializeTailwind(packageConfig, ['html'])
 
-    if (packageConfig.clientTailwindConfig) {
-        monacoTailwindcssOptions.config = JSON.parse(packageConfig.clientTailwindConfig)
-    }
-    configureMonacoTailwindcss(monacoTailwindcssOptions)
+    emmetHTML(monaco, ['html'])
+    emmetCSS(monaco, ['css', 'scss', 'less'])
 
-    monacoEmmetHTML(monaco, ['html', 'php'])
-
-    initialized = true;
     return monaco;
 }
