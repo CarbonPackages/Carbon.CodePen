@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { getEditorConfigForLanguage } from "./editorConfig";
 
 let activeModelsByContextPathAndProperty = {};
 
@@ -39,12 +40,10 @@ export default class CodeEditorWrap extends PureComponent {
         }
 
         const editor = monaco.editor.create(this.monacoContainer, {
-            roundedSelection: false,
-            scrollBeyondLastLine: false,
-            readOnly: false,
             theme: 'vs-dark',
             model: model,
-            automaticLayout: true
+            automaticLayout: true,
+            ...getEditorConfigForLanguage(this.props.language)
         });
 
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd, () => {
