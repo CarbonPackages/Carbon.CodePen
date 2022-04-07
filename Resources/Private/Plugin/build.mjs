@@ -7,7 +7,9 @@ const require = createRequire(import.meta.url);
 
 const outdir = '../../Public/Plugin'
 
-const outdir = join(__dirname, '../../Public/Plugin')
+const includedLanguages = [
+    'yaml', 'json', 'html', 'css', 'scss', 'less', 'ini', 'js', 'typescript', 'xml', 'markdown'
+]
 
 const handleBuild = result => {
     if (result.errors.length > 0) {
@@ -42,9 +44,6 @@ esbuild.build({
             name: 'carbonMagic',
             setup({ onResolve }) {
                 // following code is optional, and is non breaking when upstream changes (eg. we would then just include all languages again)
-                const includedLanguages = [
-                    'javascript', 'css', 'html'
-                ]
                 const basicLanguages = languages.map(({label}) => label)
                 const basicLanguagesToExclude = basicLanguages.filter(language => includedLanguages.includes(language) === false)
 
