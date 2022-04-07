@@ -1,9 +1,11 @@
+import {createRequire} from 'module'
+import esbuild from 'esbuild'
+import { languages } from 'monaco-editor/esm/metadata.js'
+import { neosUiExtensibility } from '@mhsdesign/esbuild-neos-ui-extensibility'
 
-const esbuild = require('esbuild');
-const {join} = require('path');
-const {languages} = require('monaco-editor/esm/metadata.js');
+const require = createRequire(import.meta.url);
 
-const {neosUiExtensibility} = require('@mhsdesign/esbuild-neos-ui-extensibility')
+const outdir = '../../Public/Plugin'
 
 const outdir = join(__dirname, '../../Public/Plugin')
 

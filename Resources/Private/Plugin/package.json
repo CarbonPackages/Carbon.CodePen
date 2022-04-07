@@ -1,8 +1,9 @@
 {
   "private": true,
+  "name": "carbon-code-editor",
   "scripts": {
-    "build": "rm -rf ../../Public/Plugin && node build.js",
-    "watch": "rm -rf ../../Public/Plugin && node build.js --watch"
+    "build": "rm -rf ../../Public/Plugin && node build.mjs",
+    "watch": "rm -rf ../../Public/Plugin && node build.mjs --watch"
   },
   "devDependencies": {
     "@mhsdesign/esbuild-neos-ui-extensibility": "^0.1.2-beta.1",
