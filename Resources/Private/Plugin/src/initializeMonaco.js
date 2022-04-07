@@ -51,52 +51,6 @@ export const initializeMonaco = () => {
 
     monacoEmmetHTML(monaco, ['html', 'php'])
 
-    const afxSnippets = {
-        'Neos.Fusion:Loop': '<Neos.Fusion:Loop items={${1:items}}>\n\t$0\n</Neos.Fusion:Loop>',
-        'Neos.Fusion:Value': '<Neos.Fusion:Value value={${1:value}}/>',
-        'Neos.Fusion:Join': '<Neos.Fusion:Join>\n\t$0\n</Neos.Fusion:Join>',
-        'Neos.Fusion:Tag': '<Neos.Fusion:Tag tagName="${1:h1}" attributes.class="${2:fancy}">\n\t$0\n</Neos.Fusion:Tag>',
-    }
-
-    monaco.languages.registerCompletionItemProvider('html', {
-        provideCompletionItems: (model, position) => {
-            const word = model.getWordUntilPosition(position);
-
-            const prevChar = model.getValueInRange({
-                startLineNumber: position.lineNumber,
-                endLineNumber: position.lineNumber,
-                startColumn: word.startColumn - 1,
-                endColumn: word.startColumn
-            });
-
-            const prepareSnippet = snippet => {
-                if (prevChar === '<' && snippet[0] === '<') {
-                    // if the char before the word was a `<`
-                    // we will not need it anymore from the snippet
-                    return snippet.slice(1)
-                }
-                return snippet;
-            }
-
-            const range = {
-                startLineNumber: position.lineNumber,
-                endLineNumber: position.lineNumber,
-                startColumn: word.startColumn,
-                endColumn: word.endColumn
-            };
-
-            return {
-                suggestions: Object.entries(afxSnippets).map(([label, snippet]) => ({
-                    label,
-                    range,
-                    insertText: prepareSnippet(snippet),
-                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                    kind: monaco.languages.CompletionItemKind.Snippet,
-                }))
-            };
-        }
-    });
-
     initialized = true;
     return monaco;
 }
