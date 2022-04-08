@@ -46,8 +46,9 @@ const initializeTailwind = (packageConfig: PackageFrontendConfiguration, languag
         if (typeof config !== "object" || config === null) {
             throw Error("Config is not a JS object.");
         }
-    } catch (e) {
-        console.error(`Carbon.CodeEditor: 'clientTailwindConfig' is not valid JSON object. ${e.message}`)
+    } catch (_e) {
+        const e = _e as Error;
+        console.error(`Carbon.CodeEditor: 'clientTailwindConfig' is not valid JSON object.${e.message}`)
         console.warn(clientTailwindConfig)
         return
     }
