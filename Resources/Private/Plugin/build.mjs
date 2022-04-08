@@ -29,12 +29,10 @@ esbuild.build({
     splitting: true,
     format: 'esm',
     entryPoints: {
-        'Plugin': 'src/index.js'
+        'Plugin': 'src/index.ts'
     },
     outdir,
     loader: {
-        // we use tsx to get the decorators from typescript + jsx support
-        '.js': 'tsx',
         // monaco icon font
         '.ttf': 'file'
     },
