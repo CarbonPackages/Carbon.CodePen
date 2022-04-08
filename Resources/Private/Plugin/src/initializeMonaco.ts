@@ -1,11 +1,18 @@
-import { getPackageFrontendConfiguration } from './manifest'
-import * as monaco from 'monaco-editor';
+import { getPackageFrontendConfiguration, PackageFrontendConfiguration } from './manifest'
+import monaco, { Environment } from 'monaco-editor';
 import { configureMonacoTailwindcss } from 'monaco-tailwindcss';
 import { emmetHTML, emmetCSS } from 'emmet-monaco-es'
 
+declare global {
+    interface Window {
+        MonacoEnvironment: Environment;
+    }
+}
+
+
 // Required Js to initiate the workers created above.
 window.MonacoEnvironment = {
-    getWorkerUrl: (moduleId, label) => {
+    getWorkerUrl(moduleId, label) {
         switch (label) {
             case 'json':
                 return new URL('json.worker.js', import.meta.url).pathname
@@ -28,9 +35,9 @@ window.MonacoEnvironment = {
     }
 };
 
-const initializeTailwind = (packageConfig, languageSelector) => {
+const initializeTailwind = (packageConfig: PackageFrontendConfiguration, languageSelector: string[]) => {
     const clientTailwindConfig = packageConfig.clientTailwindConfig;
-    if (typeof clientTailwindConfig !== "string" && clientTailwindConfig.length === 0) {
+    if (typeof clientTailwindConfig !== "string" || clientTailwindConfig.length === 0) {
         return
     }
     // enable tailwind support.
@@ -54,7 +61,7 @@ const initializeTailwind = (packageConfig, languageSelector) => {
 
 let initialized = false;
 
-export const initializeMonaco = () => {
+export const initializeMonaco = (): typeof monaco => {
     if (initialized) {
         return monaco;
     }
