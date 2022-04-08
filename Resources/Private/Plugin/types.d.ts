@@ -220,14 +220,14 @@ declare module "@neos-project/neos-ui-decorators" {
 declare module "@neos-project/neos-ui-extensibility" {
     import {
         GlobalRegistry,
-        FrontendConfiguration,
+        FrontendConfigurationRaw,
     } from "@neos-project/neos-ts-interfaces";
     // import { Store } from 'redux';
 
     type BootstrapOptions = {
         // store: Store,
         store;
-        frontendConfiguration: FrontendConfiguration;
+        frontendConfiguration: FrontendConfigurationRaw;
         configuration;
         routes;
     };
@@ -538,8 +538,16 @@ declare module "@neos-project/neos-ts-interfaces" {
             : SynchronousRegistry;
     }
 
-    export interface FrontendConfiguration
-        extends Record<string | number, any> {}
+    type VendorPackageName = string;
+    type NeosUiOption = string;
+    // basically what we can get from php arrays
+    type Configuration = number | string | null | boolean | Record<number | string, Configuration>;
+
+    type FrontendConfigurationRaw = Record<VendorPackageName | NeosUiOption, Configuration>
+
+    export interface FrontendConfigurationRegistry extends SynchronousRegistry<Configuration> {
+        get: (firstLevelKey: VendorPackageName | NeosUiOption) => Configuration | null;
+    }
 
     export interface GlobalRegistry
         extends SynchronousMetaRegistry<SynchronousRegistry> {
@@ -551,6 +559,8 @@ declare module "@neos-project/neos-ts-interfaces" {
             ? ValidatorRegistry
             : K extends "inspector"
             ? InspectorRegistry
+            : K extends "frontendConfiguration"
+            ? FrontendConfigurationRegistry
             : SynchronousRegistry;
     }
 }
