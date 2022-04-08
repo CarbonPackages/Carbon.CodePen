@@ -443,43 +443,35 @@ declare module '@friendsofreactjs/react-css-themr' {
     ): <C>(themedComponent: C) => C;
 }
 
-/**
- * Css modules are used in '@neos-project/react-ui-components'
- */
-declare module '*.css' {
-    const content: Record<string, string>;
-    export default content;
-}
-
 declare module '@neos-project/react-ui-components' {
-    import enhanceWithClickOutside from '@neos-project/react-ui-components/src/enhanceWithClickOutside';
-    import Badge from '@neos-project/react-ui-components/src/Badge';
-    import Bar from '@neos-project/react-ui-components/src/Bar';
-    import Button from '@neos-project/react-ui-components/src/Button';
-    import ButtonGroup from '@neos-project/react-ui-components/src/ButtonGroup';
-    import CheckBox from '@neos-project/react-ui-components/src/CheckBox';
-    import DateInput from '@neos-project/react-ui-components/src/DateInput';
-    import Dialog from '@neos-project/react-ui-components/src/Dialog';
-    import DropDown from '@neos-project/react-ui-components/src/DropDown';
-    import Frame from '@neos-project/react-ui-components/src/Frame';
-    import Headline from '@neos-project/react-ui-components/src/Headline';
-    import Icon from '@neos-project/react-ui-components/src/Icon';
-    import IconButton from '@neos-project/react-ui-components/src/IconButton';
-    import IconButtonDropDown from '@neos-project/react-ui-components/src/IconButtonDropDown';
-    import Label from '@neos-project/react-ui-components/src/Label';
-    import Logo from '@neos-project/react-ui-components/src/Logo';
-    import SelectBox from '@neos-project/react-ui-components/src/SelectBox';
-    import SideBar from '@neos-project/react-ui-components/src/SideBar';
-    import Tabs from '@neos-project/react-ui-components/src/Tabs';
-    import TextArea from '@neos-project/react-ui-components/src/TextArea';
-    import TextInput from '@neos-project/react-ui-components/src/TextInput';
-    import ToggablePanel from '@neos-project/react-ui-components/src/ToggablePanel';
-    import Tooltip from '@neos-project/react-ui-components/src/Tooltip';
-    import Tree from '@neos-project/react-ui-components/src/Tree';
-    import MultiSelectBox from '@neos-project/react-ui-components/src/MultiSelectBox';
-    import MultiSelectBox_ListPreviewSortable from '@neos-project/react-ui-components/src/MultiSelectBox_ListPreviewSortable';
-    import SelectBox_Option_SingleLine from '@neos-project/react-ui-components/src/SelectBox_Option_SingleLine';
-    import SelectBox_Option_MultiLineWithThumbnail from '@neos-project/react-ui-components/src/SelectBox_Option_MultiLineWithThumbnail';
+    import enhanceWithClickOutside from '@neos-project/react-ui-components/lib-esm/enhanceWithClickOutside';
+    import Badge from '@neos-project/react-ui-components/lib-esm/Badge';
+    import Bar from '@neos-project/react-ui-components/lib-esm/Bar';
+    import Button from '@neos-project/react-ui-components/lib-esm/Button';
+    import ButtonGroup from '@neos-project/react-ui-components/lib-esm/ButtonGroup';
+    import CheckBox from '@neos-project/react-ui-components/lib-esm/CheckBox';
+    import DateInput from '@neos-project/react-ui-components/lib-esm/DateInput';
+    import Dialog from '@neos-project/react-ui-components/lib-esm/Dialog';
+    import DropDown from '@neos-project/react-ui-components/lib-esm/DropDown';
+    import Frame from '@neos-project/react-ui-components/lib-esm/Frame';
+    import Headline from '@neos-project/react-ui-components/lib-esm/Headline';
+    import Icon from '@neos-project/react-ui-components/lib-esm/Icon';
+    import IconButton from '@neos-project/react-ui-components/lib-esm/IconButton';
+    import IconButtonDropDown from '@neos-project/react-ui-components/lib-esm/IconButtonDropDown';
+    import Label from '@neos-project/react-ui-components/lib-esm/Label';
+    import Logo from '@neos-project/react-ui-components/lib-esm/Logo';
+    import SelectBox from '@neos-project/react-ui-components/lib-esm/SelectBox';
+    import SideBar from '@neos-project/react-ui-components/lib-esm/SideBar';
+    import Tabs from '@neos-project/react-ui-components/lib-esm/Tabs';
+    import TextArea from '@neos-project/react-ui-components/lib-esm/TextArea';
+    import TextInput from '@neos-project/react-ui-components/lib-esm/TextInput';
+    import ToggablePanel from '@neos-project/react-ui-components/lib-esm/ToggablePanel';
+    import Tooltip from '@neos-project/react-ui-components/lib-esm/Tooltip';
+    import Tree from '@neos-project/react-ui-components/lib-esm/Tree';
+    import MultiSelectBox from '@neos-project/react-ui-components/lib-esm/MultiSelectBox';
+    import MultiSelectBox_ListPreviewSortable from '@neos-project/react-ui-components/lib-esm/MultiSelectBox_ListPreviewSortable';
+    import SelectBox_Option_SingleLine from '@neos-project/react-ui-components/lib-esm/SelectBox_Option_SingleLine';
+    import SelectBox_Option_MultiLineWithThumbnail from '@neos-project/react-ui-components/lib-esm/SelectBox_Option_MultiLineWithThumbnail';
 
     module "react" {
         // the removed SFC is used, which nearly equals the FC
