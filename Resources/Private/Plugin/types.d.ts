@@ -443,6 +443,14 @@ declare module '@friendsofreactjs/react-css-themr' {
     ): <C>(themedComponent: C) => C;
 }
 
+/**
+ * Css modules are used in '@neos-project/react-ui-components'
+ */
+declare module '*.css' {
+    const content: Record<string, string>;
+    export default content;
+}
+
 declare module '@neos-project/react-ui-components' {
     import enhanceWithClickOutside from '@neos-project/react-ui-components/src/enhanceWithClickOutside';
     import Badge from '@neos-project/react-ui-components/src/Badge';
