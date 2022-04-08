@@ -1,17 +1,3 @@
-declare module "@neos-project/neos-ui" {
-    import {
-        SynchronousMetaRegistry,
-        SynchronousMetaRegistry,
-        SynchronousRegistry,
-    } from "@mhsdesign/esbuild-neos-ui-extensibility/@neos-project/neos-ui-extensibility/src/registry";
-
-    export interface GlobalRegistry
-        extends SynchronousRegistry<SynchronousRegistry> {}
-
-    export interface FrontendConfiguration
-        extends Record<string | number, any> {}
-}
-
 declare module "@neos-project/neos-ui-editors" {
     export type EditorProps<Options = {}> = {
         id?: string;
@@ -235,7 +221,7 @@ declare module "@neos-project/neos-ui-extensibility" {
     import {
         GlobalRegistry,
         FrontendConfiguration,
-    } from "@neos-project/neos-ui";
+    } from "@neos-project/neos-ts-interfaces";
     // import { Store } from 'redux';
 
     type BootstrapOptions = {
@@ -256,6 +242,11 @@ declare module "@neos-project/neos-ui-extensibility" {
         options: {},
         bootstrap: Bootstrap
     ): void;
+
+    export {
+        SynchronousMetaRegistry,
+        SynchronousRegistry,
+    } from "@mhsdesign/esbuild-neos-ui-extensibility/@neos-project/neos-ui-extensibility/src/registry";
 }
 
 declare module "@neos-project/neos-ts-interfaces" {
@@ -491,8 +482,13 @@ declare module "@neos-project/neos-ts-interfaces" {
             };
         }> {}
 
+    import {
+        SynchronousMetaRegistry,
+        SynchronousRegistry,
+    } from "@neos-project/neos-ui-extensibility";
+
     // TODO: move to nodetypesregistry itself
-    export interface NodeTypesRegistry {
+    export interface NodeTypesRegistry extends SynchronousRegistry<NodeType> {
         get: (nodeType: NodeTypeName) => NodeType | null;
         getRole: (roleName: string) => NodeTypeName | null;
         getSubTypesOf: (nodeType: NodeTypeName) => NodeTypeName[];
@@ -510,27 +506,52 @@ declare module "@neos-project/neos-ts-interfaces" {
         values: {},
         elementConfigurations: any
     ) => null | {} | string;
-    export interface ValidatorRegistry {
-        get: (validatorName: string) => Validator | null;
-        set: (validatorName: string, validator: Validator) => void;
-    }
-    export interface I18nRegistry {
+
+    export interface ValidatorRegistry extends SynchronousRegistry<Validator> {}
+
+    export interface I18nRegistry extends SynchronousRegistry<string> {
         translate: (
             id?: string,
             fallback?: string,
-            params?: {},
-            packageKey?: string,
-            sourceName?: string
+            params? = {},
+            packageKey? = "Neos.Neos",
+            sourceName? = "Main",
+            quantity? = 0
         ) => string;
     }
-    export interface GlobalRegistry {
+
+    interface RegisteredEditor {
+        component: React.ElementType;
+        hasOwnLabel?: boolean;
+    }
+
+    interface EditorRegistry extends SynchronousRegistry<RegisteredEditor> {}
+
+    interface InspectorRegistry
+        extends SynchronousMetaRegistry<SynchronousRegistry> {
+        get: <K extends string>(
+            key: K
+        ) => K extends "editors"
+            ? EditorRegistry
+            : K extends "secondaryEditors"
+            ? EditorRegistry
+            : SynchronousRegistry;
+    }
+
+    export interface FrontendConfiguration
+        extends Record<string | number, any> {}
+
+    export interface GlobalRegistry
+        extends SynchronousMetaRegistry<SynchronousRegistry> {
         get: <K extends string>(
             key: K
         ) => K extends "i18n"
             ? I18nRegistry
             : K extends "validators"
             ? ValidatorRegistry
-            : null;
+            : K extends "inspector"
+            ? InspectorRegistry
+            : SynchronousRegistry;
     }
 }
 

@@ -5,7 +5,6 @@ import { connect, DefaultRootState } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ui-editors";
 import { GlobalRegistry, Node } from "@neos-project/neos-ts-interfaces";
-import { SynchronousRegistry } from "@mhsdesign/esbuild-neos-ui-extensibility/@neos-project/neos-ui-extensibility/src/registry";
 
 type NeosProps = NeosInjectedProps<typeof mapRegistryToProps>;
 
@@ -25,7 +24,7 @@ class CodeEditor extends React.Component<Props> {
             this.props;
         const { component: CodeEditorWrap } = secondaryEditorsRegistry.get(
             "Carbon.CodeEditor/CodeEditorWrap"
-        );
+        )!;
 
         renderSecondaryInspector("CARBON_CODEEDITOR_EDIT", () => (
             <CodeEditorWrap
@@ -56,7 +55,7 @@ class CodeEditor extends React.Component<Props> {
 const mapRegistryToProps = (globalRegistry: GlobalRegistry) => ({
     secondaryEditorsRegistry: globalRegistry
         .get("inspector")
-        .get("secondaryEditors") as SynchronousRegistry<"">,
+        .get("secondaryEditors"),
 });
 
 const mapStateToProps = (state: DefaultRootState): StateProps => ({
