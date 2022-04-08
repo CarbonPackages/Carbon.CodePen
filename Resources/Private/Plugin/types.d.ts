@@ -529,13 +529,13 @@ declare module "@neos-project/neos-ts-interfaces" {
 
     interface InspectorRegistry
         extends SynchronousMetaRegistry<SynchronousRegistry> {
-        get: <K extends string>(
+        get: <K extends "editors" | "secondaryEditors">(
             key: K
         ) => K extends "editors"
             ? EditorRegistry
             : K extends "secondaryEditors"
             ? EditorRegistry
-            : SynchronousRegistry;
+            : never;
     }
 
     type VendorPackageName = string;
@@ -551,7 +551,7 @@ declare module "@neos-project/neos-ts-interfaces" {
 
     export interface GlobalRegistry
         extends SynchronousMetaRegistry<SynchronousRegistry> {
-        get: <K extends string>(
+        get: <K extends "i18n" | "validators" | "inspector" | "frontendConfiguration">(
             key: K
         ) => K extends "i18n"
             ? I18nRegistry
@@ -561,7 +561,7 @@ declare module "@neos-project/neos-ts-interfaces" {
             ? InspectorRegistry
             : K extends "frontendConfiguration"
             ? FrontendConfigurationRegistry
-            : SynchronousRegistry;
+            : never;
     }
 }
 
