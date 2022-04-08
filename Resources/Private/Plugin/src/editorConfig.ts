@@ -1,3 +1,5 @@
+import { editor } from "monaco-editor";
+
 const languagesStylesheets = [
     'css', 'scss', 'less'
 ]
@@ -6,9 +8,10 @@ const languagesWithTwoIndents = [
     'yaml', 'markdown', ...languagesStylesheets
 ]
 
-export const getEditorConfigForLanguage = (language) => {
-    // https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.IStandaloneEditorConstructionOptions.html
-    let options = {
+type EditorOptions = editor.IStandaloneEditorConstructionOptions;
+
+export const getEditorConfigForLanguage = (language: string): EditorOptions => {
+    let options: EditorOptions = {
         roundedSelection: true,
         scrollBeyondLastLine: false,
         insertSpaces: true,

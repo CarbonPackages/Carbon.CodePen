@@ -3,7 +3,11 @@ import manifest from '@neos-project/neos-ui-extensibility';
 import CodeEditor from './CodeEditor'
 import CodeEditorWrap from './CodeEditorWrap'
 
-let config;
+export interface PackageFrontendConfiguration {
+    clientTailwindConfig: string | undefined;
+}
+
+let config: PackageFrontendConfiguration;
 
 manifest('Carbon.CodeEditor', {}, (globalRegistry, { frontendConfiguration }) => {
     const editorsRegistry = globalRegistry.get('inspector').get('editors');
