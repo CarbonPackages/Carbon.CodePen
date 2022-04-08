@@ -1,14 +1,13 @@
 import { getPackageFrontendConfiguration, PackageFrontendConfiguration } from './manifest'
-import monaco, { Environment } from 'monaco-editor';
+import * as monaco from 'monaco-editor';
 import { configureMonacoTailwindcss } from 'monaco-tailwindcss';
 import { emmetHTML, emmetCSS } from 'emmet-monaco-es'
 
 declare global {
     interface Window {
-        MonacoEnvironment: Environment;
+        MonacoEnvironment: monaco.Environment;
     }
 }
-
 
 // Required Js to initiate the workers created above.
 window.MonacoEnvironment = {
