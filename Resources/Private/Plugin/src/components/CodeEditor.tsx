@@ -4,6 +4,7 @@ import { Button, Icon, Label } from "@neos-project/react-ui-components";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ui-editors";
+type CodeEditorWrapType = typeof import("./CodeEditorWrap").default;
 
 const neosifier = neos((globalRegistry) => ({
     secondaryEditorsRegistry: globalRegistry
@@ -29,7 +30,7 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
             this.props;
         const { component: CodeEditorWrap } = secondaryEditorsRegistry.get(
             "Carbon.CodeEditor/CodeEditorWrap"
-        )!;
+        ) as { component: CodeEditorWrapType };
 
         renderSecondaryInspector("CARBON_CODEEDITOR_EDIT", () => (
             <CodeEditorWrap

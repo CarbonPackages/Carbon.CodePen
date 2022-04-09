@@ -9,7 +9,7 @@ declare module "@neos-project/neos-ui-editors" {
         hooks?: object;
         renderSecondaryInspector(
             secondaryInspectorName: string,
-            secondaryInspectorComponentFactory: () => React.ReactElement
+            secondaryInspectorComponentFactory: () => JSX.Element
         ): void;
         editor: string;
         editorRegistry: object;
@@ -345,6 +345,8 @@ declare module "@neos-project/neos-ts-interfaces" {
         SynchronousRegistry,
     } from "@neos-project/neos-ui-extensibility";
 
+    import React from "react";
+
     // TODO: move to nodetypesregistry itself
     export interface NodeTypesRegistry extends SynchronousRegistry<NodeType> {
         get: (nodeType: NodeTypeName) => NodeType | null;
@@ -379,7 +381,7 @@ declare module "@neos-project/neos-ts-interfaces" {
     }
 
     interface RegisteredEditor {
-        component: React.ElementType;
+        component: React.ComponentType<any>;
         hasOwnLabel?: boolean;
     }
 
