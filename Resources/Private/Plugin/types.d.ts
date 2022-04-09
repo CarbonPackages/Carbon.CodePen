@@ -42,7 +42,7 @@ declare module "@neos-project/neos-ui-redux-store" {
 declare module "@neos-project/neos-ui-decorators" {
     import {
         InferableComponentEnhancerWithProps,
-        ConnectedProps
+        ConnectedProps,
     } from "react-redux";
     import { GlobalRegistry } from "@neos-project/neos-ts-interfaces";
 
@@ -60,13 +60,17 @@ declare module "@neos-project/neos-ui-decorators" {
 
     export const NeosContext: React.Context<NeosContextInterface | null>;
 
-    type MapRegistryToPropsParam<TStateProps> =
-        (globalRegistry: GlobalRegistry) => TStateProps;
+    type MapRegistryToPropsParam<TStateProps> = (
+        globalRegistry: GlobalRegistry
+    ) => TStateProps;
 
     interface Neos {
         <TStateProps = {}, TOwnProps = {}>(
             mapRegistryToProps: MapRegistryToPropsParam<TStateProps>
-        ): InferableComponentEnhancerWithProps<TStateProps & { neos: NeosContextInterface }, TOwnProps>;
+        ): InferableComponentEnhancerWithProps<
+            TStateProps & { neos: NeosContextInterface },
+            TOwnProps
+        >;
     }
 
     export const neos: Neos;
@@ -74,14 +78,14 @@ declare module "@neos-project/neos-ui-decorators" {
 
 declare module "@neos-project/neos-ui-extensibility" {
     // @ts-ignore we dont require the @types/redux as they are deprecated
-    import { Store } from 'redux';
+    import { Store } from "redux";
     import {
         GlobalRegistry,
         FrontendConfigurationRaw,
     } from "@neos-project/neos-ts-interfaces";
 
     type BootstrapOptions = {
-        store: Store,
+        store: Store;
         frontendConfiguration: FrontendConfigurationRaw;
         configuration;
         routes;
@@ -381,8 +385,7 @@ declare module "@neos-project/neos-ts-interfaces" {
 
     interface EditorRegistry extends SynchronousRegistry<RegisteredEditor> {}
 
-    interface InspectorRegistry
-        extends SynchronousMetaRegistry<any> {
+    interface InspectorRegistry extends SynchronousMetaRegistry<any> {
         get: <K extends "editors" | "secondaryEditors">(
             key: K
         ) => K extends "editors"
@@ -396,15 +399,26 @@ declare module "@neos-project/neos-ts-interfaces" {
     type NeosUiOption = string;
     type Configuration = unknown;
 
-    type FrontendConfigurationRaw = Record<VendorPackageName | NeosUiOption, Configuration>
+    type FrontendConfigurationRaw = Record<
+        VendorPackageName | NeosUiOption,
+        Configuration
+    >;
 
-    export interface FrontendConfigurationRegistry extends SynchronousRegistry<Configuration> {
-        get: (firstLevelKey: VendorPackageName | NeosUiOption) => Configuration | null;
+    export interface FrontendConfigurationRegistry
+        extends SynchronousRegistry<Configuration> {
+        get: (
+            firstLevelKey: VendorPackageName | NeosUiOption
+        ) => Configuration | null;
     }
 
-    export interface GlobalRegistry
-        extends SynchronousMetaRegistry<any> {
-        get: <K extends "i18n" | "validators" | "inspector" | "frontendConfiguration">(
+    export interface GlobalRegistry extends SynchronousMetaRegistry<any> {
+        get: <
+            K extends
+                | "i18n"
+                | "validators"
+                | "inspector"
+                | "frontendConfiguration"
+        >(
             key: K
         ) => K extends "i18n"
             ? I18nRegistry

@@ -1,12 +1,8 @@
 import { editor } from "monaco-editor";
 
-const languagesStylesheets = [
-    'css', 'scss', 'less'
-]
+const languagesStylesheets = ["css", "scss", "less"];
 
-const languagesWithTwoIndents = [
-    'yaml', 'markdown', ...languagesStylesheets
-]
+const languagesWithTwoIndents = ["yaml", "markdown", ...languagesStylesheets];
 
 type EditorOptions = editor.IStandaloneEditorConstructionOptions;
 
@@ -16,7 +12,7 @@ export const getEditorConfigForLanguage = (language: string): EditorOptions => {
         scrollBeyondLastLine: false,
         insertSpaces: true,
         detectIndentation: true,
-        copyWithSyntaxHighlighting: false
+        copyWithSyntaxHighlighting: false,
     };
 
     if (languagesWithTwoIndents.includes(language)) {
@@ -24,15 +20,15 @@ export const getEditorConfigForLanguage = (language: string): EditorOptions => {
     }
 
     if (languagesStylesheets.includes(language)) {
-        options.wordWrap = "wordWrapColumn"
-        options.wordWrapColumn = 300
+        options.wordWrap = "wordWrapColumn";
+        options.wordWrapColumn = 300;
     }
 
-    if (language === 'markdown') {
+    if (language === "markdown") {
         options.trimAutoWhitespace = false;
-        options.wordWrap = "wordWrapColumn"
-        options.wordWrapColumn = 200
+        options.wordWrap = "wordWrapColumn";
+        options.wordWrapColumn = 200;
     }
 
     return options;
-}
+};
