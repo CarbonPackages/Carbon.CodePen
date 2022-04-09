@@ -1,5 +1,5 @@
 import React from "react";
-import { getEditorConfigForLanguage } from "./editorConfig";
+import { getEditorConfigForLanguage } from "../editorConfig";
 import { IDisposable, editor } from "monaco-editor";
 
 type IdentfierFromNodeAndProperty = string;
@@ -26,7 +26,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
             return;
         }
 
-        const { initializeMonaco } = await import("./initializeMonaco");
+        const { initializeMonaco } = await import("../initializeMonaco");
         const monaco = initializeMonaco();
 
         let model;

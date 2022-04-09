@@ -1,7 +1,7 @@
 import manifest from '@neos-project/neos-ui-extensibility';
 
-import CodeEditor from './CodeEditor'
-import CodeEditorWrap from './CodeEditorWrap'
+import CodeEditor from './components/CodeEditor'
+import CodeEditorWrap from './components/CodeEditorWrap'
 
 export interface PackageFrontendConfiguration {
     clientTailwindConfig: string | undefined;
