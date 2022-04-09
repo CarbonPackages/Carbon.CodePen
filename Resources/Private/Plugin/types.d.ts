@@ -432,42 +432,33 @@ declare module "@neos-project/neos-ts-interfaces" {
     }
 }
 
-declare module "@friendsofreactjs/react-css-themr" {
-    // just return the component
-    export function themr(
-        componentName: string | number | Symbol,
-        localTheme?: TReactCSSThemrTheme,
-        options?: {}
-    ): <C>(themedComponent: C) => C;
-}
-
 declare module "@neos-project/react-ui-components" {
     import enhanceWithClickOutside from "@neos-project/react-ui-components/lib-esm/enhanceWithClickOutside";
-    import Badge from "@neos-project/react-ui-components/lib-esm/Badge";
-    import Bar from "@neos-project/react-ui-components/lib-esm/Bar";
-    import Button from "@neos-project/react-ui-components/lib-esm/Button";
-    import ButtonGroup from "@neos-project/react-ui-components/lib-esm/ButtonGroup";
-    import CheckBox from "@neos-project/react-ui-components/lib-esm/CheckBox";
-    import DateInput from "@neos-project/react-ui-components/lib-esm/DateInput";
-    import Dialog from "@neos-project/react-ui-components/lib-esm/Dialog";
-    import DropDown from "@neos-project/react-ui-components/lib-esm/DropDown";
-    import Frame from "@neos-project/react-ui-components/lib-esm/Frame";
-    import Headline from "@neos-project/react-ui-components/lib-esm/Headline";
-    import Icon from "@neos-project/react-ui-components/lib-esm/Icon";
-    import IconButton from "@neos-project/react-ui-components/lib-esm/IconButton";
-    import IconButtonDropDown from "@neos-project/react-ui-components/lib-esm/IconButtonDropDown";
-    import Label from "@neos-project/react-ui-components/lib-esm/Label";
+    import Badge from "@neos-project/react-ui-components/lib-esm/Badge/badge";
+    import Bar from "@neos-project/react-ui-components/lib-esm/Bar/bar";
+    import Button from "@neos-project/react-ui-components/lib-esm/Button/button";
+    import ButtonGroup from "@neos-project/react-ui-components/lib-esm/ButtonGroup/buttonGroup";
+    import CheckBox from "@neos-project/react-ui-components/lib-esm/CheckBox/checkBox";
+    import DateInput from "@neos-project/react-ui-components/lib-esm/DateInput/dateInput";
+    import Dialog from "@neos-project/react-ui-components/lib-esm/Dialog/dialog";
+    import DropDown from "@neos-project/react-ui-components/lib-esm/DropDown/wrapper";
+    import Frame from "@neos-project/react-ui-components/lib-esm/Frame/frame";
+    import Headline from "@neos-project/react-ui-components/lib-esm/Headline/headline";
+    import Icon from "@neos-project/react-ui-components/lib-esm/Icon/icon";
+    import IconButton from "@neos-project/react-ui-components/lib-esm/IconButton/iconButton";
+    import IconButtonDropDown from "@neos-project/react-ui-components/lib-esm/IconButtonDropDown/iconButtonDropDown";
+    import Label from "@neos-project/react-ui-components/lib-esm/Label/label";
     // @ts-expect-error not correctly exported
     import Logo from "@neos-project/react-ui-components/lib-esm/Logo";
     // @ts-expect-error not correctly exported
     import SelectBox from "@neos-project/react-ui-components/lib-esm/SelectBox";
-    import SideBar from "@neos-project/react-ui-components/lib-esm/SideBar";
-    import Tabs from "@neos-project/react-ui-components/lib-esm/Tabs";
-    import TextArea from "@neos-project/react-ui-components/lib-esm/TextArea";
-    import TextInput from "@neos-project/react-ui-components/lib-esm/TextInput";
+    import SideBar from "@neos-project/react-ui-components/lib-esm/SideBar/sideBar";
+    import Tabs from "@neos-project/react-ui-components/lib-esm/Tabs/tabs";
+    import TextArea from "@neos-project/react-ui-components/lib-esm/TextArea/textArea";
+    import TextInput from "@neos-project/react-ui-components/lib-esm/TextInput/textInput";
     // @ts-expect-error not correctly exported
     import ToggablePanel from "@neos-project/react-ui-components/lib-esm/ToggablePanel";
-    import Tooltip from "@neos-project/react-ui-components/lib-esm/Tooltip";
+    import Tooltip from "@neos-project/react-ui-components/lib-esm/Tooltip/tooltip";
     // @ts-expect-error not correctly exported
     import Tree from "@neos-project/react-ui-components/lib-esm/Tree";
     // @ts-expect-error not correctly exported
