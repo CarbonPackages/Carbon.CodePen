@@ -3,7 +3,7 @@ import { neos, NeosifiedProps } from "@neos-project/neos-ui-decorators";
 import { Button, Icon, Label } from "@neos-project/react-ui-components";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
-import { EditorProps } from "@neos-project/neos-ui-editors";
+import { EditorProps } from "@neos-project/neos-ts-interfaces";
 type CodeEditorWrapType = typeof import("./CodeEditorWrap").default;
 
 const neosifier = neos((globalRegistry) => ({

@@ -1,27 +1,3 @@
-declare module "@neos-project/neos-ui-editors" {
-    export type EditorProps<Options = {}> = {
-        id?: string;
-        renderHelpIcon(): JSX.Element | "";
-        identifier: string;
-        label: string;
-        options: Options;
-        value?: any;
-        hooks?: object;
-        renderSecondaryInspector(
-            secondaryInspectorName: string,
-            secondaryInspectorComponentFactory: () => JSX.Element
-        ): void;
-        editor: string;
-        editorRegistry: object;
-        i18nRegistry: object;
-        onEnterKey(): void;
-        helpMessage?: string;
-        helpThumbnail?: string;
-        highlight?: boolean;
-        commit(value: any, hooks?): void;
-    };
-}
-
 declare module "@neos-project/neos-ui-redux-store" {
     import { Node } from "@neos-project/neos-ts-interfaces";
     import { DefaultRootState } from "react-redux";
@@ -379,6 +355,28 @@ declare module "@neos-project/neos-ts-interfaces" {
             quantity?: 0
         ) => string;
     }
+
+    export type EditorProps<Options = {}> = {
+        id?: string;
+        renderHelpIcon(): JSX.Element | "";
+        identifier: string;
+        label: string;
+        options: Options;
+        value?: any;
+        hooks?: object;
+        renderSecondaryInspector(
+            secondaryInspectorName: string,
+            secondaryInspectorComponentFactory: () => JSX.Element
+        ): void;
+        editor: string;
+        editorRegistry: object;
+        i18nRegistry: object;
+        onEnterKey(): void;
+        helpMessage?: string;
+        helpThumbnail?: string;
+        highlight?: boolean;
+        commit(value: any, hooks?): void;
+    };
 
     interface RegisteredEditor {
         component: React.ComponentType<any>;
