@@ -1,10 +1,10 @@
 import React from "react";
 import { neos, NeosInjectedProps } from "@neos-project/neos-ui-decorators";
 import { Button, Icon, Label } from "@neos-project/react-ui-components";
-import { connect, ConnectedProps, DefaultRootState } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ui-editors";
-import { GlobalRegistry, Node } from "@neos-project/neos-ts-interfaces";
+import { GlobalRegistry } from "@neos-project/neos-ts-interfaces";
 
 type NeosProps = NeosInjectedProps<typeof mapRegistryToProps>;
 
@@ -14,7 +14,7 @@ type OwnProps = EditorProps<{
     language: string;
 }>;
 
-class CodeEditor extends React.Component<OwnProps & NeosProps & StateProps> {
+class CodeEditor extends React.Component<OwnProps & StateProps & NeosProps> {
     public handleToggleCodeEditor = (): void => {
         const { secondaryEditorsRegistry, renderSecondaryInspector } =
             this.props;
@@ -54,16 +54,10 @@ const mapRegistryToProps = (globalRegistry: GlobalRegistry) => ({
         .get("secondaryEditors"),
 });
 
-const mapStateToProps = (state: DefaultRootState) => ({
+const injector = neos<OwnProps & StateProps, NeosProps>(mapRegistryToProps);
+
+const connector = connect((state) => ({
     node: selectors.CR.Nodes.focusedSelector(state),
-});
+}));
 
-const WrappedNeos = neos<OwnProps & StateProps, NeosProps>(mapRegistryToProps)(
-    CodeEditor
-);
-
-const connector = connect(mapStateToProps);
-
-const WrappedState = connector(WrappedNeos);
-
-export default WrappedState;
+export default injector(connector(CodeEditor));
