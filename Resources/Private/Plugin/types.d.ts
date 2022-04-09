@@ -49,7 +49,7 @@ declare module "@neos-project/neos-ui-redux-store" {
 declare module "@neos-project/neos-ui-decorators" {
     import {
         InferableComponentEnhancerWithProps,
-        InferableComponentEnhancer
+        ConnectedProps
     } from "react-redux";
     import { GlobalRegistry } from "@neos-project/neos-ts-interfaces";
 
@@ -61,16 +61,9 @@ declare module "@neos-project/neos-ui-decorators" {
 
     /**
      * Infers the type of props that a neosifier will inject into a component.
+     * we reuse this behavior from {@see ConnectedProps}
      */
-    export type NeosifiedProps<TNeosifier> =
-    TNeosifier extends InferableComponentEnhancerWithProps<infer TInjectedProps, any>
-        ? unknown extends TInjectedProps
-            ? TNeosifier extends InferableComponentEnhancer<infer TInjectedProps>
-                ? TInjectedProps
-                : never
-            : TInjectedProps
-        : never;
-
+    export type NeosifiedProps<TNeosifier> = ConnectedProps<TNeosifier>;
 
     export declare const NeosContext: React.Context<NeosContextInterface | null>;
 
