@@ -22,13 +22,6 @@ declare module "@neos-project/neos-ui-editors" {
     };
 }
 
-// declare module 'plow-js' {
-//     interface Transform {
-//         <T extends object>(T): ((state) => T);
-//     }
-//     export const $transform: Transform;
-// }
-
 declare module "@neos-project/neos-ui-redux-store" {
     import { Node } from "@neos-project/neos-ts-interfaces";
     import { DefaultRootState } from "react-redux";
@@ -80,15 +73,14 @@ declare module "@neos-project/neos-ui-decorators" {
 }
 
 declare module "@neos-project/neos-ui-extensibility" {
+    import { Store } from 'react-redux';
     import {
         GlobalRegistry,
         FrontendConfigurationRaw,
     } from "@neos-project/neos-ts-interfaces";
-    // import { Store } from 'redux';
 
     type BootstrapOptions = {
-        // store: Store,
-        store;
+        store: Store,
         frontendConfiguration: FrontendConfigurationRaw;
         configuration;
         routes;
