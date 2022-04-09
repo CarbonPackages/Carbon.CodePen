@@ -14,7 +14,7 @@ declare global {
 
 // Required Js to initiate the workers created above.
 window.MonacoEnvironment = {
-    getWorkerUrl(moduleId, label) {
+    getWorkerUrl(_workerId, label) {
         switch (label) {
             case "json":
                 return new URL("json.worker.js", import.meta.url).pathname;
