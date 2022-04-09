@@ -1,12 +1,11 @@
 import React from "react";
-import { neos, NeosInjectedProps } from "@neos-project/neos-ui-decorators";
+import { neos, NeosifiedProps } from "@neos-project/neos-ui-decorators";
 import { Button, Icon, Label } from "@neos-project/react-ui-components";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ui-editors";
-import { GlobalRegistry } from "@neos-project/neos-ts-interfaces";
 
-type NeosProps = NeosInjectedProps<typeof mapRegistryToProps>;
+type NeosProps = NeosifiedProps<typeof neosifier>;
 
 type StateProps = ConnectedProps<typeof connector>;
 
@@ -48,16 +47,14 @@ class CodeEditor extends React.Component<OwnProps & StateProps & NeosProps> {
     }
 }
 
-const mapRegistryToProps = (globalRegistry: GlobalRegistry) => ({
+const neosifier = neos((globalRegistry) => ({
     secondaryEditorsRegistry: globalRegistry
         .get("inspector")
         .get("secondaryEditors"),
-});
-
-const injector = neos<OwnProps & StateProps, NeosProps>(mapRegistryToProps);
+}));
 
 const connector = connect((state) => ({
     node: selectors.CR.Nodes.focusedSelector(state),
 }));
 
-export default injector(connector(CodeEditor));
+export default neosifier(connector(CodeEditor));

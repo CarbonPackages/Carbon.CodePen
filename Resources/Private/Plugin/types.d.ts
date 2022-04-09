@@ -47,174 +47,43 @@ declare module "@neos-project/neos-ui-redux-store" {
 }
 
 declare module "@neos-project/neos-ui-decorators" {
-    import { GlobalRegistry } from "@neos-project/neos-ts-interfaces";
-
-    // export const foo: <OwnProps extends {}, InjectedProps extends {}>(exraPropst: InjectedProps) => (WrappedComponent: React.ComponentType<OwnProps & InjectedProps>)
     import {
-        MapDispatchToPropsParam,
-        MapStateToPropsParam,
-        MergeProps,
-        Options,
+        InferableComponentEnhancerWithProps,
+        InferableComponentEnhancer
     } from "react-redux";
+    import { GlobalRegistry } from "@neos-project/neos-ts-interfaces";
 
     export interface NeosContextInterface {
         globalRegistry: GlobalRegistry;
         configuration: {};
         routes: {};
     }
-    export declare type NeosInjectedProps<R extends (...args: any[]) => any> =
-        ReturnType<R> & {
-            neos: NeosContextInterface;
-        };
+
+    /**
+     * Infers the type of props that a neosifier will inject into a component.
+     */
+    export type NeosifiedProps<TNeosifier> =
+    TNeosifier extends InferableComponentEnhancerWithProps<infer TInjectedProps, any>
+        ? unknown extends TInjectedProps
+            ? TNeosifier extends InferableComponentEnhancer<infer TInjectedProps>
+                ? TInjectedProps
+                : never
+            : TInjectedProps
+        : never;
+
+
     export declare const NeosContext: React.Context<NeosContextInterface | null>;
 
-    // export const neos: <TOwnProps = {}, TInjectedProps = {}>(
-    //     mapRegistriesToProps: (globalRegistry: GlobalRegistry) => any,
-    //     mapStateToProps?: MapStateToPropsParam<TStateProps, TOwnProps, StoreState>,
-    // ) => <TComponent extends React.ComponentType<TOwnProps & TInjectedProps>>(component: TComponent) => TComponent;
+    type MapRegistryToPropsParam<TStateProps> =
+        (globalRegistry: GlobalRegistry) => TStateProps;
 
-    export const neos: <OwnProps extends {}, InjectedProps extends {}>(
-        mapRegistriesToProps: (globalRegistry: GlobalRegistry) => any
-    ) => (WrappedComponent: React.ComponentType<OwnProps & InjectedProps>) => {
-        new (props: OwnProps | Readonly<OwnProps>): {
-            render(): JSX.Element;
-            context: unknown;
-            setState<K extends never>(
-                state:
-                    | {}
-                    | ((
-                          prevState: Readonly<{}>,
-                          props: Readonly<OwnProps>
-                      ) => {} | Pick<{}, K> | null)
-                    | Pick<{}, K>
-                    | null,
-                callback?: (() => void) | undefined
-            ): void;
-            forceUpdate(callback?: (() => void) | undefined): void;
-            readonly props: Readonly<OwnProps>;
-            state: Readonly<{}>;
-            refs: {
-                [key: string]: React.ReactInstance;
-            };
-            componentDidMount?(): void;
-            shouldComponentUpdate?(
-                nextProps: Readonly<OwnProps>,
-                nextState: Readonly<{}>,
-                nextContext: any
-            ): boolean;
-            componentWillUnmount?(): void;
-            componentDidCatch?(error: Error, errorInfo: React.ErrorInfo): void;
-            getSnapshotBeforeUpdate?(
-                prevProps: Readonly<OwnProps>,
-                prevState: Readonly<{}>
-            ): any;
-            componentDidUpdate?(
-                prevProps: Readonly<OwnProps>,
-                prevState: Readonly<{}>,
-                snapshot?: any
-            ): void;
-            componentWillMount?(): void;
-            UNSAFE_componentWillMount?(): void;
-            componentWillReceiveProps?(
-                nextProps: Readonly<OwnProps>,
-                nextContext: any
-            ): void;
-            UNSAFE_componentWillReceiveProps?(
-                nextProps: Readonly<OwnProps>,
-                nextContext: any
-            ): void;
-            componentWillUpdate?(
-                nextProps: Readonly<OwnProps>,
-                nextState: Readonly<{}>,
-                nextContext: any
-            ): void;
-            UNSAFE_componentWillUpdate?(
-                nextProps: Readonly<OwnProps>,
-                nextState: Readonly<{}>,
-                nextContext: any
-            ): void;
-        };
-        new (props: OwnProps, context: any): {
-            render(): JSX.Element;
-            context: unknown;
-            setState<K extends never>(
-                state:
-                    | {}
-                    | ((
-                          prevState: Readonly<{}>,
-                          props: Readonly<OwnProps>
-                      ) => {} | Pick<{}, K> | null)
-                    | Pick<{}, K>
-                    | null,
-                callback?: (() => void) | undefined
-            ): void;
-            forceUpdate(callback?: (() => void) | undefined): void;
-            readonly props: Readonly<OwnProps>;
-            state: Readonly<{}>;
-            refs: {
-                [key: string]: React.ReactInstance;
-            };
-            componentDidMount?(): void;
-            shouldComponentUpdate?(
-                nextProps: Readonly<OwnProps>,
-                nextState: Readonly<{}>,
-                nextContext: any
-            ): boolean;
-            componentWillUnmount?(): void;
-            componentDidCatch?(error: Error, errorInfo: React.ErrorInfo): void;
-            getSnapshotBeforeUpdate?(
-                prevProps: Readonly<OwnProps>,
-                prevState: Readonly<{}>
-            ): any;
-            componentDidUpdate?(
-                prevProps: Readonly<OwnProps>,
-                prevState: Readonly<{}>,
-                snapshot?: any
-            ): void;
-            componentWillMount?(): void;
-            UNSAFE_componentWillMount?(): void;
-            componentWillReceiveProps?(
-                nextProps: Readonly<OwnProps>,
-                nextContext: any
-            ): void;
-            UNSAFE_componentWillReceiveProps?(
-                nextProps: Readonly<OwnProps>,
-                nextContext: any
-            ): void;
-            componentWillUpdate?(
-                nextProps: Readonly<OwnProps>,
-                nextState: Readonly<{}>,
-                nextContext: any
-            ): void;
-            UNSAFE_componentWillUpdate?(
-                nextProps: Readonly<OwnProps>,
-                nextState: Readonly<{}>,
-                nextContext: any
-            ): void;
-        };
-        readonly Original: React.ComponentType<OwnProps & InjectedProps>;
-        readonly contextType: React.Context<NeosContextInterface | null>;
-        readonly displayName: string;
-    };
+    interface Neos {
+        <TStateProps = {}, TOwnProps = {}>(
+            mapRegistryToProps: MapRegistryToPropsParam<TStateProps>
+        ): InferableComponentEnhancerWithProps<TStateProps & { neos: NeosContextInterface }, TOwnProps>;
+    }
 
-    // import React from 'react';
-    // import { GlobalRegistry } from '@neos-project/neos-ts-interfaces';
-
-    // export interface NeosContextInterface {
-    //     globalRegistry: GlobalRegistry;
-    //     configuration: {};
-    //     routes: {};
-    // }
-
-    // export type NeosInjectedProps<R extends (...args: any[]) => any> = ReturnType<R> & {neos: NeosContextInterface};
-
-    // export const NeosContext = React.createContext<NeosContextInterface | null>(null);
-
-    // //
-    // // A higher order component to easily spread global
-    // // configuration
-    // export const neos = <OwnProps extends {}, InjectedProps extends {}> (mapRegistriesToProps: (globalRegistry: GlobalRegistry) => any) => (WrappedComponent: React.ComponentType<OwnProps & InjectedProps>) => {
-    // }
+    export const neos: Neos;
 }
 
 declare module "@neos-project/neos-ui-extensibility" {
