@@ -5,15 +5,25 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ui-editors";
 
+const neosifier = neos((globalRegistry) => ({
+    secondaryEditorsRegistry: globalRegistry
+        .get("inspector")
+        .get("secondaryEditors"),
+}));
+
+const connector = connect((state) => ({
+    node: selectors.CR.Nodes.focusedSelector(state),
+}));
+
 type NeosProps = NeosifiedProps<typeof neosifier>;
 
 type StateProps = ConnectedProps<typeof connector>;
 
-type OwnProps = EditorProps<{
+type Props = EditorProps<{
     language: string;
 }>;
 
-class CodeEditor extends React.Component<OwnProps & StateProps & NeosProps> {
+class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
     public handleToggleCodeEditor = (): void => {
         const { secondaryEditorsRegistry, renderSecondaryInspector } =
             this.props;
@@ -46,15 +56,5 @@ class CodeEditor extends React.Component<OwnProps & StateProps & NeosProps> {
         );
     }
 }
-
-const neosifier = neos((globalRegistry) => ({
-    secondaryEditorsRegistry: globalRegistry
-        .get("inspector")
-        .get("secondaryEditors"),
-}));
-
-const connector = connect((state) => ({
-    node: selectors.CR.Nodes.focusedSelector(state),
-}));
 
 export default neosifier(connector(CodeEditor));
