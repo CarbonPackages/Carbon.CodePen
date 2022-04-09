@@ -13,7 +13,7 @@ manifest('Carbon.CodeEditor', {}, (globalRegistry, { frontendConfiguration }) =>
     const editorsRegistry = globalRegistry.get('inspector').get('editors');
     const secondaryEditorsRegistry = globalRegistry.get('inspector').get('secondaryEditors');
 
-    config = frontendConfiguration['Carbon.CodeEditor']
+    config = frontendConfiguration['Carbon.CodeEditor'] as PackageFrontendConfiguration
 
     editorsRegistry.set('Carbon.CodeEditor/CodeEditor', {
         component: CodeEditor,
@@ -24,5 +24,6 @@ manifest('Carbon.CodeEditor', {}, (globalRegistry, { frontendConfiguration }) =>
         component: CodeEditorWrap
     });
 });
+
 
 export const getPackageFrontendConfiguration = () => config;
