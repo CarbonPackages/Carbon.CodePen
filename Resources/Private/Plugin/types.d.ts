@@ -58,7 +58,7 @@ declare module "@neos-project/neos-ui-decorators" {
      */
     export type NeosifiedProps<TNeosifier> = ConnectedProps<TNeosifier>;
 
-    export declare const NeosContext: React.Context<NeosContextInterface | null>;
+    export const NeosContext: React.Context<NeosContextInterface | null>;
 
     type MapRegistryToPropsParam<TStateProps> =
         (globalRegistry: GlobalRegistry) => TStateProps;
@@ -73,7 +73,8 @@ declare module "@neos-project/neos-ui-decorators" {
 }
 
 declare module "@neos-project/neos-ui-extensibility" {
-    import { Store } from 'react-redux';
+    // @ts-ignore we dont require the @types/redux as they are deprecated
+    import { Store } from 'redux';
     import {
         GlobalRegistry,
         FrontendConfigurationRaw,
@@ -185,8 +186,7 @@ declare module "@neos-project/neos-ts-interfaces" {
     }
 
     // Type guard using duck-typing on some random properties to know if object is a Node
-    export const isNode = (node: any): node is Node =>
-        Boolean(typeof node === "object" && node.contextPath);
+    export function isNode(node: any): node is Node;
 
     export interface NodeMap {
         [propName: string]: Node | undefined;
@@ -367,10 +367,10 @@ declare module "@neos-project/neos-ts-interfaces" {
         translate: (
             id?: string,
             fallback?: string,
-            params? = {},
-            packageKey? = "Neos.Neos",
-            sourceName? = "Main",
-            quantity? = 0
+            params?: {},
+            packageKey?: string,
+            sourceName?: string,
+            quantity?: 0
         ) => string;
     }
 
@@ -382,7 +382,7 @@ declare module "@neos-project/neos-ts-interfaces" {
     interface EditorRegistry extends SynchronousRegistry<RegisteredEditor> {}
 
     interface InspectorRegistry
-        extends SynchronousMetaRegistry<SynchronousRegistry> {
+        extends SynchronousMetaRegistry<any> {
         get: <K extends "editors" | "secondaryEditors">(
             key: K
         ) => K extends "editors"
@@ -394,8 +394,7 @@ declare module "@neos-project/neos-ts-interfaces" {
 
     type VendorPackageName = string;
     type NeosUiOption = string;
-    // basically what we can get from php arrays
-    type Configuration = number | string | null | boolean | Record<number | string, Configuration>;
+    type Configuration = unknown;
 
     type FrontendConfigurationRaw = Record<VendorPackageName | NeosUiOption, Configuration>
 
@@ -404,7 +403,7 @@ declare module "@neos-project/neos-ts-interfaces" {
     }
 
     export interface GlobalRegistry
-        extends SynchronousMetaRegistry<SynchronousRegistry> {
+        extends SynchronousMetaRegistry<any> {
         get: <K extends "i18n" | "validators" | "inspector" | "frontendConfiguration">(
             key: K
         ) => K extends "i18n"
@@ -444,18 +443,26 @@ declare module "@neos-project/react-ui-components" {
     import IconButton from "@neos-project/react-ui-components/lib-esm/IconButton";
     import IconButtonDropDown from "@neos-project/react-ui-components/lib-esm/IconButtonDropDown";
     import Label from "@neos-project/react-ui-components/lib-esm/Label";
+    // @ts-expect-error not correctly exported
     import Logo from "@neos-project/react-ui-components/lib-esm/Logo";
+    // @ts-expect-error not correctly exported
     import SelectBox from "@neos-project/react-ui-components/lib-esm/SelectBox";
     import SideBar from "@neos-project/react-ui-components/lib-esm/SideBar";
     import Tabs from "@neos-project/react-ui-components/lib-esm/Tabs";
     import TextArea from "@neos-project/react-ui-components/lib-esm/TextArea";
     import TextInput from "@neos-project/react-ui-components/lib-esm/TextInput";
+    // @ts-expect-error not correctly exported
     import ToggablePanel from "@neos-project/react-ui-components/lib-esm/ToggablePanel";
     import Tooltip from "@neos-project/react-ui-components/lib-esm/Tooltip";
+    // @ts-expect-error not correctly exported
     import Tree from "@neos-project/react-ui-components/lib-esm/Tree";
+    // @ts-expect-error not correctly exported
     import MultiSelectBox from "@neos-project/react-ui-components/lib-esm/MultiSelectBox";
+    // @ts-expect-error not correctly exported
     import MultiSelectBox_ListPreviewSortable from "@neos-project/react-ui-components/lib-esm/MultiSelectBox_ListPreviewSortable";
+    // @ts-expect-error not correctly exported
     import SelectBox_Option_SingleLine from "@neos-project/react-ui-components/lib-esm/SelectBox_Option_SingleLine";
+    // @ts-expect-error not correctly exported
     import SelectBox_Option_MultiLineWithThumbnail from "@neos-project/react-ui-components/lib-esm/SelectBox_Option_MultiLineWithThumbnail";
 
     module "react" {
@@ -464,37 +471,6 @@ declare module "@neos-project/react-ui-components" {
     }
 
     export {
-        enhanceWithClickOutside,
-        Badge,
-        Bar,
-        Button,
-        ButtonGroup,
-        CheckBox,
-        DateInput,
-        Dialog,
-        DropDown,
-        Frame,
-        Headline,
-        Icon,
-        IconButton,
-        IconButtonDropDown,
-        Label,
-        Logo,
-        SelectBox,
-        SideBar,
-        Tabs,
-        TextArea,
-        TextInput,
-        ToggablePanel,
-        Tooltip,
-        Tree,
-        MultiSelectBox,
-        MultiSelectBox_ListPreviewSortable,
-        SelectBox_Option_SingleLine,
-        SelectBox_Option_MultiLineWithThumbnail,
-    };
-
-    export default {
         enhanceWithClickOutside,
         Badge,
         Bar,
