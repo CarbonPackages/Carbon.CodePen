@@ -251,8 +251,10 @@ monaco-marker-data-provider@^1.0.0:
   resolved "https://registry.yarnpkg.com/monaco-marker-data-provider/-/monaco-marker-data-provider-1.0.0.tgz#153e4bdee918374dd754034a18495d207ce31cf0"
   integrity sha512-HW6DIWi0hVjJa2v5dI4P/oexz7SjLBaNGfMb/VAAk2Js9jMPrh3mCCWh1Hsm7t0ftW2RN9WDr9vyQLJING91Bw==
 
-"monaco-tailwindcss@file:../../../../../monaco-tailwindcss":
-  version "0.0.0"
+monaco-tailwindcss@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/monaco-tailwindcss/-/monaco-tailwindcss-0.1.0.tgz#bd074467b236cc2ecd50e76f0ec7c9cdd9139a22"
+  integrity sha512-cmNVqyE74q6mie6iuHf8XsJcNaoNHPOLboVMKZkc83abS4uxU2N6PVgWH3aILpnwB5a+clWHxFN7pKV6MDCKvw==
   dependencies:
     "@ctrl/tinycolor" "^3.0.0"
     monaco-marker-data-provider "^1.0.0"
