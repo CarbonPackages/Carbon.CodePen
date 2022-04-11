@@ -2,6 +2,7 @@ import { createRequire } from "module";
 import esbuild from "esbuild";
 import { languages } from "monaco-editor/esm/metadata.js";
 import { neosUiExtensibility } from "@mhsdesign/esbuild-neos-ui-extensibility";
+import { fileURLToPath } from "url";
 
 const require = createRequire(import.meta.url);
 
@@ -51,12 +52,25 @@ esbuild
             neosUiExtensibility(),
             {
                 name: "carbonMagic",
-                setup({ onResolve }) {
+                setup({ onResolve, resolve }) {
                     // following code is optional, and is non breaking when upstream changes (eg. we would then just include all languages again)
                     const basicLanguages = languages.map(({ label }) => label);
                     const basicLanguagesToExclude = basicLanguages.filter(
                         (language) =>
                             includedLanguages.includes(language) === false
+                    );
+
+                    // make sure that monaco is not include twice.
+                    onResolve(
+                        { filter: /^monaco-editor(\/.*)?$/, namespace: "file" },
+                        ({ path, ...options }) =>
+                            resolve(path, {
+                                ...options,
+                                resolveDir: fileURLToPath(
+                                    new URL(".", import.meta.url)
+                                ),
+                                namespace: "noRecurse",
+                            })
                     );
 
                     // all languages imports will look like: './html/html.contribution.js' -> and those who are not in `includedLanguages` will be ignored
