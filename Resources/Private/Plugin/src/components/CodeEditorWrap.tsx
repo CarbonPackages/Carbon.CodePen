@@ -8,6 +8,7 @@ type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
 let activeModelsByContextPathAndProperty: ActiveModels = {};
 
 interface Props {
+    monaco: typeof import("monaco-editor");
     id: string;
     onChange(value: string): void;
     onToggleEditor(): void;
@@ -26,8 +27,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
             return;
         }
 
-        const { initializeMonaco } = await import("../initializeMonaco");
-        const monaco = initializeMonaco();
+        const { monaco } = this.props;
 
         let model;
         if ((model = activeModelsByContextPathAndProperty[this.props.id])) {

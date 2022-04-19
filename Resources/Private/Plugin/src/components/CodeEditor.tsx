@@ -26,7 +26,7 @@ type Props = EditorProps<{
 }>;
 
 class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
-    public handleToggleCodeEditor = () => {
+    public handleToggleCodeEditor = async () => {
         const {
             secondaryEditorsRegistry,
             renderSecondaryInspector,
@@ -37,12 +37,15 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
             options: { language },
         } = this.props;
 
-        const CodeEditorWrap = secondaryEditorsRegistry.get(
-            "Carbon.CodeEditor/CodeEditorWrap"
-        )!.component as typeof import("./CodeEditorWrap").default;
+        const CodeEditorWrap = secondaryEditorsRegistry.get("Carbon.CodeEditor/CodeEditorWrap")!
+            .component as typeof import("./CodeEditorWrap").default;
+
+        const { initializeMonaco } = await import("../initializeMonaco");
+        const monaco = initializeMonaco();
 
         renderSecondaryInspector("CARBON_CODEEDITOR_EDIT", () => (
             <CodeEditorWrap
+                monaco={monaco}
                 id={node!.contextPath + identifier}
                 value={value}
                 onChange={this.handleChange}
