@@ -1,9 +1,10 @@
 import React from "react";
 import { neos, NeosifiedProps } from "@neos-project/neos-ui-decorators";
-import { Button, Icon, Label } from "@neos-project/react-ui-components";
+import { Button, Icon } from "@neos-project/react-ui-components";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ts-interfaces";
+import I18n from "@neos-project/neos-ui-i18n";
 type CodeEditorWrapType = typeof import("./CodeEditorWrap").default;
 
 const neosifier = neos((globalRegistry) => ({
@@ -47,12 +48,10 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
     render() {
         return (
             <div>
-                <Label>
-                    <Button onClick={this.handleToggleCodeEditor}>
-                        <Icon icon="pencil" padded="right" title="Edit" />
-                        edit code
-                    </Button>
-                </Label>
+                <Button onClick={this.handleToggleCodeEditor}>
+                    <Icon icon="pencil" padded="right" title="Edit" />
+                    <I18n id={this.props.label} />
+                </Button>
             </div>
         );
     }
