@@ -5,7 +5,6 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ts-interfaces";
 import I18n from "@neos-project/neos-ui-i18n";
-type CodeEditorWrapType = typeof import("./CodeEditorWrap").default;
 
 const neosifier = neos((globalRegistry) => ({
     secondaryEditorsRegistry: globalRegistry
@@ -27,23 +26,35 @@ type Props = EditorProps<{
 }>;
 
 class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
-    public handleToggleCodeEditor = (): void => {
-        const { secondaryEditorsRegistry, renderSecondaryInspector } =
-            this.props;
-        const { component: CodeEditorWrap } = secondaryEditorsRegistry.get(
+    public handleToggleCodeEditor = () => {
+        const {
+            secondaryEditorsRegistry,
+            renderSecondaryInspector,
+            onEnterKey,
+            node,
+            identifier,
+            value,
+            options: { language },
+        } = this.props;
+
+        const CodeEditorWrap = secondaryEditorsRegistry.get(
             "Carbon.CodeEditor/CodeEditorWrap"
-        ) as { component: CodeEditorWrapType };
+        )!.component as typeof import("./CodeEditorWrap").default;
 
         renderSecondaryInspector("CARBON_CODEEDITOR_EDIT", () => (
             <CodeEditorWrap
-                id={this.props.node!.contextPath + this.props.identifier}
-                value={this.props.value}
-                onChange={(value: string) => this.props.commit(value)}
-                onSave={this.props.onEnterKey}
+                id={node!.contextPath + identifier}
+                value={value}
+                onChange={this.handleChange}
+                onSave={onEnterKey}
                 onToggleEditor={this.handleToggleCodeEditor}
-                language={this.props.options.language}
+                language={language}
             />
         ));
+    };
+
+    handleChange = (value: string) => {
+        this.props.commit(value);
     };
 
     render() {
