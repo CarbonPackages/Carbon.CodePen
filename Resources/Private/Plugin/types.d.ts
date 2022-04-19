@@ -394,13 +394,13 @@ declare module "@neos-project/neos-ts-interfaces" {
         ) => string;
     }
 
-    export type EditorProps<Options = {}> = {
+    export type EditorProps<Options = {}, Value = any> = {
         id?: string;
         renderHelpIcon(): JSX.Element | "";
         identifier: string;
         label: string;
         options: Options;
-        value?: any;
+        value?: Value;
         hooks?: object;
         renderSecondaryInspector(
             secondaryInspectorName: string,

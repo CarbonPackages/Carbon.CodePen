@@ -3,17 +3,17 @@ Neos:
     Ui:
       resources:
         javascript:
-          'Carbon.CodeEditor:Plugin':
-            resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.js'
+          'Carbon.CodePen:Plugin':
+            resource: 'resource://Carbon.CodePen/Public/Plugin/Plugin.js'
             # TODO add `type` option in Neos ui
             type: 'module'
         stylesheets:
-          'Carbon.CodeEditor:Plugin':
-            resource: 'resource://Carbon.CodeEditor/Public/Plugin/Plugin.css'
+          'Carbon.CodePen:Plugin':
+            resource: 'resource://Carbon.CodePen/Public/Plugin/Plugin.css'
 
       frontendConfiguration:
-        'Carbon.CodeEditor':
+        'Carbon.CodePen':
           tailwindcss:
             enabled: true
-            workerUri: "${StaticResource.uri('Carbon.CodeEditor', 'Public/extensibletailwind.worker.js')}"
+            workerUri: "${StaticResource.uri('Carbon.CodePen', 'Public/extensibletailwind.worker.js')}"
             clientConfig: null

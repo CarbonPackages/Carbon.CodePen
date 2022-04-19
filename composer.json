@@ -1,18 +1,18 @@
 {
     "description": "",
     "type": "neos-plugin",
-    "name": "carbon/codeeditor",
+    "name": "carbon/codepen",
     "require": {
         "neos/neos-ui": "^7.0"
     },
     "autoload": {
         "psr-4": {
-            "Carbon\\CodeEditor\\": "Classes/"
+            "Carbon\\CodePen\\": "Classes/"
         }
     },
     "extra": {
         "neos": {
-            "package-key": "Carbon.CodeEditor"
+            "package-key": "Carbon.CodePen"
         }
     }
 }

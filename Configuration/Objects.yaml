@@ -2,4 +2,4 @@
 Neos\Neos\Ui\Controller\BackendController:
   properties:
     styleAndJavascriptInclusionService:
-      object: 'Carbon\CodeEditor\ModuleStyleAndJavascriptInclusionService'
+      object: 'Carbon\CodePen\ModuleStyleAndJavascriptInclusionService'

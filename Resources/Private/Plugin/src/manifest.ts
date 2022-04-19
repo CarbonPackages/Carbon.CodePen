@@ -26,16 +26,18 @@ export interface PackageFrontendConfiguration {
     };
 }
 
-manifest("Carbon.CodeEditor", {}, (globalRegistry) => {
+manifest("Carbon.CodePen", {}, (globalRegistry) => {
     const editorsRegistry = globalRegistry.get("inspector").get("editors");
-    const secondaryEditorsRegistry = globalRegistry.get("inspector").get("secondaryEditors");
+    const secondaryEditorsRegistry = globalRegistry
+        .get("inspector")
+        .get("secondaryEditors");
 
-    editorsRegistry.set("Carbon.CodeEditor/CodeEditor", {
+    editorsRegistry.set("Carbon.CodePen/CodeEditor", {
         component: CodeEditor,
         hasOwnLabel: true,
     });
 
-    secondaryEditorsRegistry.set("Carbon.CodeEditor/CodeEditorWrap", {
+    secondaryEditorsRegistry.set("Carbon.CodePen/CodeEditorWrap", {
         component: CodeEditorWrap,
     });
 });

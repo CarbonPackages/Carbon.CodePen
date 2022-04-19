@@ -13,6 +13,7 @@ export const getEditorConfigForLanguage = (language: string): EditorOptions => {
         insertSpaces: true,
         detectIndentation: true,
         copyWithSyntaxHighlighting: false,
+        tabSize: 4,
     };
 
     if (languagesWithTwoIndents.includes(language)) {

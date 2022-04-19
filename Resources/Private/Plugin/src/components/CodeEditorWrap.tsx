@@ -5,16 +5,25 @@ import { IDisposable, editor } from "monaco-editor";
 type IdentfierFromNodeAndProperty = string;
 type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
 
-let activeModelsByContextPathAndProperty: ActiveModels = {};
+let activeModelsByIdAndTabId: ActiveModels = {};
+
+type Tab = Readonly<{
+    value: string;
+    id: string;
+    label: string;
+    language: string;
+}>;
 
 interface Props {
     monaco: typeof import("monaco-editor");
     id: string;
-    onChange(value: string): void;
+    onChange(tabId: string, tabValue: string): void;
     onToggleEditor(): void;
     onSave(): void;
-    value: string;
-    language: string;
+    /**
+     * Immutable early state key value pair of tabname and its content
+     */
+    tabs: Tab[];
 }
 
 export default class CodeEditorWrap extends React.PureComponent<Props> {
@@ -22,41 +31,25 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
 
     disposables: IDisposable[] = [];
 
+    editor?: editor.IStandaloneCodeEditor;
+
+    activeTab?: Tab;
+
     async componentDidMount() {
         if (!this.monacoContainer) {
             return;
         }
 
-        const { monaco } = this.props;
-
-        let model;
-        if ((model = activeModelsByContextPathAndProperty[this.props.id])) {
-            if (this.props.value !== model.getValue()) {
-                model.pushEditOperations(
-                    [],
-                    [
-                        {
-                            range: model.getFullModelRange(),
-                            text: this.props.value,
-                        },
-                    ],
-                    () => null
-                );
-            }
-        } else {
-            model = monaco.editor.createModel(
-                this.props.value,
-                this.props.language
-            );
-            activeModelsByContextPathAndProperty[this.props.id] = model;
-        }
+        const { monaco, tabs } = this.props;
 
         const editor = monaco.editor.create(this.monacoContainer, {
             theme: "vs-dark",
-            model,
             automaticLayout: true,
-            ...getEditorConfigForLanguage(this.props.language),
         });
+
+        this.editor = editor;
+
+        this.setActiveTab(tabs[0]);
 
         editor.addCommand(
             monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd,
@@ -93,7 +86,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
             ...this.disposables,
             editor,
             editor.onDidChangeModelContent(() => {
-                this.props.onChange(editor.getValue());
+                this.props.onChange(this.activeTab!.id, editor.getValue());
             }),
         ];
     }
@@ -104,12 +97,53 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
         }
     }
 
+    getModel({ value, id, language }: Tab): editor.ITextModel {
+        const cacheIdentifier = this.props.id + id;
+        const cachedModel = activeModelsByIdAndTabId[cacheIdentifier];
+        if (cachedModel) {
+            if (value && value !== cachedModel.getValue()) {
+                cachedModel.pushEditOperations(
+                    [],
+                    [
+                        {
+                            range: cachedModel.getFullModelRange(),
+                            text: value,
+                        },
+                    ],
+                    () => null
+                );
+            }
+            return cachedModel;
+        }
+
+        const model = this.props.monaco.editor.createModel(value, language);
+        activeModelsByIdAndTabId[cacheIdentifier] = model;
+        return model;
+    }
+
+    setActiveTab(tab: Tab) {
+        this.activeTab = tab;
+        this.editor!.setModel(this.getModel(tab));
+        this.editor!.updateOptions(getEditorConfigForLanguage(tab.language));
+    }
+
     render() {
         return (
-            <div
-                style={{ height: "100%", width: "100%" }}
-                ref={(el) => (this.monacoContainer = el!)}
-            />
+            <div style={{ height: "100%", width: "100%" }}>
+                <ul>
+                    {this.props.tabs.map((tab) => (
+                        <li>
+                            <button onClick={() => this.setActiveTab(tab)}>
+                                {tab.label} {tab.id}
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+                <div
+                    style={{ height: "100%", width: "100%" }}
+                    ref={(el) => (this.monacoContainer = el!)}
+                />
+            </div>
         );
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Carbon\CodeEditor;
+namespace Carbon\CodePen;
 
 use Neos\Eel\CompilingEvaluator;
 use Neos\Eel\Utility;
