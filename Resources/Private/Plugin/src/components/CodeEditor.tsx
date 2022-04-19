@@ -23,6 +23,7 @@ type StateProps = ConnectedProps<typeof connector>;
 
 type Props = EditorProps<{
     language: string;
+    disabled: boolean;
 }>;
 
 class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
@@ -46,11 +47,19 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
     };
 
     render() {
+        const {
+            label,
+            options: { disabled },
+        } = this.props;
+
         return (
             <div>
-                <Button onClick={this.handleToggleCodeEditor}>
+                <Button
+                    onClick={this.handleToggleCodeEditor}
+                    disabled={disabled}
+                >
                     <Icon icon="pencil" padded="right" title="Edit" />
-                    <I18n id={this.props.label} />
+                    <I18n id={label} />
                 </Button>
             </div>
         );
