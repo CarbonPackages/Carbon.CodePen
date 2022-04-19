@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default class CodeEditorWrap extends React.PureComponent<Props> {
-    private monacoContainer: HTMLElement | null = null;
+    private monacoContainer?: HTMLElement;
 
     disposables: IDisposable[] = [];
 
@@ -53,7 +53,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
 
         const editor = monaco.editor.create(this.monacoContainer, {
             theme: "vs-dark",
-            model: model,
+            model,
             automaticLayout: true,
             ...getEditorConfigForLanguage(this.props.language),
         });
@@ -99,14 +99,16 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
     }
 
     componentWillUnmount() {
-        this.disposables.forEach((dispose) => dispose.dispose());
+        for (const disposable of this.disposables) {
+            disposable.dispose();
+        }
     }
 
     render() {
         return (
             <div
                 style={{ height: "100%", width: "100%" }}
-                ref={(self) => (this.monacoContainer = self)}
+                ref={(el) => (this.monacoContainer = el!)}
             />
         );
     }
