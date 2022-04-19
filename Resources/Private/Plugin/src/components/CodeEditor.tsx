@@ -8,7 +8,9 @@ import I18n from "@neos-project/neos-ui-i18n";
 import { PackageFrontendConfiguration } from "../manifest";
 
 const neosifier = neos((globalRegistry) => ({
-    secondaryEditorsRegistry: globalRegistry.get("inspector").get("secondaryEditors"),
+    secondaryEditorsRegistry: globalRegistry
+        .get("inspector")
+        .get("secondaryEditors"),
     packageFrontendConfiguration: globalRegistry
         .get("frontendConfiguration")
         .get("Carbon.CodeEditor") as PackageFrontendConfiguration,
@@ -40,11 +42,16 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
             options: { language },
         } = this.props;
 
-        const CodeEditorWrap = secondaryEditorsRegistry.get("Carbon.CodeEditor/CodeEditorWrap")!
-            .component as typeof import("./CodeEditorWrap").default;
+        const CodeEditorWrap = secondaryEditorsRegistry.get(
+            "Carbon.CodeEditor/CodeEditorWrap"
+        )!.component as typeof import("./CodeEditorWrap").default;
 
-        const { initializeMonacoOnceFromConfig } = await import("../initializeMonaco");
-        const monaco = initializeMonacoOnceFromConfig(packageFrontendConfiguration);
+        const { initializeMonacoOnceFromConfig } = await import(
+            "../initializeMonaco"
+        );
+        const monaco = initializeMonacoOnceFromConfig(
+            packageFrontendConfiguration
+        );
 
         renderSecondaryInspector("CARBON_CODEEDITOR_EDIT", () => (
             <CodeEditorWrap
