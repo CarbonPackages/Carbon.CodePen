@@ -6,7 +6,6 @@
  */
 
 const esbuild = require("esbuild");
-const CarbonEditor = "./DistributionPackages/Carbon.CodeEditor/";
 
 const [, , outfile] = process.argv;
 
@@ -15,7 +14,7 @@ esbuild.build({
     stdin: {
         contents: `
         import config from "./tailwind.config.js";
-        import { initializeFromStaticConfig } from '${CarbonEditor}Resources/Public/extensibletailwind.worker.js';
+        import { initializeFromStaticConfig } from './Packages/Plugins/Carbon.CodeEditor/Resources/Public/extensibletailwind.worker.js';
         initializeFromStaticConfig(config)
         `,
         resolveDir: __dirname,

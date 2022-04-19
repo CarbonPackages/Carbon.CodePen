@@ -1,6 +1,6 @@
 {
     "description": "",
-    "type": "neos-package",
+    "type": "neos-plugin",
     "name": "carbon/codeeditor",
     "require": {
         "neos/neos-ui": "^7.0"
