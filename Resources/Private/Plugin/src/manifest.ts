@@ -4,33 +4,38 @@ import CodeEditor from "./components/CodeEditor";
 import CodeEditorWrap from "./components/CodeEditorWrap";
 
 export interface PackageFrontendConfiguration {
-    clientTailwindConfig: string | undefined;
+    tailwindcss: {
+        /**
+         * Enable Tailwind css support for the monaco editor.
+         */
+        enabled: boolean;
+
+        /**
+         * Uri for the worker to be used.
+         * Its possible to configure this to a custom worker with embedded Tailwind config.
+         * This way plugins from the tailwind config are preserved.
+         */
+        workerUri: string;
+
+        /**
+         * To be used with the default worker implementation.
+         * A simple way to provide config as json.
+         * Plugins (eg functions) of the tailwind config cannot not be preserved.
+         */
+        clientConfig?: string;
+    };
 }
 
-let config: PackageFrontendConfiguration;
+manifest("Carbon.CodeEditor", {}, (globalRegistry) => {
+    const editorsRegistry = globalRegistry.get("inspector").get("editors");
+    const secondaryEditorsRegistry = globalRegistry.get("inspector").get("secondaryEditors");
 
-manifest(
-    "Carbon.CodeEditor",
-    {},
-    (globalRegistry, { frontendConfiguration }) => {
-        const editorsRegistry = globalRegistry.get("inspector").get("editors");
-        const secondaryEditorsRegistry = globalRegistry
-            .get("inspector")
-            .get("secondaryEditors");
+    editorsRegistry.set("Carbon.CodeEditor/CodeEditor", {
+        component: CodeEditor,
+        hasOwnLabel: true,
+    });
 
-        config = frontendConfiguration[
-            "Carbon.CodeEditor"
-        ] as PackageFrontendConfiguration;
-
-        editorsRegistry.set("Carbon.CodeEditor/CodeEditor", {
-            component: CodeEditor,
-            hasOwnLabel: true,
-        });
-
-        secondaryEditorsRegistry.set("Carbon.CodeEditor/CodeEditorWrap", {
-            component: CodeEditorWrap,
-        });
-    }
-);
-
-export const getPackageFrontendConfiguration = () => config;
+    secondaryEditorsRegistry.set("Carbon.CodeEditor/CodeEditorWrap", {
+        component: CodeEditorWrap,
+    });
+});

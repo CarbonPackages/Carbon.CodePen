@@ -13,4 +13,7 @@ Neos:
 
       frontendConfiguration:
         'Carbon.CodeEditor':
-          clientTailwindConfig: "${Configuration.setting('Carbon.CodeEditor.clientTailwindConfig')}"
+          tailwindcss:
+            enabled: true
+            workerUri: "${StaticResource.uri('Carbon.CodeEditor', 'Public/extensibletailwind.worker.js')}"
+            clientConfig: null

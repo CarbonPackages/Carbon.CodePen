@@ -3,6 +3,7 @@ import esbuild from "esbuild";
 import { languages } from "monaco-editor/esm/metadata.js";
 import { neosUiExtensibility } from "@mhsdesign/esbuild-neos-ui-extensibility";
 import { fileURLToPath } from "url";
+import { writeFile } from "fs/promises";
 
 const require = createRequire(import.meta.url);
 
@@ -108,8 +109,6 @@ esbuild
                 "ts.worker":
                     "monaco-editor/esm/vs/language/typescript/ts.worker.js",
                 "editor.worker": "monaco-editor/esm/vs/editor/editor.worker.js",
-                "tailwindcss.worker":
-                    "monaco-tailwindcss/tailwindcss.worker.js",
             }).map(([outfile, entry]) => [outfile, require.resolve(entry)])
         ),
         outdir,
@@ -118,3 +117,44 @@ esbuild
         minify: true,
     })
     .then(handleBuild);
+
+esbuild
+    .build({
+        entryPoints: ["./src/extensibletailwind.worker.ts"],
+        outdir: "../../Public",
+        bundle: true,
+        // cjs makes it possible to consume this via bundler and use the exported `initializeFromStaticConfig`
+        // and use this also in the browser, as this is bundled
+        format: "cjs",
+        minify: true,
+        banner: {
+            // in case this will be run in the browser directly we stub the module.
+            js: `if (typeof module === "undefined") var module = {};`,
+        },
+    })
+    .then(handleBuild);
+
+// esbuild doesnt support the generation of "d.ts" yet
+// todo use tsc
+writeFile(
+    "../../Public/extensibletailwind.worker.d.ts",
+    `
+import { TailwindConfig } from "tailwindcss/tailwind-config";
+
+/**
+ * Initializes the worker with the passed tailwindConfig
+ * If this function is not called, this worker will initialize without embedded config
+ *
+ * @param {TailwindConfig} tailwindConfig will be embedded into the the webworker
+ *
+ * @example
+ * import config from "./tailwind.config.js";
+ * initializeFromStaticConfig(config);
+ *
+ * @api
+ */
+export function initializeFromStaticConfig(
+    tailwindConfig: TailwindConfig
+): void;
+`.trimStart()
+);

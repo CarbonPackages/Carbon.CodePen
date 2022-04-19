@@ -5,11 +5,13 @@ import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ts-interfaces";
 import I18n from "@neos-project/neos-ui-i18n";
+import { PackageFrontendConfiguration } from "../manifest";
 
 const neosifier = neos((globalRegistry) => ({
-    secondaryEditorsRegistry: globalRegistry
-        .get("inspector")
-        .get("secondaryEditors"),
+    secondaryEditorsRegistry: globalRegistry.get("inspector").get("secondaryEditors"),
+    packageFrontendConfiguration: globalRegistry
+        .get("frontendConfiguration")
+        .get("Carbon.CodeEditor") as PackageFrontendConfiguration,
 }));
 
 const connector = connect((state) => ({
@@ -28,6 +30,7 @@ type Props = EditorProps<{
 class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
     public handleToggleCodeEditor = async () => {
         const {
+            packageFrontendConfiguration,
             secondaryEditorsRegistry,
             renderSecondaryInspector,
             onEnterKey,
@@ -40,8 +43,8 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
         const CodeEditorWrap = secondaryEditorsRegistry.get("Carbon.CodeEditor/CodeEditorWrap")!
             .component as typeof import("./CodeEditorWrap").default;
 
-        const { initializeMonaco } = await import("../initializeMonaco");
-        const monaco = initializeMonaco();
+        const { initializeMonacoOnceFromConfig } = await import("../initializeMonaco");
+        const monaco = initializeMonacoOnceFromConfig(packageFrontendConfiguration);
 
         renderSecondaryInspector("CARBON_CODEEDITOR_EDIT", () => (
             <CodeEditorWrap

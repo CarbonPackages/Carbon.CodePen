@@ -5,22 +5,24 @@ specifiers:
   '@neos-project/react-ui-components': ^8.0.0
   '@types/react': ^18.0.0
   '@types/react-redux': ^7.1.23
+  '@types/tailwindcss': 3.0.10
   emmet-monaco-es: ^5.1.0
   esbuild: ^0.14.31
   monaco-editor: ^0.33.0
-  monaco-tailwindcss: ^0.1.0
+  monaco-tailwindcss: link:../../../../../monaco-tailwindcss
   typescript: ^4.6.3
 
 dependencies:
   emmet-monaco-es: 5.1.0_monaco-editor@0.33.0
   monaco-editor: 0.33.0
-  monaco-tailwindcss: 0.1.0_monaco-editor@0.33.0
+  monaco-tailwindcss: link:../../../../../monaco-tailwindcss
 
 devDependencies:
   '@mhsdesign/esbuild-neos-ui-extensibility': 0.1.2-beta.2_esbuild@0.14.34
   '@neos-project/react-ui-components': 8.0.0
   '@types/react': 18.0.0
   '@types/react-redux': 7.1.23
+  '@types/tailwindcss': 3.0.10
   esbuild: 0.14.34
   typescript: 4.6.3
 
@@ -32,11 +34,6 @@ packages:
     dependencies:
       regenerator-runtime: 0.13.9
     dev: true
-
-  /@ctrl/tinycolor/3.4.0:
-    resolution: {integrity: sha512-JZButFdZ1+/xAfpguQHoabIXkcqRRKpMrWKBkpEZZyxfY9C1DpADFB8PEqGSTeFr135SaTRfKqGKx5xSCLI7ZQ==}
-    engines: {node: '>=10'}
-    dev: false
 
   /@emmetio/abbreviation/2.2.3:
     resolution: {integrity: sha512-87pltuCPt99aL+y9xS6GPZ+Wmmyhll2WXH73gG/xpGcQ84DRnptBsI2r0BeIQ0EB/SQTOe2ANPqFqj3Rj5FOGA==}
@@ -124,6 +121,10 @@ packages:
 
   /@types/scheduler/0.16.2:
     resolution: {integrity: sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==}
+    dev: true
+
+  /@types/tailwindcss/3.0.10:
+    resolution: {integrity: sha512-1UnZIHO0NOPyPlPFV0HuMjki2SHkvG9uBA1ZehWj/OQMSROk503nuNyyfmJSIT289yewxTbKoPG+KLxYRvfIIg==}
     dev: true
 
   /csstype/3.0.11:
@@ -364,38 +365,6 @@ packages:
     resolution: {integrity: sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw==}
     dev: false
 
-  /monaco-marker-data-provider/1.0.0_monaco-editor@0.33.0:
-    resolution: {integrity: sha512-HW6DIWi0hVjJa2v5dI4P/oexz7SjLBaNGfMb/VAAk2Js9jMPrh3mCCWh1Hsm7t0ftW2RN9WDr9vyQLJING91Bw==}
-    peerDependencies:
-      monaco-editor: '>=0.30.0'
-    dependencies:
-      monaco-editor: 0.33.0
-    dev: false
-
-  /monaco-tailwindcss/0.1.0_monaco-editor@0.33.0:
-    resolution: {integrity: sha512-cmNVqyE74q6mie6iuHf8XsJcNaoNHPOLboVMKZkc83abS4uxU2N6PVgWH3aILpnwB5a+clWHxFN7pKV6MDCKvw==}
-    peerDependencies:
-      monaco-editor: '>=0.30'
-    dependencies:
-      '@ctrl/tinycolor': 3.4.0
-      monaco-editor: 0.33.0
-      monaco-marker-data-provider: 1.0.0_monaco-editor@0.33.0
-      monaco-worker-manager: 1.0.1_monaco-editor@0.33.0
-      tmp-cache: 1.1.0
-      type-fest: 2.12.2
-      vscode-languageserver-protocol: 3.16.0
-      vscode-languageserver-textdocument: 1.0.4
-      vscode-languageserver-types: 3.16.0
-    dev: false
-
-  /monaco-worker-manager/1.0.1_monaco-editor@0.33.0:
-    resolution: {integrity: sha512-oTw5vY39/SW5awGdJdKIw0CDAK3b72pKx4EtoEftnerWchsT9wqlQniIN8c0g59g5zqS5nuxhIZaATI7mkdX/Q==}
-    peerDependencies:
-      monaco-editor: '>=0.30.0'
-    dependencies:
-      monaco-editor: 0.33.0
-    dev: false
-
   /react-is/16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: true
@@ -410,42 +379,12 @@ packages:
     resolution: {integrity: sha512-p3VT+cOEgxFsRRA9X4lkI1E+k2/CtnKtU4gcxyaCUreilL/vqI6CdZ3wxVUx3UOUg+gnUOQQcRI7BmSI656MYA==}
     dev: true
 
-  /tmp-cache/1.1.0:
-    resolution: {integrity: sha512-j040fkL/x+XAZQ9K3bKGEPwgYhOZNBQLa3NXEADUiuno9C+3N2JJA4bVPDREixp604G3/vTXWA3DIPpA9lu1RQ==}
-    engines: {node: '>=6'}
-    dev: false
-
   /tslib/1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
     dev: true
-
-  /type-fest/2.12.2:
-    resolution: {integrity: sha512-qt6ylCGpLjZ7AaODxbpyBZSs9fCI9SkL3Z9q2oxMBQhs/uyY+VD8jHA8ULCGmWQJlBgqvO3EJeAngOHD8zQCrQ==}
-    engines: {node: '>=12.20'}
-    dev: false
 
   /typescript/4.6.3:
     resolution: {integrity: sha512-yNIatDa5iaofVozS/uQJEl3JRWLKKGJKh6Yaiv0GLGSuhpFJe7P3SbHZ8/yjAHRQwKRoA6YZqlfjXWmVzoVSMw==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
-
-  /vscode-jsonrpc/6.0.0:
-    resolution: {integrity: sha512-wnJA4BnEjOSyFMvjZdpiOwhSq9uDoK8e/kpRJDTaMYzwlkrhG1fwDIZI94CLsLzlCK5cIbMMtFlJlfR57Lavmg==}
-    engines: {node: '>=8.0.0 || >=10.0.0'}
-    dev: false
-
-  /vscode-languageserver-protocol/3.16.0:
-    resolution: {integrity: sha512-sdeUoAawceQdgIfTI+sdcwkiK2KU+2cbEYA0agzM2uqaUy2UpnnGHtWTHVEtS0ES4zHU0eMFRGN+oQgDxlD66A==}
-    dependencies:
-      vscode-jsonrpc: 6.0.0
-      vscode-languageserver-types: 3.16.0
-    dev: false
-
-  /vscode-languageserver-textdocument/1.0.4:
-    resolution: {integrity: sha512-/xhqXP/2A2RSs+J8JNXpiiNVvvNM0oTosNVmQnunlKvq9o4mupHOBAnnzH0lwIPKazXKvAKsVp1kr+H/K4lgoQ==}
-    dev: false
-
-  /vscode-languageserver-types/3.16.0:
-    resolution: {integrity: sha512-k8luDIWJWyenLc5ToFQQMaSrqCHiLwyKPHKPQZ5zz21vM+vIVUSvsRpcbiECH4WR88K2XZqc4ScRcZ7nk/jbeA==}
-    dev: false
