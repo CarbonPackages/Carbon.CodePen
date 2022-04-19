@@ -1,3 +1,41 @@
+declare module "@neos-project/neos-ui-i18n" {
+    import React from "react";
+
+    interface I18nProps {
+        /**
+         * Fallback key which gets rendered once the i18n service doesn't return a translation.
+         */
+        fallback?: string;
+
+        /**
+         * The target id which the i18n service accepts.
+         */
+        id?: string;
+
+        /**
+         * The destination paths for the package of the translation.
+         */
+        packageKey?: string;
+
+        /**
+         * The destination paths for the source of the translation.
+         */
+        sourceName?: string;
+
+        /**
+         * Additional parameters which are passed to the i18n service.
+         */
+        params?: object;
+
+        /**
+         * className which gets added to the translation span.
+         */
+        className?: string;
+    }
+
+    export default class I18n extends React.PureComponent<I18nProps> {}
+}
+
 declare module "@neos-project/neos-ui-redux-store" {
     import { Node } from "@neos-project/neos-ts-interfaces";
     import { DefaultRootState } from "react-redux";
