@@ -37,6 +37,7 @@ type Props = EditorProps<
             [id: string]: {
                 label: string;
                 language: string;
+                completion: any;
             };
         };
         disabled: boolean;
@@ -76,11 +77,12 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
         );
 
         const tabsCombined = Object.entries(tabs).map(
-            ([id, { label, language }]) => ({
+            ([id, { label, language, completion }]) => ({
                 value: value![id],
                 id,
                 label,
                 language,
+                completion,
             })
         );
 

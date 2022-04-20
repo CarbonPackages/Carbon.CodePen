@@ -3,23 +3,31 @@ lockfileVersion: 5.3
 specifiers:
   '@mhsdesign/esbuild-neos-ui-extensibility': ^0.1.2-beta.1
   '@neos-project/react-ui-components': ^8.0.0
+  '@types/lodash.debounce': ^4.0.7
+  '@types/lodash.once': ^4.1.7
   '@types/react': ^18.0.0
   '@types/react-redux': ^7.1.23
   '@types/tailwindcss': 3.0.10
   emmet-monaco-es: ^5.1.0
   esbuild: ^0.14.31
+  lodash.debounce: ^4.0.8
+  lodash.once: ^4.1.1
   monaco-editor: ^0.33.0
   monaco-tailwindcss: link:../../../../../monaco-tailwindcss
   typescript: ^4.6.3
 
 dependencies:
+  '@types/lodash.debounce': 4.0.7
+  '@types/lodash.once': 4.1.7
   emmet-monaco-es: 5.1.0_monaco-editor@0.33.0
+  lodash.debounce: 4.0.8
+  lodash.once: 4.1.1
   monaco-editor: 0.33.0
   monaco-tailwindcss: link:../../../../../monaco-tailwindcss
 
 devDependencies:
   '@mhsdesign/esbuild-neos-ui-extensibility': 0.1.2-beta.2_esbuild@0.14.34
-  '@neos-project/react-ui-components': 8.0.0
+  '@neos-project/react-ui-components': 8.0.0_lodash.debounce@4.0.8
   '@types/react': 18.0.0
   '@types/react-redux': 7.1.23
   '@types/tailwindcss': 3.0.10
@@ -65,7 +73,7 @@ packages:
     resolution: {integrity: sha512-dhcXB/o6hzDHAl01XmtpT42LbU3Z9tOFhE9ZlxlJOHu8Z9Lsg8sbxNLbnTnIzaODwdJiA1UlJGLZXQqMUg6IBg==}
     dev: true
 
-  /@neos-project/react-ui-components/8.0.0:
+  /@neos-project/react-ui-components/8.0.0_lodash.debounce@4.0.8:
     resolution: {integrity: sha512-JFOfeHzsipqn8TXE0OV0NNEHFTwaR1KJwJqX/WRmc5Cu48imGp5AJTi0Gt+v+XXHF+ikwASXNGu9XqRI7lm0nw==}
     peerDependencies:
       '@friendsofreactjs/react-css-themr': ^4.1.0
@@ -89,6 +97,8 @@ packages:
       react-portal: ^4.2.0
       react-svg: ^11.1.2
       react-textarea-autosize: ^8.3.0
+    dependencies:
+      lodash.debounce: 4.0.8
     dev: true
 
   /@types/hoist-non-react-statics/3.3.1:
@@ -97,6 +107,22 @@ packages:
       '@types/react': 18.0.0
       hoist-non-react-statics: 3.3.2
     dev: true
+
+  /@types/lodash.debounce/4.0.7:
+    resolution: {integrity: sha512-X1T4wMZ+gT000M2/91SYj0d/7JfeNZ9PeeOldSNoE/lunLeQXKvkmIumI29IaKMotU/ln/McOIvgzZcQ/3TrSA==}
+    dependencies:
+      '@types/lodash': 4.14.182
+    dev: false
+
+  /@types/lodash.once/4.1.7:
+    resolution: {integrity: sha512-XWhnXzWkxoleOoXKmzUtep8vT+wiiQQgmPD+wzG0yO0bdlszmnqHRb2WiY5hK/8V0DTet1+z9DJj9cnbdAhWng==}
+    dependencies:
+      '@types/lodash': 4.14.182
+    dev: false
+
+  /@types/lodash/4.14.182:
+    resolution: {integrity: sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==}
+    dev: false
 
   /@types/prop-types/15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
@@ -360,6 +386,14 @@ packages:
     dependencies:
       react-is: 16.13.1
     dev: true
+
+  /lodash.debounce/4.0.8:
+    resolution: {integrity: sha1-gteb/zCmfEAF/9XiUVMArZyk168=}
+    dev: false
+
+  /lodash.once/4.1.1:
+    resolution: {integrity: sha1-DdOXEhPHxW34gJd9UEyI+0cal6w=}
+    dev: false
 
   /monaco-editor/0.33.0:
     resolution: {integrity: sha512-VcRWPSLIUEgQJQIE0pVT8FcGBIgFoxz7jtqctE+IiCxWugD0DwgyQBcZBhdSrdMC84eumoqMZsGl2GTreOzwqw==}

@@ -2,17 +2,24 @@ import React from "react";
 import { getEditorConfigForLanguage } from "../editorConfig";
 import { IDisposable, editor } from "monaco-editor";
 import { Node } from "@neos-project/neos-ts-interfaces";
+import once from "lodash.once";
+import debounce from "lodash.debounce";
 
 type IdentfierFromNodeAndProperty = string;
 type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
 
 let activeModelsByIdAndTabId: ActiveModels = {};
 
+interface Completion {
+    (node: Node): Promise<string>[];
+}
+
 type Tab = Readonly<{
     value: string;
     id: string;
     label: string;
     language: string;
+    completion?: Completion;
 }>;
 
 interface Props {
@@ -35,6 +42,8 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
     private propertyFormField?: HTMLFormElement;
 
     disposables: IDisposable[] = [];
+
+    activeTabDispose?: IDisposable;
 
     editor?: editor.IStandaloneCodeEditor;
 
@@ -92,15 +101,19 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
         );
         this.propertyFormField!.submit();
 
+        const updateIframe = debounce(() => {
+            this.propertyValueField!.value = JSON.stringify(
+                this.props.getCurrentValue()
+            );
+            this.propertyFormField!.submit();
+        }, 500);
+
         this.disposables = [
             ...this.disposables,
             editor,
             editor.onDidChangeModelContent(() => {
                 this.props.onChange(this.activeTab!.id, editor.getValue());
-                this.propertyValueField!.value = JSON.stringify(
-                    this.props.getCurrentValue()
-                );
-                this.propertyFormField!.submit();
+                updateIframe();
             }),
         ];
     }
@@ -143,9 +156,44 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
     }
 
     setActiveTab(tab: Tab) {
+        this.activeTabDispose?.dispose();
         this.activeTab = tab;
         this.editor!.setModel(this.createOrRetriveModel(tab));
         this.editor!.updateOptions(getEditorConfigForLanguage(tab.language));
+
+        if (!tab.completion) {
+            return;
+        }
+
+        const { monaco } = this.props;
+
+        const getSuggestions = once(async () => {
+            return Promise.all(tab.completion!(this.props.node));
+        });
+
+        this.activeTabDispose = monaco.languages.registerCompletionItemProvider(
+            tab.language,
+            {
+                provideCompletionItems: async (model, position) => {
+                    const word = model.getWordUntilPosition(position);
+                    const range = {
+                        startLineNumber: position.lineNumber,
+                        endLineNumber: position.lineNumber,
+                        startColumn: word.startColumn,
+                        endColumn: word.endColumn,
+                    };
+                    const plainSugestions = await getSuggestions();
+                    return {
+                        suggestions: plainSugestions.map((sug) => ({
+                            label: sug,
+                            kind: monaco.languages.CompletionItemKind.Function,
+                            insertText: sug,
+                            range,
+                        })),
+                    };
+                },
+            }
+        );
     }
 
     render() {
