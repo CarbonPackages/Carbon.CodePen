@@ -1,0 +1,10 @@
+-
+  name: 'CodePen'
+  uriPattern: 'neos/codePen(/{@action})'
+  defaults:
+    '@package':    'Carbon.CodePen'
+    '@controller': 'Preview'
+    '@format':     'html'
+    '@action':     'index'
+  appendExceedingArguments: true
+  httpMethods: ['GET', 'POST']

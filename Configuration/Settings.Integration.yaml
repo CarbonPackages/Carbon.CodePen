@@ -1,0 +1,18 @@
+Neos:
+  Flow:
+    mvc:
+      routes:
+        Carbon.CodePen: true
+    security:
+      authentication:
+        providers:
+          'Neos.Neos:Backend':
+            requestPatterns:
+              'Carbon.CodePen:backend':
+                pattern: ControllerObjectName
+                patternOptions:
+                  controllerObjectNamePattern: 'Carbon\CodePen\Controller\.*'
+  Neos:
+    fusion:
+      autoInclude:
+        "Carbon.CodePen": true

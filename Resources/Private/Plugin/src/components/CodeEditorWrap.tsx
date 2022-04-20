@@ -1,6 +1,7 @@
 import React from "react";
 import { getEditorConfigForLanguage } from "../editorConfig";
 import { IDisposable, editor } from "monaco-editor";
+import { Node } from "@neos-project/neos-ts-interfaces";
 
 type IdentfierFromNodeAndProperty = string;
 type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
@@ -16,7 +17,9 @@ type Tab = Readonly<{
 
 interface Props {
     monaco: typeof import("monaco-editor");
-    id: string;
+    node: Node;
+    property: string;
+    getCurrentValue(): Record<string, string>;
     onChange(tabId: string, tabValue: string): void;
     onToggleEditor(): void;
     onSave(): void;
@@ -28,6 +31,8 @@ interface Props {
 
 export default class CodeEditorWrap extends React.PureComponent<Props> {
     private monacoContainer?: HTMLElement;
+    private propertyValueField?: HTMLInputElement;
+    private propertyFormField?: HTMLFormElement;
 
     disposables: IDisposable[] = [];
 
@@ -82,11 +87,20 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
             run: () => this.monacoContainer!.requestFullscreen(),
         });
 
+        this.propertyValueField!.value = JSON.stringify(
+            this.props.getCurrentValue()
+        );
+        this.propertyFormField!.submit();
+
         this.disposables = [
             ...this.disposables,
             editor,
             editor.onDidChangeModelContent(() => {
                 this.props.onChange(this.activeTab!.id, editor.getValue());
+                this.propertyValueField!.value = JSON.stringify(
+                    this.props.getCurrentValue()
+                );
+                this.propertyFormField!.submit();
             }),
         ];
     }
@@ -97,8 +111,15 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
         }
     }
 
-    getModel({ value, id, language }: Tab): editor.ITextModel {
-        const cacheIdentifier = this.props.id + id;
+    getCacheIdForTab({ id }: Tab): string {
+        const { node, property } = this.props;
+        return node.contextPath + property + id;
+    }
+
+    createOrRetriveModel(tab: Tab): editor.ITextModel {
+        const cacheIdentifier = this.getCacheIdForTab(tab);
+        const { language, id } = tab;
+        const value = this.props.getCurrentValue()[id];
         const cachedModel = activeModelsByIdAndTabId[cacheIdentifier];
         if (cachedModel) {
             if (value && value !== cachedModel.getValue()) {
@@ -123,7 +144,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
 
     setActiveTab(tab: Tab) {
         this.activeTab = tab;
-        this.editor!.setModel(this.getModel(tab));
+        this.editor!.setModel(this.createOrRetriveModel(tab));
         this.editor!.updateOptions(getEditorConfigForLanguage(tab.language));
     }
 
@@ -140,9 +161,49 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
                     ))}
                 </ul>
                 <div
-                    style={{ height: "100%", width: "100%" }}
+                    style={{ height: "50%", width: "100%" }}
                     ref={(el) => (this.monacoContainer = el!)}
                 />
+                <div style={{ height: "50%", width: "100%" }}>
+                    <iframe
+                        style={{
+                            height: "100%",
+                            width: "100%",
+                            background: "#fff",
+                        }}
+                        name="carbonCodePreview"
+                    ></iframe>
+                </div>
+                <form
+                    ref={(el) => (this.propertyFormField = el!)}
+                    target="carbonCodePreview"
+                    action="/neos/codePen/render/"
+                    method="post"
+                >
+                    <input
+                        type="hidden"
+                        name="__csrfToken"
+                        value={
+                            document.getElementById("appContainer")!.dataset
+                                .csrfToken
+                        }
+                    ></input>
+                    <input
+                        type="hidden"
+                        name="node"
+                        value={this.props.node!.contextPath}
+                    ></input>
+                    <input
+                        type="hidden"
+                        name="propertyName"
+                        value={this.props.property}
+                    ></input>
+                    <input
+                        type="hidden"
+                        name="propertyValue"
+                        ref={(el) => (this.propertyValueField = el!)}
+                    ></input>
+                </form>
             </div>
         );
     }
