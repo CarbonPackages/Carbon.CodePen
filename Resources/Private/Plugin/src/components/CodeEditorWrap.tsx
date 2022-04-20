@@ -10,8 +10,10 @@ type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
 
 let activeModelsByIdAndTabId: ActiveModels = {};
 
-interface Completion {
-    (node: Node): Promise<string>[];
+type Suggestions = string[] | Promise<string>[];
+
+interface LazySuggestions {
+    (): Suggestions;
 }
 
 type Tab = Readonly<{
@@ -19,7 +21,7 @@ type Tab = Readonly<{
     id: string;
     label: string;
     language: string;
-    completion?: Completion;
+    completion?: LazySuggestions | Suggestions;
 }>;
 
 interface Props {
@@ -168,7 +170,18 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
         const { monaco } = this.props;
 
         const getSuggestions = once(async () => {
-            return Promise.all(tab.completion!(this.props.node));
+            const { completion } = tab;
+            switch (typeof completion) {
+                case "function":
+                    return Promise.all(completion());
+                case "object":
+                    return Promise.all(completion);
+                default:
+                    console.error(
+                        `Carbon.CodePen: invalid completion in tab: "${tab.id}" of property: "${this.props.property}" of nodeType: "${this.props.node.nodeType}"`
+                    );
+                    return [];
+            }
         });
 
         this.activeTabDispose = monaco.languages.registerCompletionItemProvider(
