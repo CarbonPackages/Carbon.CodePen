@@ -4,6 +4,7 @@ import { IDisposable, editor } from "monaco-editor";
 import { Node } from "@neos-project/neos-ts-interfaces";
 import once from "lodash.once";
 import debounce from "lodash.debounce";
+import { PackageFrontendConfiguration } from "../manifest";
 
 type IdentfierFromNodeAndProperty = string;
 type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
@@ -28,6 +29,7 @@ interface Props {
     monaco: typeof import("monaco-editor");
     node: Node;
     property: string;
+    packageFrontendConfiguration: PackageFrontendConfiguration;
     getCurrentValue(): Record<string, string>;
     onChange(tabId: string, tabValue: string): void;
     onToggleEditor(): void;
@@ -118,6 +120,58 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
                 updateIframe();
             }),
         ];
+
+        const fusionObjectsConfig =
+            this.props.packageFrontendConfiguration.afx.fusionObjects;
+
+        const fusionObjectsWithDoc = Object.keys(fusionObjectsConfig).filter(
+            (name) => fusionObjectsConfig[name].documentation
+        );
+
+        if (!fusionObjectsWithDoc.length) {
+            return;
+        }
+
+        monaco.languages.registerHoverProvider("html", {
+            provideHover(model, position) {
+                const currentLine = position.lineNumber;
+                const currentCursor = position.column;
+
+                const line = model.getLineContent(currentLine);
+                if (line.trim() === "") {
+                    return null;
+                }
+
+                const regex = `<(${fusionObjectsWithDoc.join("|")})\\b`;
+
+                const matches = line.matchAll(new RegExp(regex, "g"));
+
+                for (const match of matches) {
+                    const [, matchedTag] = match;
+                    const startPosition = match.index! + 1 + 1; // +1 to remove < // +1 to convert to column
+                    const endPosition = startPosition + matchedTag.length;
+                    if (
+                        currentCursor >= startPosition &&
+                        currentCursor <= endPosition
+                    ) {
+                        return {
+                            range: new monaco.Range(
+                                currentLine,
+                                startPosition,
+                                currentLine,
+                                endPosition
+                            ),
+                            contents: [
+                                {
+                                    value: fusionObjectsConfig[matchedTag]
+                                        .documentation,
+                                },
+                            ],
+                        };
+                    }
+                }
+            },
+        });
     }
 
     componentWillUnmount() {
@@ -216,7 +270,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
                     {this.props.tabs.map((tab) => (
                         <li>
                             <button onClick={() => this.setActiveTab(tab)}>
-                                {tab.label} {tab.id}
+                                {tab.label || `${tab.language} [${tab.id}]`}
                             </button>
                         </li>
                     ))}

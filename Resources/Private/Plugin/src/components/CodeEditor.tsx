@@ -89,6 +89,7 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
         renderSecondaryInspector("CARBON_CODEPEN_EDIT", () => (
             <CodeEditorWrap
                 getCurrentValue={() => this.currentValue}
+                packageFrontendConfiguration={packageFrontendConfiguration}
                 monaco={monaco}
                 node={node!}
                 property={identifier}

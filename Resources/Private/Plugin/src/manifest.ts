@@ -24,6 +24,17 @@ export interface PackageFrontendConfiguration {
          */
         clientConfig?: string;
     };
+    afx: {
+        /**
+         * Define fusion Objects to have auto completion and hover examples
+         */
+        fusionObjects: {
+            [fusionObject: string]: {
+                documentation?: string;
+                snippet?: string;
+            };
+        };
+    };
 }
 
 manifest("Carbon.CodePen", {}, (globalRegistry) => {

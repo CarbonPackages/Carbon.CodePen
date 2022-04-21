@@ -17,3 +17,26 @@ Neos:
             enabled: true
             workerUri: "${StaticResource.uri('Carbon.CodePen', 'Public/extensibletailwind.worker.js')}"
             clientConfig: null
+
+          afx:
+            fusionObjects:
+              'Neos.Fusion:Loop':
+                documentation: |
+                  **Loop over the items**
+                  paramer: __items__ an array
+
+                  the children will receive the current item as `item` unless specifed differently in itemName
+
+                  [Neos.Fusion:Loop](https://neos.readthedocs.io/en/stable/References/NeosFusionReference.html#neos-fusion-loop)
+                snippet: |
+                  <Neos.Fusion:Loop items={${1:items}}>
+                    $0
+                  </Neos.Fusion:Loop>
+              'Neos.Fusion:Value':
+                documentation: |
+                  Render the value.
+                  Is just useless in afx
+
+                  [Neos.Fusion:Value](https://neos.readthedocs.io/en/stable/References/NeosFusionReference.html#neos-fusion-value)
+                snippet: |
+                  <Neos.Fusion:Value value={${1:value}}/>
