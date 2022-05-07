@@ -17,10 +17,12 @@
   "dependencies": {
     "@types/lodash.debounce": "^4.0.7",
     "@types/lodash.once": "^4.1.7",
+    "@types/styled-components": "^5.1.25",
     "emmet-monaco-es": "^5.1.0",
     "lodash.debounce": "^4.0.8",
     "lodash.once": "^4.1.1",
     "monaco-editor": "^0.33.0",
-    "monaco-tailwindcss": "link:../../../../../monaco-tailwindcss"
+    "monaco-tailwindcss": "link:../../../../../monaco-tailwindcss",
+    "styled-components": "^5.3.5"
   }
 }

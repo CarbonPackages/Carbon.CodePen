@@ -8,6 +8,7 @@ import { Icon } from "@neos-project/react-ui-components";
 import { Tab } from "./types";
 import { registerCompletionForTab } from "./registerCompletionForTab";
 import { registerDocumentationForFusionObjects } from "./registerDocumentationForFusionObjects";
+import styled, { css } from "styled-components";
 
 type IdentfierFromNodeAndProperty = string;
 type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
@@ -25,9 +26,85 @@ interface Props {
     onSave(): void;
 }
 
-export default class CodeEditorWrap extends React.PureComponent<Props> {
-    private monacoContainer?: HTMLElement;
+const CodePenContainer = styled.div`
+    height: "100%";
+    width: "100%";
+`;
+
+const TabNavigation = styled.ul`
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: #141414;
+    border-bottom: 1px solid #3f3f3f;
+`;
+
+const TabItem = styled.li<{ active: boolean }>`
+    position: relative;
+    display: block;
+    font-size: 14px;
+    margin: 0;
+    height: 40px;
+    padding: 0 16px;
+    line-height: 40px;
+    cursor: pointer;
+    border-top: 1px solid #3f3f3f;
+    border-right: 1px solid #3f3f3f;
+
+    ${({ active }) =>
+        active &&
+        css`
+            background-color: #222;
+            color: #00adee;
+        `}
+
+    &::after {
+        display: block;
+        content: "";
+        position: absolute;
+        height: 2px;
+        width: 100%;
+        top: 0;
+        right: 0;
+        ${({ active }) =>
+            active &&
+            css`
+                background: #00adee;
+            `}
+    }
+`;
+
+const TabButton = styled.button`
+    color: currentColor;
+    font-size: 14px;
+    margin: 0;
+    display: inline-block;
+    height: 40px;
+    padding: 0 16px;
+    line-height: 40px;
+    cursor: pointer;
+    border: 0;
+    background: 0;
+    font-family: "Noto Sans", sans-serif;
+    font-weight: normal;
+    &:focus {
+        outline: 0;
+    }
+`;
+
+const TabIcon = styled(Icon)`
+    color: currentColor;
+    margin-right: 0.5em;
+`;
+
+type State = {
+    activeTab: Tab;
+};
+
+export default class CodeEditorWrap extends React.Component<Props, State> {
     private codePenContainer?: HTMLElement;
+    private monacoContainer?: HTMLElement;
     private previewIframe?: HTMLIFrameElement;
 
     private disposables: (IDisposable | undefined)[] = [];
@@ -35,14 +112,19 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
 
     private editor?: editor.IStandaloneCodeEditor;
 
-    private activeTab?: Tab;
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            activeTab: this.props.tabs[0],
+        };
+    }
 
     async componentDidMount() {
         if (!this.monacoContainer) {
             return;
         }
 
-        const { monaco, tabs } = this.props;
+        const { monaco } = this.props;
 
         const editor = monaco.editor.create(this.monacoContainer, {
             theme: "vs-dark",
@@ -51,7 +133,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
 
         this.editor = editor;
 
-        this.setActiveTab(tabs[0]);
+        this.editorChangeToTab(this.state.activeTab);
 
         editor.addCommand(
             monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd,
@@ -99,7 +181,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
             ...this.disposables,
             editor,
             editor.onDidChangeModelContent(() => {
-                this.activeTab!.setValue(editor.getValue());
+                this.state.activeTab.setValue(editor.getValue());
                 updateIframeDebounced();
             }),
         ];
@@ -155,9 +237,12 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
         return model;
     }
 
-    setActiveTab(tab: Tab) {
-        this.activeTab = tab;
+    changeToTab(tab: Tab) {
+        this.editorChangeToTab(tab);
+        this.setState({ activeTab: tab });
+    }
 
+    editorChangeToTab(tab: Tab) {
         this.editor!.setModel(this.createOrRetriveModel(tab));
         this.editor!.updateOptions(getEditorConfigForLanguage(tab.language));
 
@@ -168,24 +253,30 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
 
     render() {
         return (
-            <div
-                ref={(el) => (this.codePenContainer = el!)}
-                style={{ height: "100%", width: "100%" }}
-            >
-                <ul>
+            <CodePenContainer ref={(el) => (this.codePenContainer = el!)}>
+                <TabNavigation>
                     {this.props.tabs.map((tab) => (
-                        <li>
-                            <button onClick={() => this.setActiveTab(tab)}>
-                                <Icon icon={tab.icon}></Icon>
+                        <TabItem
+                            active={tab.id === this.state.activeTab.id}
+                            role="presentation"
+                            key={tab.id}
+                        >
+                            <TabButton
+                                onClick={() => this.changeToTab(tab)}
+                                role="tab"
+                            >
+                                <TabIcon icon={tab.icon} />
                                 {tab.label}
-                            </button>
-                        </li>
+                            </TabButton>
+                        </TabItem>
                     ))}
-                </ul>
+                </TabNavigation>
+
                 <div
-                    style={{ height: "50%", width: "100%" }}
+                    style={{ height: "40vh", width: "100%" }}
                     ref={(el) => (this.monacoContainer = el!)}
-                />
+                ></div>
+
                 <div style={{ height: "50%", width: "100%" }}>
                     <iframe
                         style={{
@@ -196,7 +287,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
                         ref={(el) => (this.previewIframe = el!)}
                     ></iframe>
                 </div>
-            </div>
+            </CodePenContainer>
         );
     }
 }
