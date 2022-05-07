@@ -27,15 +27,15 @@ interface Props {
 
 export default class CodeEditorWrap extends React.PureComponent<Props> {
     private monacoContainer?: HTMLElement;
+    private codePenContainer?: HTMLElement;
     private previewIframe?: HTMLIFrameElement;
 
-    disposables: (IDisposable | undefined)[] = [];
+    private disposables: (IDisposable | undefined)[] = [];
+    private activeTabDisposable?: IDisposable;
 
-    activeTabDispose?: IDisposable;
+    private editor?: editor.IStandaloneCodeEditor;
 
-    editor?: editor.IStandaloneCodeEditor;
-
-    activeTab?: Tab;
+    private activeTab?: Tab;
 
     async componentDidMount() {
         if (!this.monacoContainer) {
@@ -81,7 +81,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
             keybindings: [monaco.KeyCode.F11],
             contextMenuGroupId: "navigation",
             contextMenuOrder: 1.5,
-            run: () => this.monacoContainer!.requestFullscreen(),
+            run: () => this.codePenContainer!.requestFullscreen(),
         });
 
         const updateIframe = async () => {
@@ -113,7 +113,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
     }
 
     componentWillUnmount() {
-        this.activeTabDispose?.dispose();
+        this.activeTabDisposable?.dispose();
         for (const disposable of this.disposables) {
             disposable?.dispose();
         }
@@ -162,13 +162,16 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
         this.editor!.updateOptions(getEditorConfigForLanguage(tab.language));
 
         const { monaco, node } = this.props;
-        this.activeTabDispose?.dispose();
-        this.activeTabDispose = registerCompletionForTab(monaco, node, tab);
+        this.activeTabDisposable?.dispose();
+        this.activeTabDisposable = registerCompletionForTab(monaco, node, tab);
     }
 
     render() {
         return (
-            <div style={{ height: "100%", width: "100%" }}>
+            <div
+                ref={(el) => (this.codePenContainer = el!)}
+                style={{ height: "100%", width: "100%" }}
+            >
                 <ul>
                     {this.props.tabs.map((tab) => (
                         <li>
