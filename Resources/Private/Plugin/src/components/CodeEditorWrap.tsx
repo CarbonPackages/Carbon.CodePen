@@ -224,10 +224,29 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
         const { monaco } = this.props;
 
         const getSuggestions = once(async () => {
-            const { completion } = tab;
+            let { completion } = tab;
+            const { node } = this.props;
+            if (
+                typeof completion === "string" &&
+                completion.startsWith("ClientEval:")
+            ) {
+                const clientEval = new Function(
+                    "node",
+                    "return " + completion.slice(11)
+                );
+                completion = clientEval(node);
+                console.warn(
+                    `Carbon.CodePen: Hi you encountered a bug which is caused when updating a node and opening the code editor too fast. The 'ClientEval' is not evaluated by Neos yet. But we got you covered.`
+                );
+            }
             switch (typeof completion) {
                 case "function":
-                    return Promise.all(completion());
+                    if (!completion.__carbonCallback) {
+                        console.warn(
+                            "You are most likely using callbacks in ClientEval wrong. Unless you wrap them in `ClientEval:carbonCallback(...)` performance will suffer immensely: https://github.com/neos/neos-ui/issues/3117"
+                        );
+                    }
+                    return Promise.all(completion({ node }));
                 case "object":
                     return Promise.all(completion);
                 default:

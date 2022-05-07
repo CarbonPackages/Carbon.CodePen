@@ -2,6 +2,7 @@ import manifest from "@neos-project/neos-ui-extensibility";
 
 import CodeEditor from "./components/CodeEditor";
 import CodeEditorWrap from "./components/CodeEditorWrap";
+import { carbonCallbackFactory } from "./carbonCallback";
 
 export interface PackageFrontendConfiguration {
     tailwindcss: {
@@ -36,6 +37,14 @@ export interface PackageFrontendConfiguration {
         };
     };
 }
+
+// Fixes https://github.com/neos/neos-ui/issues/3117
+declare global {
+    interface Window {
+        carbonCallback: ReturnType<typeof carbonCallbackFactory>;
+    }
+}
+window.carbonCallback = carbonCallbackFactory();
 
 manifest("Carbon.CodePen", {}, (globalRegistry) => {
     const editorsRegistry = globalRegistry.get("inspector").get("editors");
