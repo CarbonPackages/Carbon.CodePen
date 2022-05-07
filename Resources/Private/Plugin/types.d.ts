@@ -1,3 +1,51 @@
+declare module "@neos-project/neos-ui-backend-connector" {
+    type MakeFetchRequest = (csrf: string) => RequestInit & { url?: string };
+
+    interface RequestQueueItem {
+        makeFetchRequest: MakeFetchRequest;
+        resolve: (value?: any | undefined) => void;
+        reject: (reason?: any) => void;
+    }
+
+    declare class FetchWithErrorHandling {
+        /**
+         * MAIN ENTRY POINT, replacing the "fetch" API.
+         *
+         * does a "fetch" request with a CSRF token and automatic relogin if a login error occurs.
+         *
+         * EXAMPLE
+         *
+         *      fetchWithErrorHandling.withCsrfToken((csrfToken) => ({
+         *          url: "/neos/route",
+         *          method: "POST",
+         *          credentials: "include",
+         *          headers: {
+         *              'X-Flow-Csrftoken': csrfToken,
+         *              'Content-Type': 'application/json'
+         *          },
+         *          body: JSON.stringify(
+         *              args
+         *          )
+         *      })).catch(reason => fetchWithErrorHandling.generalErrorHandler(reason))
+         *
+         */
+        public withCsrfToken(makeFetchRequest: MakeFetchRequest): Promise<any>;
+
+        /**
+         * Every request that is supposed to show an error message on failure (i.e. any request),
+         * should end with this catch block:
+         * `.catch(reason => fetchWithErrorHandling.generalErrorHandler(reason))`
+         */
+        public generalErrorHandler(reason: string | Error): void;
+
+        /**
+         * Safely parse JSON from response
+         */
+        public parseJson(response: Body): any;
+    }
+    export const fetchWithErrorHandling = new FetchWithErrorHandling();
+}
+
 declare module "@neos-project/neos-ui-i18n" {
     import React from "react";
 
