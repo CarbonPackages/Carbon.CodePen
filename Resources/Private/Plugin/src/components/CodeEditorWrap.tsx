@@ -27,8 +27,28 @@ interface Props {
 }
 
 const CodePenContainer = styled.div`
-    height: "100%";
-    width: "100%";
+    height: 100%;
+    width: 100%;
+`;
+
+const EditorAndPreviewContainer = styled.div<{ column: boolean }>`
+    display: flex;
+    height: 100%;
+    width: 100%;
+    & > * {
+        height: 100%;
+        width: 50%;
+    }
+
+    ${({ column }) =>
+        column &&
+        css`
+            flex-direction: column;
+            & > * {
+                height: 50%;
+                width: 100%;
+            }
+        `}
 `;
 
 const TabNavigation = styled.ul`
@@ -81,7 +101,6 @@ const TabButton = styled.button`
     margin: 0;
     display: inline-block;
     height: 40px;
-    padding: 0 16px;
     line-height: 40px;
     cursor: pointer;
     border: 0;
@@ -95,11 +114,11 @@ const TabButton = styled.button`
 
 const TabIcon = styled(Icon)`
     color: currentColor;
-    margin-right: 0.5em;
 `;
 
 type State = {
     activeTab: Tab;
+    previewModeColumn: boolean;
 };
 
 export default class CodeEditorWrap extends React.Component<Props, State> {
@@ -116,6 +135,7 @@ export default class CodeEditorWrap extends React.Component<Props, State> {
         super(props);
         this.state = {
             activeTab: this.props.tabs[0],
+            previewModeColumn: false,
         };
     }
 
@@ -251,42 +271,62 @@ export default class CodeEditorWrap extends React.Component<Props, State> {
         this.activeTabDisposable = registerCompletionForTab(monaco, node, tab);
     }
 
+    togglePreview() {
+        this.setState(({ previewModeColumn }) => ({
+            previewModeColumn: !previewModeColumn,
+        }));
+    }
+
     render() {
+        this.editor?.layout();
         return (
             <CodePenContainer ref={(el) => (this.codePenContainer = el!)}>
                 <TabNavigation>
+                    <TabItem
+                        active={this.state.previewModeColumn}
+                        role="presentation"
+                    >
+                        <TabButton onClick={() => this.togglePreview()}>
+                            <TabIcon icon="sync" />
+                        </TabButton>
+                    </TabItem>
+
                     {this.props.tabs.map((tab) => (
                         <TabItem
                             active={tab.id === this.state.activeTab.id}
                             role="presentation"
                             key={tab.id}
+                            style={{ padding: "0 16px" }}
                         >
                             <TabButton
                                 onClick={() => this.changeToTab(tab)}
                                 role="tab"
                             >
-                                <TabIcon icon={tab.icon} />
+                                <TabIcon
+                                    style={{ marginRight: "0.5em" }}
+                                    icon={tab.icon}
+                                />
                                 {tab.label}
                             </TabButton>
                         </TabItem>
                     ))}
                 </TabNavigation>
 
-                <div
-                    style={{ height: "40vh", width: "100%" }}
-                    ref={(el) => (this.monacoContainer = el!)}
-                ></div>
-
-                <div style={{ height: "50%", width: "100%" }}>
-                    <iframe
-                        style={{
-                            height: "100%",
-                            width: "100%",
-                            background: "#fff",
-                        }}
-                        ref={(el) => (this.previewIframe = el!)}
-                    ></iframe>
-                </div>
+                <EditorAndPreviewContainer
+                    column={this.state.previewModeColumn}
+                >
+                    <div ref={(el) => (this.monacoContainer = el!)} />
+                    <div>
+                        <iframe
+                            style={{
+                                height: "100%",
+                                width: "100%",
+                                background: "#fff",
+                            }}
+                            ref={(el) => (this.previewIframe = el!)}
+                        ></iframe>
+                    </div>
+                </EditorAndPreviewContainer>
             </CodePenContainer>
         );
     }
