@@ -6,6 +6,7 @@ import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ts-interfaces";
 import I18n from "@neos-project/neos-ui-i18n";
 import { PackageFrontendConfiguration } from "../manifest";
+import { fetchWithErrorHandling } from "@neos-project/neos-ui-backend-connector";
 
 const objectIsEmpty = (obj: object) => {
     for (var _key in obj) {
@@ -35,9 +36,10 @@ type Props = EditorProps<
     {
         tabs: {
             [id: string]: {
-                label: string;
+                label?: string;
+                icon?: string;
                 language: string;
-                completion: any;
+                completion?: any;
             };
         };
         disabled: boolean;
@@ -45,14 +47,7 @@ type Props = EditorProps<
     Record<string, string>
 >;
 
-class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
-    private currentValue: Record<string, string> = {};
-
-    constructor(props: any) {
-        super(props);
-        this.currentValue = this.props.value ?? {};
-    }
-
+class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
     public handleToggleCodeEditor = async () => {
         const {
             packageFrontendConfiguration,
@@ -61,7 +56,6 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
             onEnterKey,
             node,
             identifier,
-            value,
             options: { tabs },
         } = this.props;
 
@@ -76,11 +70,17 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
             packageFrontendConfiguration
         );
 
-        const tabsCombined = Object.entries(tabs).map(
-            ([id, { label, language, completion }]) => ({
-                value: value![id],
+        const transformedInteractiveTabs = Object.entries(tabs).map(
+            ([id, { label, language, completion, icon }]) => ({
+                getValue: (): string | undefined => {
+                    return this.getValuesFromAllTabs()[id];
+                },
+                setValue: (newValue: string) => {
+                    this.updateTabValue(id, newValue);
+                },
                 id,
                 label,
+                icon,
                 language,
                 completion,
             })
@@ -88,45 +88,70 @@ class CodeEditor extends React.Component<Props & StateProps & NeosProps> {
 
         renderSecondaryInspector("CARBON_CODEPEN_EDIT", () => (
             <CodeEditorWrap
-                getCurrentValue={() => this.currentValue}
+                renderPreviewOutOfBand={() => this.renderPreviewOutOfBand()}
                 packageFrontendConfiguration={packageFrontendConfiguration}
                 monaco={monaco}
                 node={node!}
                 property={identifier}
-                tabs={tabsCombined}
-                onChange={this.handleChange}
+                tabs={transformedInteractiveTabs}
                 onSave={onEnterKey}
                 onToggleEditor={this.handleToggleCodeEditor}
             />
         ));
     };
 
+    public getValuesFromAllTabs() {
+        return this.props.value ?? {};
+    }
+
+    public async renderPreviewOutOfBand() {
+        const result = await fetchWithErrorHandling
+            .withCsrfToken((csrfToken) => ({
+                url: "/neos/codePen/render/",
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "X-Flow-Csrftoken": csrfToken,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    node: this.props.node!.contextPath,
+                    propertyName: this.props.identifier,
+                    propertyValue: JSON.stringify(this.getValuesFromAllTabs()),
+                }),
+            }))
+            .catch((reason) =>
+                fetchWithErrorHandling.generalErrorHandler(reason)
+            );
+        return result.text();
+    }
+
     /**
      * Notifies the Neos UI that a tab content changed.
      * commit expects the final array value of the combined tabs,
      * so we instert the new change into the known values.
      *
+     * The `value` prop will be refreshed automatically by the ui.
+     * Eg the component will update.
      */
-    handleChange = (tabId: string, tabValue: string) => {
+    private updateTabValue = (tabId: string, tabValue: string) => {
+        // spread makes some kind of better copy
+        // other wise removing a tabs content wont be commited.
+        let newValue = { ...this.props.value };
         if (tabValue === "") {
-            delete this.currentValue[tabId];
+            delete newValue[tabId];
         } else {
-            // normal assign doenst work: `this.currentValue[tabId] = tabValue`
-            this.currentValue = {
-                ...this.currentValue,
-                [tabId]: tabValue,
-            };
+            newValue[tabId] = tabValue;
         }
-        if (objectIsEmpty(this.currentValue)) {
-            this.currentValue = {};
+        if (objectIsEmpty(newValue)) {
             // nope its not commit(null); to reset, but will be treated as null.
             this.props.commit("");
             return;
         }
-        this.props.commit(this.currentValue);
+        this.props.commit(newValue);
     };
 
-    render() {
+    public render() {
         const {
             label,
             options: { disabled },
