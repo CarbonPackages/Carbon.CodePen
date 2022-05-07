@@ -14,6 +14,14 @@ export const registerDocumentationForFusionObjects = (
         return;
     }
 
+    // - we look at the current line
+    //      and and use a from all fusionObjects composed regex
+    //      too see if there were any matches
+    // - for each map we look if it is in range of the mouse cursor.
+    // - if so we return a doc note for the fusionObject
+
+    const regex = new RegExp(`<(${fusionObjectsWithDoc.join("|")})\\b`, "g");
+
     return monaco.languages.registerHoverProvider(languageId, {
         provideHover(model, position) {
             const currentLine = position.lineNumber;
@@ -24,14 +32,13 @@ export const registerDocumentationForFusionObjects = (
                 return null;
             }
 
-            const regex = `<(${fusionObjectsWithDoc.join("|")})\\b`;
-
-            const matches = line.matchAll(new RegExp(regex, "g"));
+            const matches = line.matchAll(regex);
 
             for (const match of matches) {
                 const [, matchedTag] = match;
                 const startPosition = match.index! + 1 + 1; // +1 to remove < // +1 to convert to column
                 const endPosition = startPosition + matchedTag.length;
+                // is in range?
                 if (
                     currentCursor >= startPosition &&
                     currentCursor <= endPosition
