@@ -124,15 +124,16 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
         const fusionObjectsConfig =
             this.props.packageFrontendConfiguration.afx.fusionObjects;
 
-        const fusionObjectsWithDoc = Object.keys(fusionObjectsConfig).filter(
-            (name) => fusionObjectsConfig[name].documentation
-        );
+        const fusionObjectsWithDoc = Object.entries(fusionObjectsConfig)
+            .filter(([, { documentation }]) => documentation)
+            .map(([name]) => name);
 
         if (!fusionObjectsWithDoc.length) {
             return;
         }
 
-        monaco.languages.registerHoverProvider("html", {
+        let disp;
+        disp = monaco.languages.registerHoverProvider("html", {
             provideHover(model, position) {
                 const currentLine = position.lineNumber;
                 const currentCursor = position.column;
@@ -164,14 +165,17 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
                             contents: [
                                 {
                                     value: fusionObjectsConfig[matchedTag]
-                                        .documentation,
+                                        .documentation!,
                                 },
                             ],
                         };
                     }
                 }
+                return null;
             },
         });
+
+        this.disposables.push(disp);
     }
 
     componentWillUnmount() {
