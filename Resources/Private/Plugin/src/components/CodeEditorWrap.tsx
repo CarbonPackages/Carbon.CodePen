@@ -2,11 +2,11 @@ import React from "react";
 import { getEditorConfigForLanguage } from "../editorConfig";
 import { IDisposable, editor } from "monaco-editor";
 import { Node } from "@neos-project/neos-ts-interfaces";
-import once from "lodash.once";
 import debounce from "lodash.debounce";
 import { PackageFrontendConfiguration } from "../manifest";
 import { Icon } from "@neos-project/react-ui-components";
 import { Tab } from "./types";
+import { registerCompletionForTab } from "./registerCompletionForTab";
 
 type IdentfierFromNodeAndProperty = string;
 type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
@@ -204,74 +204,14 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
     }
 
     setActiveTab(tab: Tab) {
-        this.activeTabDispose?.dispose();
         this.activeTab = tab;
+
         this.editor!.setModel(this.createOrRetriveModel(tab));
         this.editor!.updateOptions(getEditorConfigForLanguage(tab.language));
 
-        if (!tab.completion) {
-            return;
-        }
-
-        const { monaco } = this.props;
-
-        const getSuggestions = once(async () => {
-            let { completion } = tab;
-            const { node } = this.props;
-            if (
-                typeof completion === "string" &&
-                completion.startsWith("ClientEval:")
-            ) {
-                const clientEval = new Function(
-                    "node",
-                    "return " + completion.slice(11)
-                );
-                completion = clientEval(node);
-                console.warn(
-                    `Carbon.CodePen: Hi you encountered a bug which is caused when updating a node and opening the code editor too fast. The 'ClientEval' is not evaluated by Neos yet. But we got you covered.`
-                );
-            }
-            switch (typeof completion) {
-                case "function":
-                    if (!completion.__carbonCallback) {
-                        console.warn(
-                            "You are most likely using callbacks in ClientEval wrong. Unless you wrap them in `ClientEval:carbonCallback(...)` performance will suffer immensely: https://github.com/neos/neos-ui/issues/3117"
-                        );
-                    }
-                    return Promise.all(completion({ node }));
-                case "object":
-                    return Promise.all(completion);
-                default:
-                    console.error(
-                        `Carbon.CodePen: invalid completion in tab: "${tab.id}" of property: "${this.props.property}" of nodeType: "${this.props.node.nodeType}"`
-                    );
-                    return [];
-            }
-        });
-
-        this.activeTabDispose = monaco.languages.registerCompletionItemProvider(
-            tab.language,
-            {
-                provideCompletionItems: async (model, position) => {
-                    const word = model.getWordUntilPosition(position);
-                    const range = {
-                        startLineNumber: position.lineNumber,
-                        endLineNumber: position.lineNumber,
-                        startColumn: word.startColumn,
-                        endColumn: word.endColumn,
-                    };
-                    const plainSugestions = await getSuggestions();
-                    return {
-                        suggestions: plainSugestions.map((sug) => ({
-                            label: sug,
-                            kind: monaco.languages.CompletionItemKind.Function,
-                            insertText: sug,
-                            range,
-                        })),
-                    };
-                },
-            }
-        );
+        const { monaco, node } = this.props;
+        this.activeTabDispose?.dispose();
+        this.activeTabDispose = registerCompletionForTab(monaco, node, tab);
     }
 
     render() {
