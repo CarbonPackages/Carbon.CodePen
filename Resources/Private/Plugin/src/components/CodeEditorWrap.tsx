@@ -7,6 +7,7 @@ import { PackageFrontendConfiguration } from "../manifest";
 import { Icon } from "@neos-project/react-ui-components";
 import { Tab } from "./types";
 import { registerCompletionForTab } from "./registerCompletionForTab";
+import { registerDocumentationForFusionObjects } from "./registerDocumentationForFusionObjects";
 
 type IdentfierFromNodeAndProperty = string;
 type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
@@ -28,7 +29,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
     private monacoContainer?: HTMLElement;
     private previewIframe?: HTMLIFrameElement;
 
-    disposables: IDisposable[] = [];
+    disposables: (IDisposable | undefined)[] = [];
 
     activeTabDispose?: IDisposable;
 
@@ -106,64 +107,15 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
         const fusionObjectsConfig =
             this.props.packageFrontendConfiguration.afx.fusionObjects;
 
-        const fusionObjectsWithDoc = Object.entries(fusionObjectsConfig)
-            .filter(([, { documentation }]) => documentation)
-            .map(([name]) => name);
-
-        if (!fusionObjectsWithDoc.length) {
-            return;
-        }
-
-        let disp;
-        disp = monaco.languages.registerHoverProvider("html", {
-            provideHover(model, position) {
-                const currentLine = position.lineNumber;
-                const currentCursor = position.column;
-
-                const line = model.getLineContent(currentLine);
-                if (line.trim() === "") {
-                    return null;
-                }
-
-                const regex = `<(${fusionObjectsWithDoc.join("|")})\\b`;
-
-                const matches = line.matchAll(new RegExp(regex, "g"));
-
-                for (const match of matches) {
-                    const [, matchedTag] = match;
-                    const startPosition = match.index! + 1 + 1; // +1 to remove < // +1 to convert to column
-                    const endPosition = startPosition + matchedTag.length;
-                    if (
-                        currentCursor >= startPosition &&
-                        currentCursor <= endPosition
-                    ) {
-                        return {
-                            range: new monaco.Range(
-                                currentLine,
-                                startPosition,
-                                currentLine,
-                                endPosition
-                            ),
-                            contents: [
-                                {
-                                    value: fusionObjectsConfig[matchedTag]
-                                        .documentation!,
-                                },
-                            ],
-                        };
-                    }
-                }
-                return null;
-            },
-        });
-
-        this.disposables.push(disp);
+        this.disposables.push(
+            registerDocumentationForFusionObjects(monaco, fusionObjectsConfig)
+        );
     }
 
     componentWillUnmount() {
         this.activeTabDispose?.dispose();
         for (const disposable of this.disposables) {
-            disposable.dispose();
+            disposable?.dispose();
         }
     }
 
