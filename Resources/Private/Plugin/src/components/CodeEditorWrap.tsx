@@ -69,7 +69,6 @@ const TabItem = styled.li<{ active: boolean }>`
     padding: 0 16px;
     line-height: 40px;
     cursor: pointer;
-    border-top: 1px solid #3f3f3f;
     border-right: 1px solid #3f3f3f;
 
     ${({ active }) =>
@@ -85,7 +84,7 @@ const TabItem = styled.li<{ active: boolean }>`
         position: absolute;
         height: 2px;
         width: 100%;
-        top: 0;
+        top: -1px;
         right: 0;
         ${({ active }) =>
             active &&
