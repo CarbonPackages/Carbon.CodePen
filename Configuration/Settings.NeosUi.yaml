@@ -15,8 +15,8 @@ Neos:
         'Carbon.CodePen':
           tailwindcss:
             enabled: true
-            workerUri: "${StaticResource.uri('Carbon.CodePen', 'Public/extensibletailwind.worker.js')}"
-            clientConfig: null
+            # clientConfig: null
+            clientConfig: "${StaticResource.uri('Neos.Demo', 'Public/bundledTailwindConfig.js')}"
 
           afx:
             fusionObjects:
