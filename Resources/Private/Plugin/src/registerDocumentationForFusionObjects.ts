@@ -1,9 +1,10 @@
 import { IDisposable } from "monaco-editor";
-import { PackageFrontendConfiguration } from "../manifest";
+import { PackageFrontendConfiguration } from "./manifest";
 
 export const registerDocumentationForFusionObjects = (
     monaco: typeof import("monaco-editor"),
-    fusionObjects: PackageFrontendConfiguration["afx"]["fusionObjects"]
+    fusionObjects: PackageFrontendConfiguration["afx"]["fusionObjects"],
+    languageId: string
 ): IDisposable | undefined => {
     const fusionObjectsWithDoc = Object.entries(fusionObjects)
         .filter(([, { documentation }]) => documentation)
@@ -13,7 +14,7 @@ export const registerDocumentationForFusionObjects = (
         return;
     }
 
-    return monaco.languages.registerHoverProvider("twig", {
+    return monaco.languages.registerHoverProvider(languageId, {
         provideHover(model, position) {
             const currentLine = position.lineNumber;
             const currentCursor = position.column;

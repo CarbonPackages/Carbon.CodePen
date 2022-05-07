@@ -7,7 +7,6 @@ import { PackageFrontendConfiguration } from "../manifest";
 import { Icon } from "@neos-project/react-ui-components";
 import { Tab } from "./types";
 import { registerCompletionForTab } from "./registerCompletionForTab";
-import { registerDocumentationForFusionObjects } from "./registerDocumentationForFusionObjects";
 import styled, { css } from "styled-components";
 
 type IdentfierFromNodeAndProperty = string;
@@ -84,7 +83,7 @@ const TabItem = styled.li<{ active: boolean }>`
         position: absolute;
         height: 2px;
         width: 100%;
-        top: -1px;
+        top: 0; // or -1px
         right: 0;
         ${({ active }) =>
             active &&
@@ -204,13 +203,6 @@ export default class CodeEditorWrap extends React.Component<Props, State> {
                 updateIframeDebounced();
             }),
         ];
-
-        const fusionObjectsConfig =
-            this.props.packageFrontendConfiguration.afx.fusionObjects;
-
-        this.disposables.push(
-            registerDocumentationForFusionObjects(monaco, fusionObjectsConfig)
-        );
     }
 
     componentWillUnmount() {

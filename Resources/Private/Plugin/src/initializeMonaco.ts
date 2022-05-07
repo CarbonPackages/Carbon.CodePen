@@ -6,6 +6,8 @@ import {
     conf as htmlConf,
     language as htmlLanguage,
 } from "monaco-editor/esm/vs/basic-languages/html/html";
+import { registerDocumentationForFusionObjects } from "./registerDocumentationForFusionObjects";
+import { registerCompletionForFusionObjects } from "./registerCompletionForFusionObjects";
 
 declare global {
     interface Window {
@@ -66,6 +68,10 @@ export const initializeMonacoOnceFromConfig = (
         },
     });
     monaco.languages.setLanguageConfiguration("twig", htmlConf);
+
+    const fusionObjectsConfig = packageConfig.afx.fusionObjects;
+    registerDocumentationForFusionObjects(monaco, fusionObjectsConfig, "twig");
+    registerCompletionForFusionObjects(monaco, fusionObjectsConfig, "twig");
 
     initializeTailwind(packageConfig, ["html", "twig"]);
 
