@@ -8,6 +8,7 @@ import {
 } from "monaco-editor/esm/vs/basic-languages/html/html";
 import { registerDocumentationForFusionObjects } from "./registerDocumentationForFusionObjects";
 import { registerCompletionForFusionObjects } from "./registerCompletionForFusionObjects";
+import { afxMappedLanguageId } from "./afxMappedLanguageId";
 
 declare global {
     interface Window {
@@ -35,6 +36,7 @@ export const initializeMonacoOnceFromConfig = (
                 case "less":
                     return new URL("css.worker.js", import.meta.url).pathname;
                 case "html":
+                case "handlebars":
                     return new URL("html.worker.js", import.meta.url).pathname;
                 case "typescript":
                 case "javascript":
@@ -53,29 +55,35 @@ export const initializeMonacoOnceFromConfig = (
         },
     };
 
-    // we map `afx` to `twig` as we dont support twig, but twig has better 3rd party support
-
     monaco.languages.register({
-        id: "twig",
+        id: afxMappedLanguageId,
         extensions: [".afx"],
         aliases: ["AFX", "afx"],
         mimetypes: ["text/html"],
     });
 
-    monaco.languages.registerTokensProviderFactory("twig", {
+    monaco.languages.registerTokensProviderFactory(afxMappedLanguageId, {
         create() {
             return htmlLanguage;
         },
     });
-    monaco.languages.setLanguageConfiguration("twig", htmlConf);
+    monaco.languages.setLanguageConfiguration(afxMappedLanguageId, htmlConf);
 
     const fusionObjectsConfig = packageConfig.afx.fusionObjects;
-    registerDocumentationForFusionObjects(monaco, fusionObjectsConfig, "twig");
-    registerCompletionForFusionObjects(monaco, fusionObjectsConfig, "twig");
+    registerDocumentationForFusionObjects(
+        monaco,
+        fusionObjectsConfig,
+        afxMappedLanguageId
+    );
+    registerCompletionForFusionObjects(
+        monaco,
+        fusionObjectsConfig,
+        afxMappedLanguageId
+    );
 
-    initializeTailwind(packageConfig, ["html", "twig"]);
+    initializeTailwind(packageConfig, ["html", afxMappedLanguageId]);
 
-    emmetHTML(monaco, ["html", "twig"]);
+    emmetHTML(monaco, ["html", afxMappedLanguageId]);
     emmetCSS(monaco, ["css", "scss", "less"]);
 
     return monaco;

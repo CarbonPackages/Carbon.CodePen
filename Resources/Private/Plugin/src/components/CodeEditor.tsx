@@ -8,6 +8,7 @@ import I18n from "@neos-project/neos-ui-i18n";
 import { PackageFrontendConfiguration } from "../manifest";
 import { fetchWithErrorHandling } from "@neos-project/neos-ui-backend-connector";
 import { CodePenEditorOptions } from "./types";
+import { afxMappedLanguageId } from "../afxMappedLanguageId";
 
 const objectIsEmpty = (obj: object) => {
     for (var _key in obj) {
@@ -95,8 +96,10 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
                 },
                 id,
                 label: label ?? `${language} [${id}]`,
-                // we map `afx` to `twig` as we dont support twig, but twig has better 3rd party support
-                language: language === "afx" ? "twig" : language ?? "html",
+                language:
+                    language === "afx"
+                        ? afxMappedLanguageId
+                        : language ?? "html",
                 icon: icon ?? "file",
                 completion,
             })
