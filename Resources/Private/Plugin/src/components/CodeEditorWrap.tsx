@@ -173,7 +173,7 @@ export default class CodeEditorWrap extends React.Component<Props, State> {
             this.props.onSave();
         });
 
-        editor.addCommand(monaco.KeyCode.Escape, () => {
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ, () => {
             this.props.onToggleEditor();
         });
 
