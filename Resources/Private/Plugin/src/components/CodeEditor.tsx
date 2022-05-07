@@ -36,6 +36,26 @@ type StateProps = ConnectedProps<typeof connector>;
 type Props = EditorProps<CodePenEditorOptions, Record<string, string>>;
 
 class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
+    public warnUserForPossibleNotSavedChanges(e) {
+        const confirmationMessage = `Es könnte sein dass die letzten änderungen im CodePen noch nicht gespeichert sind.`;
+        (e || window.event).returnValue = confirmationMessage;
+        return confirmationMessage;
+    }
+
+    public componentDidMount() {
+        window.addEventListener(
+            "beforeunload",
+            this.warnUserForPossibleNotSavedChanges
+        );
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener(
+            "beforeunload",
+            this.warnUserForPossibleNotSavedChanges
+        );
+    }
+
     public handleToggleCodeEditor = async () => {
         const {
             packageFrontendConfiguration,
