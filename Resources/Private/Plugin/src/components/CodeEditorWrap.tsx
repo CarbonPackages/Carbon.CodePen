@@ -175,6 +175,7 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
     }
 
     componentWillUnmount() {
+        this.activeTabDispose?.dispose();
         for (const disposable of this.disposables) {
             disposable.dispose();
         }
