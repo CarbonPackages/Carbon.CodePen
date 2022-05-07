@@ -7,6 +7,7 @@ use Neos\ContentRepository\Domain\Model\Node;
 use Neos\Flow\Mvc\Controller\ActionController;
 use Neos\Neos\View\FusionView;
 use Neos\Flow\Annotations as Flow;
+use Carbon\CodePen\VirtualNodeWithProperty;
 
 /**
  * @property FusionView view
@@ -33,6 +34,7 @@ class PreviewController extends ActionController
         $mockedNode = $this->getMockedNodeWithProperty($node, $propertyName, $propertyValueDecoded);
         $this->view->setFusionPath($this->fusionRootPath);
         $this->view->assign('value', $mockedNode);
+        $this->view->assign('site', $node->getContext()->getCurrentSiteNode());
     }
 
     /**
@@ -41,14 +43,6 @@ class PreviewController extends ActionController
      */
     private function getMockedNodeWithProperty(Node $node, string $propertyName, $propertyValue)
     {
-        $nodeData = $node->getNodeData();
-
-        $nodeDataPropertiesReflection = (new \ReflectionClass($nodeData))->getProperty('properties');
-        $nodeDataPropertiesReflection->setAccessible(true);
-        $properties = $nodeDataPropertiesReflection->getValue($nodeData);
-
-        $properties[$propertyName] = $propertyValue;
-        $nodeDataPropertiesReflection->setValue($nodeData, $properties);
-        return $node;
+        return new VirtualNodeWithProperty($node, $propertyName, $propertyValue);
     }
 }
