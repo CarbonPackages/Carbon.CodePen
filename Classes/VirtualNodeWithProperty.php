@@ -4,7 +4,9 @@ namespace Carbon\CodePen;
 
 use Neos\ContentRepository\Domain\Projection\Content\PropertyCollectionInterface;
 use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
+use Neos\Flow\Annotations as Flow;
 
+#[Flow\Proxy(false)]
 class VirtualNodeWithProperty implements TraversableNodeInterface
 {
     use ShallowNodeTrait;
