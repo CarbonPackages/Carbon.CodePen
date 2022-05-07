@@ -6,30 +6,50 @@ const languagesWithTwoIndents = ["yaml", "markdown", ...languagesStylesheets];
 
 type EditorOptions = editor.IStandaloneEditorConstructionOptions;
 
-export const getEditorConfigForLanguage = (language: string): EditorOptions => {
-    let options: EditorOptions = {
-        roundedSelection: true,
-        scrollBeyondLastLine: false,
-        insertSpaces: true,
-        detectIndentation: true,
-        copyWithSyntaxHighlighting: false,
-        tabSize: 4,
-    };
+export const getEditorConfigForLanguage = (
+    language: string
+): EditorOptions => ({
+    //
+    // Basic Config
+    //
+    roundedSelection: true,
+    scrollBeyondLastLine: false,
+    insertSpaces: true,
+    detectIndentation: true,
+    copyWithSyntaxHighlighting: false,
 
-    if (languagesWithTwoIndents.includes(language)) {
-        options.tabSize = 2;
-    }
+    //
+    // Languages With Two Indents
+    //
+    tabSize: languagesWithTwoIndents.includes(language) ? 2 : 4,
 
-    if (languagesStylesheets.includes(language)) {
-        options.wordWrap = "wordWrapColumn";
-        options.wordWrapColumn = 300;
-    }
+    //
+    // Languages Stylesheets
+    //
+    ...(languagesStylesheets.includes(language)
+        ? {
+              wordWrap: "wordWrapColumn",
+              wordWrapColumn: 300,
+          }
+        : {
+              // reset to default
+              wordWrap: "off",
+              wordWrapColumn: 80,
+          }),
 
-    if (language === "markdown") {
-        options.trimAutoWhitespace = false;
-        options.wordWrap = "wordWrapColumn";
-        options.wordWrapColumn = 200;
-    }
-
-    return options;
-};
+    //
+    // Language Markdown
+    //
+    ...(language === "markdown"
+        ? {
+              trimAutoWhitespace: false,
+              wordWrap: "wordWrapColumn",
+              wordWrapColumn: 200,
+          }
+        : {
+              // reset to default
+              trimAutoWhitespace: true,
+              wordWrap: "off",
+              wordWrapColumn: 80,
+          }),
+});
