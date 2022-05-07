@@ -7,6 +7,7 @@ import { EditorProps } from "@neos-project/neos-ts-interfaces";
 import I18n from "@neos-project/neos-ui-i18n";
 import { PackageFrontendConfiguration } from "../manifest";
 import { fetchWithErrorHandling } from "@neos-project/neos-ui-backend-connector";
+import { CodePenEditorOptions } from "./types";
 
 const objectIsEmpty = (obj: object) => {
     for (var _key in obj) {
@@ -32,20 +33,7 @@ type NeosProps = NeosifiedProps<typeof neosifier>;
 
 type StateProps = ConnectedProps<typeof connector>;
 
-type Props = EditorProps<
-    {
-        tabs: {
-            [id: string]: {
-                label?: string;
-                icon?: string;
-                language: string;
-                completion?: any;
-            };
-        };
-        disabled: boolean;
-    },
-    Record<string, string>
->;
+type Props = EditorProps<CodePenEditorOptions, Record<string, string>>;
 
 class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
     public handleToggleCodeEditor = async () => {
@@ -70,6 +58,13 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
             packageFrontendConfiguration
         );
 
+        if (!tabs) {
+            console.error(
+                `Carbon.CodePen cannot be initialized, because no tabs were defined in editiorOptions.`
+            );
+            return;
+        }
+
         const transformedInteractiveTabs = Object.entries(tabs).map(
             ([id, { label, language, completion, icon }]) => ({
                 getValue: (): string | undefined => {
@@ -79,9 +74,9 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
                     this.updateTabValue(id, newValue);
                 },
                 id,
-                label,
-                icon,
-                language,
+                label: label ?? `${language} [${id}]`,
+                language: language ?? "html",
+                icon: icon ?? "file",
                 completion,
             })
         );

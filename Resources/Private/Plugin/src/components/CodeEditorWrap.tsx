@@ -6,27 +6,12 @@ import once from "lodash.once";
 import debounce from "lodash.debounce";
 import { PackageFrontendConfiguration } from "../manifest";
 import { Icon } from "@neos-project/react-ui-components";
+import { Tab } from "./types";
 
 type IdentfierFromNodeAndProperty = string;
 type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
 
 let activeModelsByIdAndTabId: ActiveModels = {};
-
-type Suggestions = string[] | Promise<string>[];
-
-interface LazySuggestions {
-    (params: { node: Node }): Suggestions;
-}
-
-type Tab = Readonly<{
-    id: string;
-    language: string;
-    completion?: LazySuggestions | Suggestions | string;
-    label?: string;
-    icon?: string;
-    getValue(): string | undefined;
-    setValue(newValue: string): void;
-}>;
 
 interface Props {
     tabs: Tab[];
@@ -296,8 +281,8 @@ export default class CodeEditorWrap extends React.PureComponent<Props> {
                     {this.props.tabs.map((tab) => (
                         <li>
                             <button onClick={() => this.setActiveTab(tab)}>
-                                <Icon icon={tab.icon ?? "file"}></Icon>
-                                {tab.label || `${tab.language} [${tab.id}]`}
+                                <Icon icon={tab.icon}></Icon>
+                                {tab.label}
                             </button>
                         </li>
                     ))}
