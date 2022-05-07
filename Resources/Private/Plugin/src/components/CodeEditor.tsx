@@ -95,7 +95,8 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
                 },
                 id,
                 label: label ?? `${language} [${id}]`,
-                language: language ?? "html",
+                // we map `afx` to `twig` as we dont support twig, but twig has better 3rd party support
+                language: language === "afx" ? "twig" : language ?? "html",
                 icon: icon ?? "file",
                 completion,
             })

@@ -13,7 +13,7 @@ export const registerDocumentationForFusionObjects = (
         return;
     }
 
-    return monaco.languages.registerHoverProvider("html", {
+    return monaco.languages.registerHoverProvider("twig", {
         provideHover(model, position) {
             const currentLine = position.lineNumber;
             const currentCursor = position.column;

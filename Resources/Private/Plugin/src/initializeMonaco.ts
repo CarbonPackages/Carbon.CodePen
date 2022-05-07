@@ -2,6 +2,10 @@ import { PackageFrontendConfiguration } from "./manifest";
 import * as monaco from "monaco-editor";
 import { configureMonacoTailwindcss } from "monaco-tailwindcss";
 import { emmetHTML, emmetCSS } from "emmet-monaco-es";
+import {
+    conf as htmlConf,
+    language as htmlLanguage,
+} from "monaco-editor/esm/vs/basic-languages/html/html";
 
 declare global {
     interface Window {
@@ -47,9 +51,25 @@ export const initializeMonacoOnceFromConfig = (
         },
     };
 
-    initializeTailwind(packageConfig, ["html"]);
+    // we map `afx` to `twig` as we dont support twig, but twig has better 3rd party support
 
-    emmetHTML(monaco, ["html"]);
+    monaco.languages.register({
+        id: "twig",
+        extensions: [".afx"],
+        aliases: ["AFX", "afx"],
+        mimetypes: ["text/html"],
+    });
+
+    monaco.languages.registerTokensProviderFactory("twig", {
+        create() {
+            return htmlLanguage;
+        },
+    });
+    monaco.languages.setLanguageConfiguration("twig", htmlConf);
+
+    initializeTailwind(packageConfig, ["html", "twig"]);
+
+    emmetHTML(monaco, ["html", "twig"]);
     emmetCSS(monaco, ["css", "scss", "less"]);
 
     return monaco;
