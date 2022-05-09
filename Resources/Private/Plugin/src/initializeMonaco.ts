@@ -20,20 +20,12 @@ declare global {
     }
 }
 
-let initialized: {
+export const initializeMonacoFromConfig = (
+    packageConfig: PackageFrontendConfiguration
+): {
     monaco: typeof monaco;
     monacoTailwindCss?: MonacoTailwindcss;
-};
-
-export const initializeMonacoOnceFromConfig = (
-    packageConfig: PackageFrontendConfiguration
-) => {
-    if (initialized) {
-        return initialized;
-    }
-
-    initialized = { monaco };
-
+} => {
     window.MonacoEnvironment = {
         getWorkerUrl(_workerId, label) {
             switch (label) {
@@ -89,8 +81,10 @@ export const initializeMonacoOnceFromConfig = (
         afxMappedLanguageId
     );
 
+    let monacoTailwindCss: MonacoTailwindcss | undefined;
+
     if (packageConfig.tailwindcss.enabled) {
-        initialized.monacoTailwindCss = configureMonacoTailwindcss({
+        monacoTailwindCss = configureMonacoTailwindcss({
             languageSelector: ["html", afxMappedLanguageId],
             // configTailwindcss.worker.ts handles the input.
             tailwindConfig: packageConfig.tailwindcss.clientConfig,
@@ -100,5 +94,8 @@ export const initializeMonacoOnceFromConfig = (
     emmetHTML(monaco, ["html", afxMappedLanguageId]);
     emmetCSS(monaco, ["css", "scss", "less"]);
 
-    return initialized;
+    return {
+        monaco,
+        monacoTailwindCss,
+    };
 };

@@ -26,8 +26,6 @@ export type Tab = Readonly<{
     label: string;
     icon: string;
     completion?: Completion;
-    getValue(): string | undefined;
-    setValue(newValue: string): void;
 }>;
 
 export type ContentChangeListener = (args: {

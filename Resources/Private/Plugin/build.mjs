@@ -9,6 +9,7 @@ const require = createRequire(import.meta.url);
 const outdir = "../../Public/Plugin";
 
 const includedLanguages = [
+    // afx too but this is not a monaco basic language
     "yaml",
     "json",
     "html",
@@ -36,7 +37,8 @@ esbuild
     .build({
         watch: process.argv.includes("--watch"),
         logLevel: "info",
-        minify: true,
+        minify: false,
+        sourcemap: true,
         bundle: true,
         splitting: true,
         format: "esm",

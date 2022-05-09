@@ -1,8 +1,7 @@
 import manifest from "@neos-project/neos-ui-extensibility";
-
-import CodeEditor from "./components/CodeEditor";
-import CodeEditorWrap from "./components/CodeEditorWrap";
 import { carbonCallbackFactory } from "./carbonCallback";
+import NeosUiCodePenApp from "./components/NeosUiCodePenApp";
+import { CodePenWindow } from "./components/CodePenWindow";
 
 export interface PackageFrontendConfiguration {
     tailwindcss: {
@@ -53,11 +52,11 @@ manifest("Carbon.CodePen", {}, (globalRegistry) => {
         .get("secondaryEditors");
 
     editorsRegistry.set("Carbon.CodePen/CodeEditor", {
-        component: CodeEditor,
+        component: NeosUiCodePenApp,
         hasOwnLabel: true,
     });
 
     secondaryEditorsRegistry.set("Carbon.CodePen/CodeEditorWrap", {
-        component: CodeEditorWrap,
+        component: CodePenWindow,
     });
 });
