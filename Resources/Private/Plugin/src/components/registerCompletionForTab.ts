@@ -29,6 +29,7 @@ export const registerCompletionForTab = (
         }
         switch (typeof completion) {
             case "function":
+                // @ts-expect-error
                 if (!completion.__carbonCallback) {
                     console.warn(
                         "You are most likely using callbacks in ClientEval wrong. Unless you wrap them in `ClientEval:carbonCallback(...)` performance will suffer immensely: https://github.com/neos/neos-ui/issues/3117"

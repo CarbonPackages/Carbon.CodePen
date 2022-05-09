@@ -2,7 +2,6 @@ import React from "react";
 import { getEditorConfigForLanguage } from "../editorConfig";
 import { IDisposable, editor } from "monaco-editor";
 import { Node } from "@neos-project/neos-ts-interfaces";
-import { PackageFrontendConfiguration } from "../manifest";
 import { Icon } from "@neos-project/react-ui-components";
 import { Tab } from "./types";
 import { registerCompletionForTab } from "./registerCompletionForTab";
@@ -19,7 +18,6 @@ interface Props {
     property: string;
     monaco: typeof import("monaco-editor");
     setUpIframePreview(e: React.SyntheticEvent<HTMLIFrameElement>): void;
-    packageFrontendConfiguration: PackageFrontendConfiguration;
     onToggleEditor(): void;
     onSave(): void;
 }

@@ -46,8 +46,9 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
     private previewContentChangeListener?: ContentChangeListener;
     private monacoTailwindCss?: MonacoTailwindcss;
 
-    public warnUserForPossibleNotSavedChanges(e) {
+    public warnUserForPossibleNotSavedChanges(e: Event) {
         const confirmationMessage = `Es könnte sein dass die letzten änderungen im CodePen noch nicht gespeichert sind.`;
+        // @ts-expect-error
         (e || window.event).returnValue = confirmationMessage;
         return confirmationMessage;
     }
@@ -122,7 +123,6 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
 
         renderSecondaryInspector("CARBON_CODEPEN_EDIT", () => (
             <CodeEditorWrap
-                packageFrontendConfiguration={packageFrontendConfiguration}
                 monaco={monaco}
                 setUpIframePreview={this.setUpIframePreview.bind(this)}
                 node={node!}
@@ -153,9 +153,11 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
             },
         };
 
+        // @ts-expect-error
         if (iframeWindow.initializeCarbonCodpen) {
             // Custom behaviour:
             // - can be injected via fusion
+            // @ts-expect-error
             iframeWindow.initializeCarbonCodpen(codePenContext);
         } else {
             // Default behaviour:

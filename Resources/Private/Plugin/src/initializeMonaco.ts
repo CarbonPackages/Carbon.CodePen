@@ -8,6 +8,7 @@ import { emmetHTML, emmetCSS } from "emmet-monaco-es";
 import {
     conf as htmlConf,
     language as htmlLanguage,
+    // @ts-expect-error
 } from "monaco-editor/esm/vs/basic-languages/html/html";
 import { registerDocumentationForFusionObjects } from "./registerDocumentationForFusionObjects";
 import { registerCompletionForFusionObjects } from "./registerCompletionForFusionObjects";
