@@ -30,6 +30,37 @@ class VirtualNodeWithProperty implements TraversableNodeInterface
         return $this->node->{$name}(...$arguments);
     }
 
+    /**
+     * `getContext` is not part of the API, but still used in Fusion via `node.context.inBackend`
+     * We provide like the new ESCR a wrapper around this - to let fusion think we are not in Backend.
+     * @link https://github.com/neos/contentrepository-development-collection/blob/693e65edb54b82a173cb925f72c2b76bd6ff4efb/Neos.EventSourcedContentRepository.LegacyApi/Classes/ContextInNodeBasedReadModel/EmulatedLegacyContext.php#L45
+     */
+    public function getContext() {
+        return new class($this->node->getContext()) {
+            private $nodeContext;
+
+            public function __construct($nodeContext)
+            {
+                $this->nodeContext = $nodeContext;
+            }
+
+            public function isInBackend(): bool
+            {
+                return false;
+            }
+
+            public function isLive(): bool
+            {
+                return true;
+            }
+
+            public function __call(string $name, array $arguments)
+            {
+                return $this->nodeContext->{$name}(...$arguments);
+            }
+        };
+    }
+
     /*
      * Special property handling to virtualize $propertyName and $propertyValue on $node
      */
