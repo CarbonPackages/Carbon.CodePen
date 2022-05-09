@@ -2,13 +2,11 @@ import React from "react";
 import { getEditorConfigForLanguage } from "../editorConfig";
 import { IDisposable, editor } from "monaco-editor";
 import { Node } from "@neos-project/neos-ts-interfaces";
-import debounce from "lodash.debounce";
 import { PackageFrontendConfiguration } from "../manifest";
 import { Icon } from "@neos-project/react-ui-components";
 import { Tab } from "./types";
 import { registerCompletionForTab } from "./registerCompletionForTab";
 import styled, { css } from "styled-components";
-import { MonacoTailwindcss } from "monaco-tailwindcss";
 
 type IdentfierFromNodeAndProperty = string;
 type ActiveModels = Record<IdentfierFromNodeAndProperty, editor.ITextModel>;
@@ -20,9 +18,8 @@ interface Props {
     node: Node;
     property: string;
     monaco: typeof import("monaco-editor");
-    monacoTailwindCss?: MonacoTailwindcss;
+    setUpIframePreview(e: React.SyntheticEvent<HTMLIFrameElement>): void;
     packageFrontendConfiguration: PackageFrontendConfiguration;
-    renderPreviewOutOfBand(): Promise<string>;
     onToggleEditor(): void;
     onSave(): void;
 }
@@ -124,7 +121,6 @@ type State = {
 export default class CodeEditorWrap extends React.Component<Props, State> {
     private codePenContainer?: HTMLElement;
     private monacoContainer?: HTMLElement;
-    private changer;
 
     private disposables: (IDisposable | undefined)[] = [];
     private activeTabDisposable?: IDisposable;
@@ -192,13 +188,6 @@ export default class CodeEditorWrap extends React.Component<Props, State> {
             editor.onDidChangeModelContent(() => {
                 const newTabValue = editor.getValue();
                 this.state.activeTab.setValue(newTabValue);
-
-                if (this.changer) {
-                    this.changer({
-                        tabValue: newTabValue,
-                        tabId: this.state.activeTab.id,
-                    });
-                }
             }),
         ];
     }
@@ -266,85 +255,6 @@ export default class CodeEditorWrap extends React.Component<Props, State> {
         }));
     }
 
-    iframeReady = (e: React.SyntheticEvent<HTMLIFrameElement>) => {
-        console.log("iframeReady");
-
-        type ContentChangeListener = (args: {
-            tabId: string;
-            tabValue: string;
-        }) => void;
-
-        type Param = {
-            onDidChangeEditorContent(
-                callback: ContentChangeListener,
-                debounce?: number
-            ): void;
-
-            library: {
-                generateStylesFromContent(
-                    baseCss: string,
-                    content: string[]
-                ): Promise<string>;
-                renderPreviewOutOfBand(): Promise<string>;
-            };
-        };
-
-        const codePenContext: Param = {
-            onDidChangeEditorContent: (callback, debounceTimeout) => {
-                this.changer = debounce(callback, debounceTimeout);
-            },
-            library: {
-                renderPreviewOutOfBand: this.props.renderPreviewOutOfBand,
-                generateStylesFromContent:
-                    this.props.monacoTailwindCss.generateStylesFromContent,
-            },
-        };
-
-        // we use the iframe window as api. If `initializeCarbonCodpen` was registered we will use it.
-        const iframeWindow = e.currentTarget.contentWindow!;
-        const iframeDocument = iframeWindow.document;
-
-        if (iframeWindow.initializeCarbonCodpen) {
-            iframeWindow.initializeCarbonCodpen(codePenContext);
-        } else {
-            codePenContext.onDidChangeEditorContent(async ({ tabValue }) => {
-                // codePenContext.library
-                //     .renderPreviewOutOfBand()
-                //     .then((content) => {
-                //         iframeDocument.body.innerHTML = content;
-                //     });
-
-                iframeDocument.body.innerHTML = tabValue;
-
-                codePenContext.library
-                    .generateStylesFromContent(
-                        `@tailwind base;
-                        @tailwind components;
-                        @tailwind utilities;`,
-                        [tabValue]
-                    )
-                    .then((css) => {
-                        const style =
-                            iframeDocument.getElementById("_codePenTwStyle");
-                        const newStyle = iframeDocument.createElement("style");
-                        newStyle.id = "_codePenTwStyle";
-                        newStyle.innerHTML = css;
-                        if (style) {
-                            style.parentNode!.replaceChild(newStyle, style!);
-                        } else {
-                            iframeDocument.head.append(newStyle);
-                        }
-                    });
-            });
-        }
-
-        // trigger initial run
-        this.changer({
-            tabValue: this.state.activeTab.getValue(),
-            tabId: this.state.activeTab.id,
-        });
-    };
-
     render() {
         this.editor?.layout();
         return (
@@ -391,7 +301,7 @@ export default class CodeEditorWrap extends React.Component<Props, State> {
                                 width: "100%",
                                 background: "#fff",
                             }}
-                            onLoad={this.iframeReady}
+                            onLoad={this.props.setUpIframePreview}
                             srcDoc={`
                                 <!DOCTYPE html>
                                 <html>

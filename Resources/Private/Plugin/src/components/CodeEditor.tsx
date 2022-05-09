@@ -7,8 +7,14 @@ import { EditorProps } from "@neos-project/neos-ts-interfaces";
 import I18n from "@neos-project/neos-ui-i18n";
 import { PackageFrontendConfiguration } from "../manifest";
 import { fetchWithErrorHandling } from "@neos-project/neos-ui-backend-connector";
-import { CodePenEditorOptions } from "./types";
+import {
+    BootOptionsCodePenJsApi,
+    CodePenEditorOptions,
+    ContentChangeListener,
+} from "./types";
 import { afxMappedLanguageId } from "../afxMappedLanguageId";
+import debounce from "lodash.debounce";
+import { MonacoTailwindcss } from "monaco-tailwindcss";
 
 const objectIsEmpty = (obj: object) => {
     for (var _key in obj) {
@@ -37,6 +43,9 @@ type StateProps = ConnectedProps<typeof connector>;
 type Props = EditorProps<CodePenEditorOptions, Record<string, string>>;
 
 class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
+    private previewContentChangeListener?: ContentChangeListener;
+    private monacoTailwindCss?: MonacoTailwindcss;
+
     public warnUserForPossibleNotSavedChanges(e) {
         const confirmationMessage = `Es könnte sein dass die letzten änderungen im CodePen noch nicht gespeichert sind.`;
         (e || window.event).returnValue = confirmationMessage;
@@ -78,6 +87,7 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
         const { monaco, monacoTailwindCss } = initializeMonacoOnceFromConfig(
             packageFrontendConfiguration
         );
+        this.monacoTailwindCss = monacoTailwindCss;
 
         if (!tabs) {
             console.error(
@@ -93,6 +103,11 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
                 },
                 setValue: (newValue: string) => {
                     this.updateTabValue(id, newValue);
+
+                    this.previewContentChangeListener?.({
+                        tabValues: this.getValuesFromAllTabs(),
+                        tabId: id,
+                    });
                 },
                 id,
                 label: label ?? `${language} [${id}]`,
@@ -107,10 +122,9 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
 
         renderSecondaryInspector("CARBON_CODEPEN_EDIT", () => (
             <CodeEditorWrap
-                renderPreviewOutOfBand={() => this.renderPreviewOutOfBand()}
                 packageFrontendConfiguration={packageFrontendConfiguration}
                 monaco={monaco}
-                monacoTailwindCss={monacoTailwindCss}
+                setUpIframePreview={this.setUpIframePreview.bind(this)}
                 node={node!}
                 property={identifier}
                 tabs={transformedInteractiveTabs}
@@ -120,11 +134,72 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
         ));
     };
 
+    public setUpIframePreview(e: React.SyntheticEvent<HTMLIFrameElement>) {
+        // we use the iframe window as api. If `initializeCarbonCodpen` was registered we will use it.
+        const iframeWindow = e.currentTarget.contentWindow!;
+        const iframeDocument = iframeWindow.document;
+
+        const codePenContext: BootOptionsCodePenJsApi = {
+            onContentDidChange: (listener, debounceTimeout) => {
+                this.previewContentChangeListener = debounce(
+                    listener,
+                    debounceTimeout
+                );
+            },
+            renderComponentOutOfBand: () => this.renderComponentOutOfBand(),
+            library: {
+                generateStylesFromContent:
+                    this.monacoTailwindCss?.generateStylesFromContent,
+            },
+        };
+
+        if (iframeWindow.initializeCarbonCodpen) {
+            // Custom behaviour:
+            // - can be injected via fusion
+            iframeWindow.initializeCarbonCodpen(codePenContext);
+        } else {
+            // Default behaviour:
+            // - inject tailwindstyles generated from all content tabs,
+            // - render component server side
+            codePenContext.onContentDidChange(async ({ tabValues }) => {
+                codePenContext.renderComponentOutOfBand().then((content) => {
+                    iframeDocument.body.innerHTML = content;
+                });
+
+                codePenContext.library
+                    .generateStylesFromContent?.(
+                        `@tailwind base;
+                        @tailwind components;
+                        @tailwind utilities;`,
+                        Object.values(tabValues)
+                    )
+                    .then((css) => {
+                        const style =
+                            iframeDocument.getElementById("_codePenTwStyle");
+                        const newStyle = iframeDocument.createElement("style");
+                        newStyle.id = "_codePenTwStyle";
+                        newStyle.innerHTML = css;
+                        if (!style) {
+                            iframeDocument.head.append(newStyle);
+                            return;
+                        }
+                        style.parentNode!.replaceChild(newStyle, style!);
+                    });
+            });
+        }
+
+        // trigger initial run
+        this.previewContentChangeListener?.({
+            tabValues: this.getValuesFromAllTabs(),
+            tabId: Object.keys(this.props.options.tabs!)[0],
+        });
+    }
+
     public getValuesFromAllTabs() {
         return this.props.value ?? {};
     }
 
-    public async renderPreviewOutOfBand() {
+    private async renderComponentOutOfBand() {
         const result = await fetchWithErrorHandling
             .withCsrfToken((csrfToken) => ({
                 url: "/neos/codePen/render/",

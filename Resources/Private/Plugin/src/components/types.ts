@@ -29,3 +29,23 @@ export type Tab = Readonly<{
     getValue(): string | undefined;
     setValue(newValue: string): void;
 }>;
+
+export type ContentChangeListener = (args: {
+    tabId: string;
+    tabValues: Record<string, string>;
+}) => void;
+
+export type BootOptionsCodePenJsApi = {
+    onContentDidChange(
+        listener: ContentChangeListener,
+        debounce?: number
+    ): void;
+    renderComponentOutOfBand(): Promise<string>;
+
+    library: {
+        generateStylesFromContent?(
+            baseCss: string,
+            content: string[]
+        ): Promise<string>;
+    };
+};
