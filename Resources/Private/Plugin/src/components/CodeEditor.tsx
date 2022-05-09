@@ -75,7 +75,7 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
         const { initializeMonacoOnceFromConfig } = await import(
             "../initializeMonaco"
         );
-        const monaco = initializeMonacoOnceFromConfig(
+        const { monaco, monacoTailwindCss } = initializeMonacoOnceFromConfig(
             packageFrontendConfiguration
         );
 
@@ -110,6 +110,7 @@ class CodeEditor extends React.PureComponent<Props & StateProps & NeosProps> {
                 renderPreviewOutOfBand={() => this.renderPreviewOutOfBand()}
                 packageFrontendConfiguration={packageFrontendConfiguration}
                 monaco={monaco}
+                monacoTailwindCss={monacoTailwindCss}
                 node={node!}
                 property={identifier}
                 tabs={transformedInteractiveTabs}

@@ -1,6 +1,9 @@
 import { PackageFrontendConfiguration } from "./manifest";
 import * as monaco from "monaco-editor";
-import { configureMonacoTailwindcss } from "monaco-tailwindcss";
+import {
+    configureMonacoTailwindcss,
+    MonacoTailwindcss,
+} from "monaco-tailwindcss";
 import { emmetHTML, emmetCSS } from "emmet-monaco-es";
 import {
     conf as htmlConf,
@@ -16,15 +19,19 @@ declare global {
     }
 }
 
-let initialized = false;
+let initialized: {
+    monaco: typeof monaco;
+    monacoTailwindCss?: MonacoTailwindcss;
+};
 
 export const initializeMonacoOnceFromConfig = (
     packageConfig: PackageFrontendConfiguration
-): typeof monaco => {
+) => {
     if (initialized) {
-        return monaco;
+        return initialized;
     }
-    initialized = true;
+
+    initialized = { monaco };
 
     window.MonacoEnvironment = {
         getWorkerUrl(_workerId, label) {
@@ -81,24 +88,16 @@ export const initializeMonacoOnceFromConfig = (
         afxMappedLanguageId
     );
 
-    initializeTailwind(packageConfig, ["html", afxMappedLanguageId]);
+    if (packageConfig.tailwindcss.enabled) {
+        initialized.monacoTailwindCss = configureMonacoTailwindcss({
+            languageSelector: ["html", afxMappedLanguageId],
+            // configTailwindcss.worker.ts handles the input.
+            tailwindConfig: packageConfig.tailwindcss.clientConfig,
+        });
+    }
 
     emmetHTML(monaco, ["html", afxMappedLanguageId]);
     emmetCSS(monaco, ["css", "scss", "less"]);
 
-    return monaco;
-};
-
-const initializeTailwind = (
-    packageConfig: PackageFrontendConfiguration,
-    languageSelector: string[]
-) => {
-    if (!packageConfig.tailwindcss.enabled) {
-        return;
-    }
-    configureMonacoTailwindcss({
-        languageSelector,
-        // configTailwindcss.worker.ts handles the input.
-        tailwindConfig: packageConfig.tailwindcss.clientConfig,
-    });
+    return initialized;
 };
