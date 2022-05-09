@@ -135,6 +135,30 @@ export default class CodeEditorWrap extends React.Component<Props, State> {
         };
     }
 
+    /**
+     * Currently the secondary editor is rendered via a React Portal and absolutely positioned with css
+     * see image https://github.com/neos/neos-ui/issues/3095#issuecomment-1085740348
+     * but the css `top` property is with `82px` px to high and we would cut off content of the bottom from the editor
+     * so we hackily set the top property to `41px` for this editor.
+     */
+    private fixNeosSecondEditorPortalHangingToLow(): IDisposable | undefined {
+        const secondaryEditorFrame = document.querySelector(
+            "[class*=secondaryInspector]"
+        ) as HTMLElement | null;
+
+        if (!secondaryEditorFrame?.contains(this.monacoContainer!)) {
+            return;
+        }
+
+        secondaryEditorFrame.style.top = "41px";
+
+        return {
+            dispose() {
+                secondaryEditorFrame.style.top = "";
+            },
+        };
+    }
+
     async componentDidMount() {
         if (!this.monacoContainer) {
             return;
@@ -189,6 +213,7 @@ export default class CodeEditorWrap extends React.Component<Props, State> {
                 const newTabValue = editor.getValue();
                 this.state.activeTab.setValue(newTabValue);
             }),
+            this.fixNeosSecondEditorPortalHangingToLow(),
         ];
     }
 
