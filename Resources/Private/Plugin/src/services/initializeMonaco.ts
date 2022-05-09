@@ -1,4 +1,4 @@
-import { PackageFrontendConfiguration } from "./manifest";
+import { PackageFrontendConfiguration } from "../manifest";
 import * as monaco from "monaco-editor";
 import {
     configureMonacoTailwindcss,
@@ -12,7 +12,7 @@ import {
 } from "monaco-editor/esm/vs/basic-languages/html/html";
 import { registerDocumentationForFusionObjects } from "./registerDocumentationForFusionObjects";
 import { registerCompletionForFusionObjects } from "./registerCompletionForFusionObjects";
-import { afxMappedLanguageId } from "./afxMappedLanguageId";
+import { afxMappedLanguageId } from "../afxMappedLanguageId";
 
 declare global {
     interface Window {

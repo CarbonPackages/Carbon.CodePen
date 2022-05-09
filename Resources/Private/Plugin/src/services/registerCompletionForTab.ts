@@ -1,5 +1,5 @@
 import { IDisposable } from "monaco-editor";
-import { Tab } from "./types";
+import { Tab } from "../types";
 import once from "lodash.once";
 import { Node } from "@neos-project/neos-ts-interfaces";
 

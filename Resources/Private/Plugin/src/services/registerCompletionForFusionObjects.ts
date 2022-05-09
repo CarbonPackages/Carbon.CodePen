@@ -1,5 +1,5 @@
 import { IDisposable } from "monaco-editor";
-import { PackageFrontendConfiguration } from "./manifest";
+import { PackageFrontendConfiguration } from "../manifest";
 // not api see https://github.com/troy351/emmet-monaco-es/issues/102
 import { isValidLocationForEmmetAbbreviation } from "emmet-monaco-es/src/abbreviationActions";
 

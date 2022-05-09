@@ -1,6 +1,6 @@
 import manifest from "@neos-project/neos-ui-extensibility";
 import { carbonCallbackFactory } from "./carbonCallback";
-import NeosUiCodePenApp from "./components/NeosUiCodePenApp";
+import NeosUiCodePenApp from "./NeosUiCodePenApp";
 import { CodePenWindow } from "./components/CodePenWindow";
 
 export interface PackageFrontendConfiguration {

@@ -3,12 +3,12 @@ import { neos, NeosifiedProps } from "@neos-project/neos-ui-decorators";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ts-interfaces";
-import { PackageFrontendConfiguration } from "../manifest";
+import { PackageFrontendConfiguration } from "./manifest";
 import { CodePenEditorOptions, Tab } from "./types";
-import { CodePenButton } from "./CodePenButton";
-import { CodePenBloc } from "./CodePenBloc";
-import { provideCodePenPlock } from "./DependencyLoader";
-import { afxMappedLanguageId } from "../afxMappedLanguageId";
+import { CodePenButton } from "./components/CodePenButton";
+import { CodePenBloc } from "./bloc/CodePenBloc";
+import { provideCodePenPlock } from "./dependencyLoader";
+import { afxMappedLanguageId } from "./afxMappedLanguageId";
 
 const neosifier = neos((globalRegistry) => ({
     secondaryEditorsRegistry: globalRegistry
@@ -141,7 +141,8 @@ class NeosUiCodePenApp extends React.PureComponent<Props> {
     public renderWindow = () => {
         const CodePenWindow = this.props.secondaryEditorsRegistry.get(
             "Carbon.CodePen/CodeEditorWrap"
-        )!.component as typeof import("./CodePenWindow").CodePenWindow;
+        )!
+            .component as typeof import("./components/CodePenWindow").CodePenWindow;
 
         return <CodePenWindow codePenBloc={this.codePenBloc!} />;
     };

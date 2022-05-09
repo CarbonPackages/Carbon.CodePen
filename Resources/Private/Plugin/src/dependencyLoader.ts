@@ -1,5 +1,5 @@
-import { PackageFrontendConfiguration } from "../manifest";
-import { CodePenBloc } from "./CodePenBloc";
+import { PackageFrontendConfiguration } from "./manifest";
+import { CodePenBloc } from "./bloc/CodePenBloc";
 
 let codePenBloc: CodePenBloc;
 
@@ -10,7 +10,9 @@ export const provideCodePenPlock = async (
         return codePenBloc;
     }
 
-    const { initializeMonacoFromConfig } = await import("../initializeMonaco");
+    const { initializeMonacoFromConfig } = await import(
+        "./services/initializeMonaco"
+    );
 
     const { monaco, monacoTailwindCss } = initializeMonacoFromConfig(
         frontendConfiguration

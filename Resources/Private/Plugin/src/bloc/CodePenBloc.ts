@@ -3,10 +3,10 @@ import { fetchWithErrorHandling } from "@neos-project/neos-ui-backend-connector"
 import debounce from "lodash.debounce";
 import { editor, IDisposable } from "monaco-editor";
 import { MonacoTailwindcss } from "monaco-tailwindcss";
-import { getEditorConfigForLanguage } from "../editorConfig";
+import { getEditorConfigForLanguage } from "../services/editorConfig";
 import { Bloc } from "./Bloc";
-import { registerCompletionForTab } from "./registerCompletionForTab";
-import { BootOptionsCodePenJsApi, ContentChangeListener, Tab } from "./types";
+import { registerCompletionForTab } from "../services/registerCompletionForTab";
+import { BootOptionsCodePenJsApi, ContentChangeListener, Tab } from "../types";
 
 export type CodePenState = {
     tabs: Tab[];

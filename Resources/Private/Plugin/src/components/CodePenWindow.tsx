@@ -1,5 +1,5 @@
 import React from "react";
-import { CodePenBloc, CodePenState } from "./CodePenBloc";
+import { CodePenBloc, CodePenState } from "../bloc/CodePenBloc";
 import {
     CodePenContainer,
     EditorAndPreviewContainer,
