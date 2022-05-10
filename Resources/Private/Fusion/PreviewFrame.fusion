@@ -1,0 +1,46 @@
+prototype(Carbon.CodePen:PreviewFrame) < prototype(Neos.Fusion:Http.Message) {
+    doctype = '<!DOCTYPE html>'
+
+    htmlTag = Neos.Fusion:Tag {
+        tagName = 'html'
+        omitClosingTag = TRUE
+    }
+
+    headTag = Neos.Fusion:Tag {
+        tagName = 'head'
+        omitClosingTag = TRUE
+    }
+
+    # @api
+    # The content of the head tag, integrators can add their own head content in this array.
+    head = Neos.Fusion:Join {
+        meta = afx`
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        `
+
+        # Link tags for stylesheets in the head should go here
+        stylesheets = Neos.Fusion:Join
+
+        # Script includes in the head should go here
+        javascripts = Neos.Fusion:Join {
+
+            defaultPreviewHandler = afx`
+                <script>
+                    {StaticResource.content('Carbon.CodePen', 'Private/Fusion/defaultCodePenPreviewHandler.js')}
+                </script>
+            `
+            defaultPreviewHandler.@position = "end 100"
+
+        }
+    }
+
+    closingHeadTag = '</head>'
+
+    // the body is empty, since it will be filled via javascript.
+    body = '<body></body>'
+
+    closingHtmlTag = '</html>'
+
+    @exceptionHandler = 'Neos\\Neos\\Fusion\\ExceptionHandlers\\PageHandler'
+}

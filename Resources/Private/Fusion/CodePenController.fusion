@@ -1,0 +1,29 @@
+codePenPreviewFrame = Neos.Fusion:Case {
+    nodeSpecificPreviewFrame {
+        condition = Neos.Fusion:CanRender {
+            type = ${node.nodeType + '.PreviewFrame'}
+        }
+        type = ${node.nodeType + '.PreviewFrame'}
+    }
+
+    previewFrame {
+        @position = "end"
+        condition = true
+        renderer = Carbon.CodePen:PreviewFrame
+    }
+}
+
+codePenVirtualNode = Neos.Fusion:Case {
+    nodeSpecificComponent {
+        condition = Neos.Fusion:CanRender {
+            type = ${node.nodeType + '.CodePen'}
+        }
+        type = ${node.nodeType + '.CodePen'}
+    }
+
+    component {
+        @position = "end"
+        condition = true
+        type = ${node.nodeType}
+    }
+}
