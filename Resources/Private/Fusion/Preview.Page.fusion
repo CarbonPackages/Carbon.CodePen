@@ -1,37 +1,15 @@
-
-prototype(Carbon.CodePen:DefaultStylesAndJavascript) < prototype(Neos.Fusion:Join) {
-
-    meta = afx`
-        <meta charset="utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    `
-
-    stylesheets = Neos.Fusion:Join
-
-    javascripts = Neos.Fusion:Join {
-
-        defaultPreviewHandler = afx`
-            <script>
-                {StaticResource.content('Carbon.CodePen', 'Private/Fusion/defaultStylesAndJavascript.js')}
-            </script>
-        `
-        defaultPreviewHandler.@position = "end 100"
-    }
-}
-
-
-codePenStylesAndJavascript = Neos.Fusion:Case {
+codePenPreviewFrame = Neos.Fusion:Case {
 
     nodeSpecificStylesAndJavascript {
         condition = Neos.Fusion:CanRender {
-            type = ${node.nodeType + '.StylesAndJavascript'}
+            type = ${node.nodeType + '.PreviewFrame'}
         }
-        type = ${node.nodeType + '.StylesAndJavascript'}
+        type = ${node.nodeType + '.PreviewFrame'}
     }
 
     default {
         condition = true
-        renderer = Carbon.CodePen:DefaultStylesAndJavascript
+        renderer = Carbon.CodePen:PreviewFrame
     }
 }
 
@@ -49,10 +27,7 @@ codePenVirtualNode = Neos.Fusion:Case {
     }
 }
 
-#
-# Prototype that renders a the document around a preview-prototype
-#
-prototype(Carbon.CodePen:Preview.Page) < prototype(Neos.Fusion:Http.Message) {
+prototype(Carbon.CodePen:PreviewFrame) < prototype(Neos.Fusion:Http.Message) {
 
     doctype = '<!DOCTYPE html>'
     doctype.@position = 'start 100'
@@ -76,17 +51,10 @@ prototype(Carbon.CodePen:Preview.Page) < prototype(Neos.Fusion:Http.Message) {
     head = Neos.Fusion:Join {
         @position = 'after headTag'
 
-        characterSetMetaTag = Neos.Fusion:Tag {
-            @position = 'start 10'
-            tagName = 'meta'
-            attributes {
-                charset = 'UTF-8'
-            }
-        }
-
-        titleTag = Neos.Fusion:Tag {
-            tagName = 'title'
-        }
+        meta = afx`
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        `
 
         # Link tags for stylesheets in the head should go here
         stylesheets = Neos.Fusion:Join
@@ -107,24 +75,8 @@ prototype(Carbon.CodePen:Preview.Page) < prototype(Neos.Fusion:Http.Message) {
         omitClosingTag = TRUE
     }
 
-    # Content of the body tag. To be defined by the integrator.
-    body = Neos.Fusion:Join {
-        @position = 'after bodyTag'
-
-        nodeOutOfBand = Neos.Fusion:Case {
-            codePenComponent {
-                condition = Neos.Fusion:CanRender {
-                    type = ${node.nodeType + '.CodePen'}
-                }
-                type = ${node.nodeType + '.CodePen'}
-            }
-
-            component {
-                condition = true
-                type = ${node.nodeType}
-            }
-        }
-    }
+    // not body!
+    body >
 
     closingBodyTag = '</body>'
     closingBodyTag.@position = 'end 100'
@@ -133,4 +85,14 @@ prototype(Carbon.CodePen:Preview.Page) < prototype(Neos.Fusion:Http.Message) {
     closingHtmlTag.@position = 'end 200'
 
     @exceptionHandler = 'Neos\\Neos\\Fusion\\ExceptionHandlers\\PageHandler'
+}
+
+
+prototype(Carbon.CodePen:PreviewFrame).head.javascripts {
+    defaultPreviewHandler = afx`
+        <script>
+            {StaticResource.content('Carbon.CodePen', 'Private/Fusion/defaultStylesAndJavascript.js')}
+        </script>
+    `
+    defaultPreviewHandler.@position = "end 100"
 }

@@ -37,9 +37,9 @@ class PreviewController extends ActionController
         $this->view->assign('site', $node->getContext()->getCurrentSiteNode());
     }
 
-    public function renderStylesAndJavascriptAction(Node $node)
+    public function renderPreviewFrameAction(Node $node)
     {
-        $this->view->setFusionPath('codePenStylesAndJavascript');
+        $this->view->setFusionPath('codePenPreviewFrame');
         $this->view->assign('value', $node);
     }
 

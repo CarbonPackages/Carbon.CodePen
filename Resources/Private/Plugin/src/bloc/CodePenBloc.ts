@@ -12,7 +12,7 @@ import {
     ContentChangeListener,
     Tab,
 } from "../types";
-import { insertHtmlStringAndRunScriptTags, objectIsEmpty } from "./helper";
+import { objectIsEmpty } from "./helper";
 
 export type CodePenState = {
     tabs: Tab[];
@@ -172,35 +172,23 @@ export class CodePenBloc extends Bloc<CodePenState> {
     }
 
     public async setUpIframePreview(iframe: HTMLIFrameElement) {
+        if (!iframe || !iframe.contentWindow) {
+            console.error(`Cannot initialize iframe.`);
+            return;
+        }
+
         // we use the iframe window as api
-        const iframeWindow = iframe.contentWindow!;
-        const iframeDocument = iframeWindow.document;
+        const iframeWindow = iframe.contentWindow;
 
+        // make it callable only once.
         let initialized = false;
-
         iframeWindow.configureCodePenPreview = (bootstrap) => {
-            // make it callable only once.
             if (initialized) {
                 return;
             }
             initialized = true;
             this.configureCodePenPreview(bootstrap);
         };
-
-        // inject the head rendered by fusion.
-        // todo use different method, as
-        const headHtml = await this.renderStylesAndJavascript();
-        insertHtmlStringAndRunScriptTags(
-            iframeDocument,
-            iframeDocument.head,
-            headHtml
-        );
-    }
-
-    private renderStylesAndJavascript() {
-        return this.fetchAction("renderStylesAndJavascript", {
-            node: this.neosUiEditorApi!.node!.contextPath,
-        });
     }
 
     private renderComponentOutOfBand() {
@@ -211,6 +199,12 @@ export class CodePenBloc extends Bloc<CodePenState> {
                 this.neosUiEditorApi!.tabValues
             ),
         });
+    }
+
+    public getIframePreviewUri() {
+        const action = "renderPreviewFrame";
+        const query = `node=${this.neosUiEditorApi!.node.contextPath}`;
+        return `/neos/codePen/${action}?${query}`;
     }
 
     private fetchAction(action: string, args: Record<string, string>) {

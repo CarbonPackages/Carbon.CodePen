@@ -30,5 +30,5 @@ window.configureCodePenPreview((codePenContext) => {
                 }
                 style.parentNode.replaceChild(newStyle, style);
             });
-    });
+    }, 500);
 });

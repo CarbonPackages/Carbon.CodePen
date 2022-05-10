@@ -14,8 +14,9 @@ type Props = {
 };
 
 export class CodePenWindow extends React.PureComponent<Props, CodePenState> {
-    private codePenContainer?: HTMLElement;
-    private monacoContainer?: HTMLElement;
+    private codePenContainer?: HTMLElement | null;
+    private monacoContainer?: HTMLElement | null;
+    private iframePreview?: HTMLIFrameElement | null;
 
     public constructor(props: Props) {
         super(props);
@@ -32,6 +33,7 @@ export class CodePenWindow extends React.PureComponent<Props, CodePenState> {
             this.monacoContainer!,
             this.codePenContainer!
         );
+        this.props.codePenBloc.setUpIframePreview(this.iframePreview!);
     }
 
     public componentWillUnmount() {
@@ -41,7 +43,7 @@ export class CodePenWindow extends React.PureComponent<Props, CodePenState> {
 
     public render() {
         return (
-            <CodePenContainer ref={(el) => (this.codePenContainer = el!)}>
+            <CodePenContainer ref={(el) => (this.codePenContainer = el)}>
                 <TabNavigation>
                     <TabItem
                         active={this.state.previewModeColumn}
@@ -82,7 +84,7 @@ export class CodePenWindow extends React.PureComponent<Props, CodePenState> {
                 <EditorAndPreviewContainer
                     column={this.state.previewModeColumn}
                 >
-                    <div ref={(el) => (this.monacoContainer = el!)} />
+                    <div ref={(el) => (this.monacoContainer = el)} />
                     <div>
                         <iframe
                             style={{
@@ -90,18 +92,8 @@ export class CodePenWindow extends React.PureComponent<Props, CodePenState> {
                                 width: "100%",
                                 background: "#fff",
                             }}
-                            onLoad={({ currentTarget }) =>
-                                this.props.codePenBloc.setUpIframePreview(
-                                    currentTarget
-                                )
-                            }
-                            srcDoc={`
-                            <!DOCTYPE html>
-                            <html>
-                                <head></head>
-                                <body></body>
-                            </html>
-                        `}
+                            ref={(el) => (this.iframePreview = el)}
+                            src={this.props.codePenBloc.getIframePreviewUri()}
                         ></iframe>
                     </div>
                 </EditorAndPreviewContainer>
