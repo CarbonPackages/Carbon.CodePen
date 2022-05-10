@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'Resources/Private/Plugin/**/*'
+      - 'Resources/Private/Plugin/**/*.ts'
+      - 'Resources/Private/Plugin/**/*.tsx'
     branches-ignore:
       - dependabot/**
 
