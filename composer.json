@@ -1,7 +1,7 @@
 {
-    "description": "",
-    "type": "neos-plugin",
     "name": "carbon/codepen",
+    "type": "neos-plugin",
+    "description": "Code alongside a live preview rendered by Fusion. You can configure it further to use Javascript to preview or inject JS and styles via Fusion",
     "require": {
         "neos/neos-ui": "^7.0 || ^8.0"
     },
