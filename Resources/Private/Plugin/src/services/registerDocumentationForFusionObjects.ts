@@ -1,5 +1,5 @@
 import { IDisposable } from "monaco-editor";
-import { PackageFrontendConfiguration } from "./manifest";
+import { PackageFrontendConfiguration } from "../manifest";
 
 export const registerDocumentationForFusionObjects = (
     monaco: typeof import("monaco-editor"),

@@ -8,7 +8,7 @@ import { CodePenEditorOptions, Tab } from "./types";
 import { CodePenButton } from "./components/CodePenButton";
 import { CodePenBloc } from "./bloc/CodePenBloc";
 import { provideCodePenPlock } from "./dependencyLoader";
-import { afxMappedLanguageId } from "./afxMappedLanguageId";
+import { afxMappedLanguageId } from "./services/afxMappedLanguageId";
 
 const neosifier = neos((globalRegistry) => ({
     secondaryEditorsRegistry: globalRegistry

@@ -12,7 +12,7 @@ import {
     ContentChangeListener,
     Tab,
 } from "../types";
-import { objectIsEmpty } from "./helper";
+import { objectIsEmpty } from "../utils/helper";
 
 export type CodePenState = {
     tabs: Tab[];
@@ -27,6 +27,8 @@ const initalState: CodePenState = {
 };
 
 type PropertyValue = Record<string, string>;
+
+type TabValues = Record<string, string>;
 
 type NeosUiEditorApi = {
     node: Node;

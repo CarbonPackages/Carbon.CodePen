@@ -37,8 +37,8 @@ esbuild
     .build({
         watch: process.argv.includes("--watch"),
         logLevel: "info",
-        minify: false,
-        sourcemap: true,
+        minify: true,
+        sourcemap: false,
         bundle: true,
         splitting: true,
         format: "esm",
