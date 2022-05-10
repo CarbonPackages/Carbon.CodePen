@@ -1,3 +1,54 @@
+
+prototype(Carbon.CodePen:DefaultStylesAndJavascript) < prototype(Neos.Fusion:Join) {
+
+    meta = afx`
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    `
+
+    stylesheets = Neos.Fusion:Join
+
+    javascripts = Neos.Fusion:Join {
+
+        defaultPreviewHandler = afx`
+            <script>
+                {StaticResource.content('Carbon.CodePen', 'Private/Fusion/defaultStylesAndJavascript.js')}
+            </script>
+        `
+        defaultPreviewHandler.@position = "end 100"
+    }
+}
+
+
+codePenStylesAndJavascript = Neos.Fusion:Case {
+
+    nodeSpecificStylesAndJavascript {
+        condition = Neos.Fusion:CanRender {
+            type = ${node.nodeType + '.StylesAndJavascript'}
+        }
+        type = ${node.nodeType + '.StylesAndJavascript'}
+    }
+
+    default {
+        condition = true
+        renderer = Carbon.CodePen:DefaultStylesAndJavascript
+    }
+}
+
+codePenVirtualNode = Neos.Fusion:Case {
+    codePenComponent {
+        condition = Neos.Fusion:CanRender {
+            type = ${node.nodeType + '.CodePen'}
+        }
+        type = ${node.nodeType + '.CodePen'}
+    }
+
+    component {
+        condition = true
+        type = ${node.nodeType}
+    }
+}
+
 #
 # Prototype that renders a the document around a preview-prototype
 #

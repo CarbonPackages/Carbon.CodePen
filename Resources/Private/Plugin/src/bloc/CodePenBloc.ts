@@ -6,7 +6,13 @@ import { MonacoTailwindcss } from "monaco-tailwindcss";
 import { getEditorConfigForLanguage } from "../services/editorConfig";
 import { Bloc } from "./Bloc";
 import { registerCompletionForTab } from "../services/registerCompletionForTab";
-import { BootOptionsCodePenJsApi, ContentChangeListener, Tab } from "../types";
+import {
+    CodePenContext,
+    ConfigureCodePenBootstrap,
+    ContentChangeListener,
+    Tab,
+} from "../types";
+import { insertHtmlStringAndRunScriptTags, objectIsEmpty } from "./helper";
 
 export type CodePenState = {
     tabs: Tab[];
@@ -33,13 +39,6 @@ type NeosUiEditorApi = {
     applyTabValues(): void;
     commitTabValues(propertyValue: PropertyValue): void;
     resetTabValues(): void;
-};
-
-const objectIsEmpty = (obj: object) => {
-    for (var _key in obj) {
-        return false;
-    }
-    return true;
 };
 
 /**
@@ -149,12 +148,8 @@ export class CodePenBloc extends Bloc<CodePenState> {
         });
     }
 
-    public setUpIframePreview(iframe: HTMLIFrameElement) {
-        // we use the iframe window as api. If `initializeCarbonCodpen` was registered we will use it.
-        const iframeWindow = iframe.contentWindow!;
-        const iframeDocument = iframeWindow.document;
-
-        const codePenContext: BootOptionsCodePenJsApi = {
+    public configureCodePenPreview(bootstrap: ConfigureCodePenBootstrap) {
+        const codePenContext: CodePenContext = {
             onContentDidChange: (listener, debounceTimeout) => {
                 this.previewContentChangeListener = debounce(
                     listener,
@@ -163,47 +158,11 @@ export class CodePenBloc extends Bloc<CodePenState> {
             },
             renderComponentOutOfBand: () => this.renderComponentOutOfBand(),
             library: {
-                generateStylesFromContent:
+                generateTailwindStylesFromContent:
                     this.monacoTailwindCss?.generateStylesFromContent,
             },
         };
-
-        // @ts-expect-error
-        if (iframeWindow.initializeCarbonCodpen) {
-            // Custom behaviour:
-            // - can be injected via fusion
-            // @ts-expect-error
-            iframeWindow.initializeCarbonCodpen(codePenContext);
-        } else {
-            // Default behaviour:
-            // - inject tailwindstyles generated from all content tabs,
-            // - render component server side
-            codePenContext.onContentDidChange(async ({ tabValues }) => {
-                codePenContext.renderComponentOutOfBand().then((content) => {
-                    iframeDocument.body.innerHTML = content;
-                });
-
-                codePenContext.library
-                    .generateStylesFromContent?.(
-                        `@tailwind base;
-                        @tailwind components;
-                        @tailwind utilities;`,
-                        Object.values(tabValues)
-                    )
-                    .then((css) => {
-                        const style =
-                            iframeDocument.getElementById("_codePenTwStyle");
-                        const newStyle = iframeDocument.createElement("style");
-                        newStyle.id = "_codePenTwStyle";
-                        newStyle.innerHTML = css;
-                        if (!style) {
-                            iframeDocument.head.append(newStyle);
-                            return;
-                        }
-                        style.parentNode!.replaceChild(newStyle, style!);
-                    });
-            });
-        }
+        bootstrap(codePenContext);
 
         // trigger initial run
         this.previewContentChangeListener!({
@@ -212,28 +171,64 @@ export class CodePenBloc extends Bloc<CodePenState> {
         });
     }
 
-    private async renderComponentOutOfBand() {
-        const result = await fetchWithErrorHandling
+    public async setUpIframePreview(iframe: HTMLIFrameElement) {
+        // we use the iframe window as api
+        const iframeWindow = iframe.contentWindow!;
+        const iframeDocument = iframeWindow.document;
+
+        let initialized = false;
+
+        iframeWindow.configureCodePenPreview = (bootstrap) => {
+            // make it callable only once.
+            if (initialized) {
+                return;
+            }
+            initialized = true;
+            this.configureCodePenPreview(bootstrap);
+        };
+
+        // inject the head rendered by fusion.
+        // todo use different method, as
+        const headHtml = await this.renderStylesAndJavascript();
+        insertHtmlStringAndRunScriptTags(
+            iframeDocument,
+            iframeDocument.head,
+            headHtml
+        );
+    }
+
+    private renderStylesAndJavascript() {
+        return this.fetchAction("renderStylesAndJavascript", {
+            node: this.neosUiEditorApi!.node!.contextPath,
+        });
+    }
+
+    private renderComponentOutOfBand() {
+        return this.fetchAction("renderVirtualNode", {
+            node: this.neosUiEditorApi!.node!.contextPath,
+            additionalPropertyName: this.neosUiEditorApi!.nodeTabProperty,
+            additionalPropertyValue: JSON.stringify(
+                this.neosUiEditorApi!.tabValues
+            ),
+        });
+    }
+
+    private fetchAction(action: string, args: Record<string, string>) {
+        return fetchWithErrorHandling
             .withCsrfToken((csrfToken) => ({
-                url: "/neos/codePen/render/",
+                url: `/neos/codePen/${action}`,
                 method: "POST",
                 credentials: "include",
                 headers: {
                     "X-Flow-Csrftoken": csrfToken,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    node: this.neosUiEditorApi!.node!.contextPath,
-                    propertyName: this.neosUiEditorApi!.nodeTabProperty,
-                    propertyValue: JSON.stringify(
-                        this.neosUiEditorApi!.tabValues
-                    ),
-                }),
+                body: JSON.stringify(args),
             }))
             .catch((reason) =>
                 fetchWithErrorHandling.generalErrorHandler(reason)
-            );
-        return result.text();
+            )
+            .then((result) => result.text());
     }
 
     public initializeMonaco(

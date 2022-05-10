@@ -4,7 +4,7 @@ privilegeTargets:
       matcher: 'method(Carbon\CodePen\Controller\PreviewController->(?!initialize).*Action())'
 
 roles:
-  'Neos.Flow:Everybody':
+  'Neos.Neos:AbstractEditor':
     privileges:
       -
         privilegeTarget:  'Carbon.CodePen:Preview'

@@ -33,7 +33,7 @@ export type ContentChangeListener = (args: {
     tabValues: Record<string, string>;
 }) => void;
 
-export type BootOptionsCodePenJsApi = {
+export type CodePenContext = {
     onContentDidChange(
         listener: ContentChangeListener,
         debounce?: number
@@ -41,9 +41,19 @@ export type BootOptionsCodePenJsApi = {
     renderComponentOutOfBand(): Promise<string>;
 
     library: {
-        generateStylesFromContent?(
+        generateTailwindStylesFromContent?(
             baseCss: string,
             content: string[]
         ): Promise<string>;
     };
 };
+
+export type ConfigureCodePenBootstrap = (
+    codePenContext: CodePenContext
+) => void;
+
+declare global {
+    interface Window {
+        configureCodePenPreview(bootstrap: ConfigureCodePenBootstrap): void;
+    }
+}

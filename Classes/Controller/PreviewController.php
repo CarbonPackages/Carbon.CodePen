@@ -25,16 +25,22 @@ class PreviewController extends ActionController
      */
     protected $fusionRootPath;
 
-    public function renderAction(Node $node, string $propertyName, string $propertyValue)
+    public function renderVirtualNodeAction(Node $node, string $additionalPropertyName, string $additionalPropertyValue)
     {
-        $propertyValueDecoded = json_decode($propertyValue, true, 512, JSON_THROW_ON_ERROR);
+        $propertyValueDecoded = json_decode($additionalPropertyValue, true, 512, JSON_THROW_ON_ERROR);
         if ($propertyValueDecoded === '' || $propertyValueDecoded === []) {
             $propertyValueDecoded = null;
         }
-        $mockedNode = $this->getMockedNodeWithProperty($node, $propertyName, $propertyValueDecoded);
-        $this->view->setFusionPath($this->fusionRootPath);
+        $mockedNode = $this->getMockedNodeWithProperty($node, $additionalPropertyName, $propertyValueDecoded);
+        $this->view->setFusionPath('codePenVirtualNode');
         $this->view->assign('value', $mockedNode);
         $this->view->assign('site', $node->getContext()->getCurrentSiteNode());
+    }
+
+    public function renderStylesAndJavascriptAction(Node $node)
+    {
+        $this->view->setFusionPath('codePenStylesAndJavascript');
+        $this->view->assign('value', $node);
     }
 
     /**
