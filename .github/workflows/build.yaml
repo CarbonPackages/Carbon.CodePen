@@ -32,9 +32,8 @@ jobs:
 
       - name: Push files to GitHub
         run: |
-          ex -sc g%^/Resources/Public%d -cx .gitignore
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Resources/Public/**/*
-          git commit -m "Update: Build frontend files"
+          git commit -f -m "Update: Build frontend files"
           git push
