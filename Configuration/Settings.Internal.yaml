@@ -16,3 +16,14 @@ Neos:
     fusion:
       autoInclude:
         "Carbon.CodePen": true
+
+    Ui:
+      resources:
+        javascript:
+          'Carbon.CodePen:Plugin':
+            resource: 'resource://Carbon.CodePen/Public/Plugin/Plugin.js'
+            # TODO add `type` option in Neos ui
+            type: 'module'
+        stylesheets:
+          'Carbon.CodePen:Plugin':
+            resource: 'resource://Carbon.CodePen/Public/Plugin/Plugin.css'

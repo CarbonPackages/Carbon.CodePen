@@ -3,6 +3,10 @@ Neos:
     Ui:
       frontendConfiguration:
         'Carbon.CodeEditor':
+
+          #
+          # Options for the tailwindcss support
+          #
           tailwindcss:
 
             #
@@ -13,19 +17,45 @@ Neos:
             enabled: true
 
             #
-            # Uri for the worker to be used.
-            # Its possible to configure this to a custom worker with embedded Tailwind config.
-            # This way plugins from the tailwind config are preserved.
+            # Provide a custom tailwind configuartion for the editor.
+            # You can decide to insert a Json string or a http URI to a Javascript bundle of your config.
             #
-            # @var string
+            # @example:
+            #   - using Json:
+            #     "${File.readFile('resource://Neos.Demo/Public/clientTailwindConfig.json')}"
+            #   - using JavaScript:
+            #     "${StaticResource.uri('Neos.Demo', 'Public/bundledTailwindConfig.js')}"
             #
-            workerUri: "${StaticResource.uri('Neos.Demo', 'Public/embeddedconfigtailwind.worker.js')}"
+            # @var string | null
+            #
+            clientConfig: null
+
+          #
+          # Options for the afx support
+          #
+          afx:
 
             #
-            # To be used with the *default worker* implementation.
-            # A simple way to provide config as json.
-            # Plugins (eg functions) of the tailwind config cannot not be preserved.
+            # Configure the fusion objects relevant for AFX
+            # you can add a custom expand snippet ala vscode syntax
+            # or provide some markdown configuration
             #
-            # @var string?
+            # @var {[fusionObjectName:string]: {
+            #   documentation: string;
+            #   snippet: string;
+            # }}
             #
-            clientConfig: "${File.readFile('resource://Neos.Demo/Public/clientTailwindConfig.json')}"
+            # @example
+            fusionObjects:
+              'Neos.Fusion:Loop':
+                documentation: |
+                  **Loop over the items**
+                  paramer: __items__ an array
+
+                  the children will receive the current item as `item` unless specifed differently in itemName
+
+                  [Neos.Fusion:Loop](https://neos.readthedocs.io/en/stable/References/NeosFusionReference.html#neos-fusion-loop)
+                snippet: |
+                  <Neos.Fusion:Loop items={${1:items}}>
+                    $0
+                  </Neos.Fusion:Loop>
