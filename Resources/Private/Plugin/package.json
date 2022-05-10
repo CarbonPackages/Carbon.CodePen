@@ -2,9 +2,11 @@
   "private": true,
   "name": "carbon-code-editor",
   "scripts": {
-    "build": "rm -rf ../../Public/Plugin && node build.mjs --production",
-    "dev": "rm -rf ../../Public/Plugin && node build.mjs",
-    "watch": "rm -rf ../../Public/Plugin && node build.mjs --watch"
+    "delete": "rm -rf ../../Public/Plugin",
+    "build": "pnpm delete && node build.mjs --production",
+    "dev": "pnpm delete && node build.mjs",
+    "watch": "pnpm delete && node build.mjs --watch",
+    "pipeline": "pnpm delete && pnpm install && pnpm build"
   },
   "devDependencies": {
     "@mhsdesign/esbuild-neos-ui-extensibility": "^0.1.2-beta.1",
