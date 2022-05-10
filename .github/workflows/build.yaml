@@ -1,4 +1,4 @@
-name: Build Javascipt
+name: Build Javascript
 
 on:
   workflow_dispatch:
