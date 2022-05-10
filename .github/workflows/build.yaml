@@ -25,6 +25,7 @@ jobs:
         with:
           node-version-file: Resources/Private/Plugin/.nvmrc
           cache: pnpm
+          cache-dependency-path: Resources/Private/Plugin/pnpm-lock.yaml
 
       - name: Build JS and CSS
         run: pnpm run build -C Resources/Private/Plugin
