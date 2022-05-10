@@ -142,7 +142,7 @@ class NeosUiCodePenApp extends React.PureComponent<Props> {
 
     public handleClick = async () => {
         await this.initializeCodePenBlock();
-        this.codePenBloc!.toggleWindow();
+        this.codePenBloc!.toggleCodePenWindow();
     };
 
     public renderWindow = () => {

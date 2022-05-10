@@ -29,16 +29,18 @@ export class CodePenWindow extends React.PureComponent<Props, CodePenState> {
     };
 
     public componentDidMount() {
-        this.props.codePenBloc.initializeMonaco(
+        this.props.codePenBloc.configureAndRenderMonaco(
             this.monacoContainer!,
             this.codePenContainer!
         );
-        this.props.codePenBloc.setUpIframePreview(this.iframePreview!);
+        this.props.codePenBloc.configureIframePreviewBeforeLoad(
+            this.iframePreview!
+        );
     }
 
     public componentWillUnmount() {
         this.props.codePenBloc.unsubscribe(this.listener);
-        this.props.codePenBloc.windowClosed();
+        this.props.codePenBloc.codePenWindowDidClose();
     }
 
     public render() {
@@ -51,7 +53,7 @@ export class CodePenWindow extends React.PureComponent<Props, CodePenState> {
                     >
                         <TabButton
                             onClick={() =>
-                                this.props.codePenBloc.togglePreview()
+                                this.props.codePenBloc.togglePreviewModeColumn()
                             }
                         >
                             <TabIcon icon="sync" />

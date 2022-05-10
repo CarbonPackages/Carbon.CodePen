@@ -86,20 +86,171 @@ export class CodePenBloc extends Bloc<CodePenState> {
         });
     }
 
-    private getIframePreviewUriForNode(node: Node) {
-        const action = "renderPreviewFrame";
-        const query = `node=${node.contextPath}`;
-        return `/neos/codePen/${action}?${query}`;
-    }
-
     public detatchNeosUiEditor() {
         this.neosUiEditorApi = undefined;
+        this.publishState({
+            ...this.state,
+            activeTab: undefined,
+            tabs: [],
+            iframePreviewUri: "",
+        });
         // just in case...
-        this.windowClosed();
+        this.codePenWindowDidClose();
     }
 
     public updateNeosUiEditorTabValues(tabValues: TabValues) {
         this.neosUiEditorApi!.tabValues = tabValues;
+    }
+
+    public changeToTab(tab: Tab) {
+        this.monacoChangeEditorToTab(tab);
+        this.publishState({ ...this.state, activeTab: tab });
+    }
+
+    public togglePreviewModeColumn() {
+        this.publishState({
+            ...this.state,
+            previewModeColumn: !this.state.previewModeColumn,
+        });
+    }
+
+    public configureCodePenPreview(bootstrap: ConfigureCodePenBootstrap) {
+        const codePenContext: CodePenContext = {
+            onContentDidChange: (listener, debounceTimeout) => {
+                this.previewContentChangeListener = debounce(
+                    listener,
+                    debounceTimeout
+                );
+            },
+            renderComponentOutOfBand: () => this.renderComponentOutOfBand(),
+            library: {
+                generateTailwindStylesFromContent:
+                    this.monacoTailwindCss?.generateStylesFromContent,
+            },
+        };
+        bootstrap(codePenContext);
+
+        // trigger initial run
+        this.previewContentChangeListener!({
+            tabValues: this.neosUiEditorApi!.tabValues,
+            tabId: this.state.activeTab!.id,
+        });
+    }
+
+    public configureIframePreviewBeforeLoad(iframe: HTMLIFrameElement) {
+        if (!iframe || !iframe.contentWindow) {
+            console.error(`Cannot initialize iframe.`);
+            return;
+        }
+
+        // we use the iframe window as api
+        const iframeWindow = iframe.contentWindow!;
+
+        // hack to check onload if the session was timed out,
+        // then we close the editor (destroy the iframe) and show the relogin
+        iframeWindow.addEventListener(
+            "load",
+            () => {
+                // TODO: Find a more reliable way to determine login page
+                if (iframeWindow.document.querySelector(".neos-login-main")) {
+                    this.closeWindowAndReloginOnSessionTimeOut();
+                }
+            },
+            {
+                once: true,
+            }
+        );
+
+        // make it callable only once.
+        let initialized = false;
+        iframeWindow.configureCodePenPreview = (bootstrap) => {
+            if (initialized) {
+                return;
+            }
+            initialized = true;
+            this.configureCodePenPreview(bootstrap);
+        };
+    }
+
+    public toggleCodePenWindow() {
+        this.neosUiEditorApi!.toggleCodePenWindow();
+    }
+
+    public configureAndRenderMonaco(
+        monacoContainer: HTMLElement,
+        codePenContainer: HTMLElement
+    ) {
+        const monaco = this.monaco;
+
+        const editor = (this.monacoEditor = monaco.editor.create(
+            monacoContainer,
+            {
+                theme: "vs-dark",
+                automaticLayout: true,
+            }
+        ));
+
+        this.monacoChangeEditorToTab(this.state.activeTab!);
+
+        editor.addCommand(
+            monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd,
+            () => editor.trigger("keyboard", "editor.action.fontZoomIn", {})
+        );
+
+        editor.addCommand(
+            monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadSubtract,
+            () => editor.trigger("keyboard", "editor.action.fontZoomOut", {})
+        );
+
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Numpad0, () =>
+            editor.trigger("keyboard", "editor.action.fontZoomReset", {})
+        );
+
+        editor.addCommand(
+            monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
+            this.neosUiEditorApi!.applyTabValues
+        );
+
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ, () =>
+            this.toggleCodePenWindow()
+        );
+
+        editor.addAction({
+            id: "carbon.fullscreen",
+            label: "Fullscreen",
+            keybindings: [monaco.KeyCode.F11],
+            contextMenuGroupId: "navigation",
+            contextMenuOrder: 1.5,
+            run: () => codePenContainer!.requestFullscreen(),
+        });
+
+        this.codePenWindowDisposables = [
+            ...this.codePenWindowDisposables,
+            editor,
+            editor.onDidChangeModelContent(() => {
+                const newTabValue = editor.getValue();
+                const activeTab = this.state.activeTab!;
+                this.changeValueOfTab(activeTab, newTabValue);
+                this.previewContentChangeListener?.({
+                    tabId: activeTab.id,
+                    tabValues: this.neosUiEditorApi!.tabValues,
+                });
+            }),
+            this.fixNeosSecondEditorPortalHangingToLow(monacoContainer),
+        ];
+    }
+
+    public codePenWindowDidClose() {
+        for (const disposeable of this.codePenWindowDisposables) {
+            disposeable?.dispose();
+        }
+        this.codePenWindowDisposables = [];
+    }
+
+    private getIframePreviewUriForNode(node: Node) {
+        const action = "renderPreviewFrame";
+        const query = `node=${node.contextPath}`;
+        return `/neos/codePen/${action}?${query}`;
     }
 
     private getCacheIdForTab({ id }: Tab): string {
@@ -151,80 +302,10 @@ export class CodePenBloc extends Bloc<CodePenState> {
         ];
     }
 
-    public changeToTab(tab: Tab) {
-        this.monacoChangeEditorToTab(tab);
-        this.publishState({ ...this.state, activeTab: tab });
-    }
-
-    public togglePreview() {
-        this.publishState({
-            ...this.state,
-            previewModeColumn: !this.state.previewModeColumn,
-        });
-    }
-
-    public configureCodePenPreview(bootstrap: ConfigureCodePenBootstrap) {
-        const codePenContext: CodePenContext = {
-            onContentDidChange: (listener, debounceTimeout) => {
-                this.previewContentChangeListener = debounce(
-                    listener,
-                    debounceTimeout
-                );
-            },
-            renderComponentOutOfBand: () => this.renderComponentOutOfBand(),
-            library: {
-                generateTailwindStylesFromContent:
-                    this.monacoTailwindCss?.generateStylesFromContent,
-            },
-        };
-        bootstrap(codePenContext);
-
-        // trigger initial run
-        this.previewContentChangeListener!({
-            tabValues: this.neosUiEditorApi!.tabValues,
-            tabId: this.state.activeTab!.id,
-        });
-    }
-
-    private handleSessionTimedOut() {
+    private closeWindowAndReloginOnSessionTimeOut() {
         console.log(`Session timed out: Closing CodePen and relogin ...`);
         this.neosUiEditorApi!.requestLogin();
-        this.toggleWindow();
-    }
-
-    public async setUpIframePreview(iframe: HTMLIFrameElement) {
-        if (!iframe || !iframe.contentWindow) {
-            console.error(`Cannot initialize iframe.`);
-            return;
-        }
-
-        // we use the iframe window as api
-        const iframeWindow = iframe.contentWindow!;
-
-        // hack to check onload if the session was timed out,
-        // then we close the editor (destroy the iframe) and show the relogin
-        iframeWindow.addEventListener(
-            "load",
-            () => {
-                // TODO: Find a more reliable way to determine login page
-                if (iframeWindow.document.querySelector(".neos-login-main")) {
-                    this.handleSessionTimedOut();
-                }
-            },
-            {
-                once: true,
-            }
-        );
-
-        // make it callable only once.
-        let initialized = false;
-        iframeWindow.configureCodePenPreview = (bootstrap) => {
-            if (initialized) {
-                return;
-            }
-            initialized = true;
-            this.configureCodePenPreview(bootstrap);
-        };
+        this.toggleCodePenWindow();
     }
 
     private renderComponentOutOfBand() {
@@ -260,75 +341,34 @@ export class CodePenBloc extends Bloc<CodePenState> {
 
         // TODO: Find a more reliable way to determine login page
         if (html.includes("neos-login-main")) {
-            this.handleSessionTimedOut();
+            this.closeWindowAndReloginOnSessionTimeOut();
             return;
         }
 
         return html;
     }
 
-    public initializeMonaco(
-        monacoContainer: HTMLElement,
-        codePenContainer: HTMLElement
-    ) {
-        const monaco = this.monaco;
-
-        const editor = (this.monacoEditor = monaco.editor.create(
-            monacoContainer,
-            {
-                theme: "vs-dark",
-                automaticLayout: true,
-            }
-        ));
-
-        this.monacoChangeEditorToTab(this.state.activeTab!);
-
-        editor.addCommand(
-            monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd,
-            () => editor.trigger("keyboard", "editor.action.fontZoomIn", {})
-        );
-
-        editor.addCommand(
-            monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadSubtract,
-            () => editor.trigger("keyboard", "editor.action.fontZoomOut", {})
-        );
-
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Numpad0, () =>
-            editor.trigger("keyboard", "editor.action.fontZoomReset", {})
-        );
-
-        editor.addCommand(
-            monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
-            this.neosUiEditorApi!.applyTabValues
-        );
-
-        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ, () =>
-            this.toggleWindow()
-        );
-
-        editor.addAction({
-            id: "carbon.fullscreen",
-            label: "Fullscreen",
-            keybindings: [monaco.KeyCode.F11],
-            contextMenuGroupId: "navigation",
-            contextMenuOrder: 1.5,
-            run: () => codePenContainer!.requestFullscreen(),
-        });
-
-        this.codePenWindowDisposables = [
-            ...this.codePenWindowDisposables,
-            editor,
-            editor.onDidChangeModelContent(() => {
-                const newTabValue = editor.getValue();
-                const activeTab = this.state.activeTab!;
-                this.changeValueOfTab(activeTab, newTabValue);
-                this.previewContentChangeListener?.({
-                    tabId: activeTab.id,
-                    tabValues: this.neosUiEditorApi!.tabValues,
-                });
-            }),
-            this.fixNeosSecondEditorPortalHangingToLow(monacoContainer),
-        ];
+    /**
+     * Notifies the Neos UI that a tab content changed.
+     * commit expects the final array value of the combined tabs,
+     * so we instert the new change into the known values.
+     *
+     * The `this.neosUiEditorApi.tabValues` prop will be refreshed automatically by the ui.
+     */
+    private changeValueOfTab({ id }: Tab, newTabValue: string) {
+        // spread makes some kind of better copy
+        // other wise removing a tabs content wont be commited.
+        let newValue = { ...this.neosUiEditorApi!.tabValues };
+        if (newTabValue === "") {
+            delete newValue[id];
+        } else {
+            newValue[id] = newTabValue;
+        }
+        if (objectIsEmpty(newValue)) {
+            this.neosUiEditorApi!.resetTabValues();
+            return;
+        }
+        this.neosUiEditorApi!.commitTabValues(newValue);
     }
 
     /**
@@ -355,40 +395,5 @@ export class CodePenBloc extends Bloc<CodePenState> {
                 secondaryEditorFrame.style.top = "";
             },
         };
-    }
-
-    /**
-     * Notifies the Neos UI that a tab content changed.
-     * commit expects the final array value of the combined tabs,
-     * so we instert the new change into the known values.
-     *
-     * The `value` prop will be refreshed automatically by the ui.
-     * Eg the component will update.
-     */
-    private changeValueOfTab({ id }: Tab, newTabValue: string) {
-        // spread makes some kind of better copy
-        // other wise removing a tabs content wont be commited.
-        let newValue = { ...this.neosUiEditorApi!.tabValues };
-        if (newTabValue === "") {
-            delete newValue[id];
-        } else {
-            newValue[id] = newTabValue;
-        }
-        if (objectIsEmpty(newValue)) {
-            this.neosUiEditorApi!.resetTabValues();
-            return;
-        }
-        this.neosUiEditorApi!.commitTabValues(newValue);
-    }
-
-    public toggleWindow() {
-        this.neosUiEditorApi!.toggleCodePenWindow();
-    }
-
-    public windowClosed() {
-        for (const disposeable of this.codePenWindowDisposables) {
-            disposeable?.dispose();
-        }
-        this.codePenWindowDisposables = [];
     }
 }
