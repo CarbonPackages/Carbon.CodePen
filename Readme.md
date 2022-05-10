@@ -23,5 +23,5 @@
 
 # FAQ
 *What is the use of Tailwind in this editor? How can I save my generated styles?*
-> You can't as of right now unless you use node js on the server too and want to create a complex pipeline.
-> It is certainly possible to generate styles on the client as shown in the live preview, but we don#t know yet how we can wrap this into a nice API. If you want to help and have ideas about that, feel free to get in touch!
+> You can't use it unless you use NodeJS on the server and want to create a pipeline there.
+> It is certainly possible to generate styles on the client, as shown in the live preview, but we don't know yet how we can wrap this into a nice API. If you want to help and have ideas about that, feel free to get in touch!
