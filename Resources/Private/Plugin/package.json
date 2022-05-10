@@ -2,7 +2,8 @@
   "private": true,
   "name": "carbon-code-editor",
   "scripts": {
-    "build": "rm -rf ../../Public/Plugin && node build.mjs",
+    "build": "rm -rf ../../Public/Plugin && node build.mjs --production",
+    "dev": "rm -rf ../../Public/Plugin && node build.mjs",
     "watch": "rm -rf ../../Public/Plugin && node build.mjs --watch"
   },
   "devDependencies": {

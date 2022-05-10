@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 const require = createRequire(import.meta.url);
 
 const outdir = "../../Public/Plugin";
+const production = process.argv.includes("--production");
 
 const includedLanguages = [
     // afx too but this is not a monaco basic language
@@ -116,6 +117,6 @@ esbuild
         outdir,
         bundle: true,
         format: "iife",
-        minify: true,
+        minify: production,
     })
     .then(handleBuild);
