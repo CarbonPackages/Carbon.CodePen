@@ -93,7 +93,7 @@ export class CodePenWindow extends React.PureComponent<Props, CodePenState> {
                                 background: "#fff",
                             }}
                             ref={(el) => (this.iframePreview = el)}
-                            src={this.props.codePenBloc.getIframePreviewUri()}
+                            src={this.props.codePenBloc.state.iframePreviewUri}
                         ></iframe>
                     </div>
                 </EditorAndPreviewContainer>

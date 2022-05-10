@@ -96,8 +96,18 @@ declare module "@neos-project/neos-ui-redux-store" {
                 focusedSelector: Selector<Node | undefined>;
             };
         };
+        System: {
+            authenticationTimeout: Selector<boolean>;
+        };
     };
 
+    type Actions = {
+        System: {
+            authenticationTimeout(): void;
+        };
+    };
+
+    export const actions: Actions;
     export const selectors: Selectors;
 }
 

@@ -18,12 +18,14 @@ export type CodePenState = {
     tabs: Tab[];
     activeTab?: Tab;
     previewModeColumn: boolean;
+    iframePreviewUri: string;
 };
 
 const initalState: CodePenState = {
     tabs: [],
     activeTab: undefined,
     previewModeColumn: false,
+    iframePreviewUri: "",
 };
 
 type PropertyValue = Record<string, string>;
@@ -41,6 +43,8 @@ type NeosUiEditorApi = {
     applyTabValues(): void;
     commitTabValues(propertyValue: PropertyValue): void;
     resetTabValues(): void;
+
+    requestLogin(): void;
 };
 
 /**
@@ -76,7 +80,16 @@ export class CodePenBloc extends Bloc<CodePenState> {
             ...this.state,
             activeTab: neosUiEditorApi.tabs[0],
             tabs: neosUiEditorApi.tabs,
+            iframePreviewUri: this.getIframePreviewUriForNode(
+                neosUiEditorApi.node!
+            ),
         });
+    }
+
+    private getIframePreviewUriForNode(node: Node) {
+        const action = "renderPreviewFrame";
+        const query = `node=${node.contextPath}`;
+        return `/neos/codePen/${action}?${query}`;
     }
 
     public detatchNeosUiEditor() {
@@ -173,6 +186,12 @@ export class CodePenBloc extends Bloc<CodePenState> {
         });
     }
 
+    private handleSessionTimedOut() {
+        console.log(`Session timed out: Closing CodePen and relogin ...`);
+        this.neosUiEditorApi!.requestLogin();
+        this.toggleWindow();
+    }
+
     public async setUpIframePreview(iframe: HTMLIFrameElement) {
         if (!iframe || !iframe.contentWindow) {
             console.error(`Cannot initialize iframe.`);
@@ -180,7 +199,22 @@ export class CodePenBloc extends Bloc<CodePenState> {
         }
 
         // we use the iframe window as api
-        const iframeWindow = iframe.contentWindow;
+        const iframeWindow = iframe.contentWindow!;
+
+        // hack to check onload if the session was timed out,
+        // then we close the editor (destroy the iframe) and show the relogin
+        iframeWindow.addEventListener(
+            "load",
+            () => {
+                // TODO: Find a more reliable way to determine login page
+                if (iframeWindow.document.querySelector(".neos-login-main")) {
+                    this.handleSessionTimedOut();
+                }
+            },
+            {
+                once: true,
+            }
+        );
 
         // make it callable only once.
         let initialized = false;
@@ -200,17 +234,11 @@ export class CodePenBloc extends Bloc<CodePenState> {
             additionalPropertyValue: JSON.stringify(
                 this.neosUiEditorApi!.tabValues
             ),
-        });
+        }) as Promise<string>;
     }
 
-    public getIframePreviewUri() {
-        const action = "renderPreviewFrame";
-        const query = `node=${this.neosUiEditorApi!.node.contextPath}`;
-        return `/neos/codePen/${action}?${query}`;
-    }
-
-    private fetchAction(action: string, args: Record<string, string>) {
-        return fetchWithErrorHandling
+    private async fetchAction(action: string, args: Record<string, string>) {
+        const result = await fetchWithErrorHandling
             .withCsrfToken((csrfToken) => ({
                 url: `/neos/codePen/${action}`,
                 method: "POST",
@@ -223,8 +251,20 @@ export class CodePenBloc extends Bloc<CodePenState> {
             }))
             .catch((reason) =>
                 fetchWithErrorHandling.generalErrorHandler(reason)
-            )
-            .then((result) => result.text());
+            );
+
+        const html = (await result.text()) as string;
+
+        // hack to check on out of band render if the session was timed out,
+        // then we close the editor (destroy the iframe) and show the relogin
+
+        // TODO: Find a more reliable way to determine login page
+        if (html.includes("neos-login-main")) {
+            this.handleSessionTimedOut();
+            return;
+        }
+
+        return html;
     }
 
     public initializeMonaco(

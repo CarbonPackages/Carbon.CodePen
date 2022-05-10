@@ -1,7 +1,7 @@
 import React from "react";
 import { neos, NeosifiedProps } from "@neos-project/neos-ui-decorators";
 import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "@neos-project/neos-ui-redux-store";
+import { selectors, actions } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ts-interfaces";
 import { PackageFrontendConfiguration } from "./manifest";
 import { CodePenEditorOptions, Tab } from "./types";
@@ -19,9 +19,14 @@ const neosifier = neos((globalRegistry) => ({
         .get("Carbon.CodePen") as PackageFrontendConfiguration,
 }));
 
-const connector = connect((state) => ({
-    node: selectors.CR.Nodes.focusedSelector(state),
-}));
+const connector = connect(
+    (state) => ({
+        node: selectors.CR.Nodes.focusedSelector(state),
+    }),
+    {
+        authenticationTimeout: actions.System.authenticationTimeout,
+    }
+);
 
 type NeosProps = NeosifiedProps<typeof neosifier>;
 
@@ -110,6 +115,8 @@ class NeosUiCodePenApp extends React.PureComponent<Props> {
             applyTabValues: this.applyPropertyValue,
             commitTabValues: this.commitPropertyValue,
             resetTabValues: this.resetPropertyValue,
+
+            requestLogin: this.props.authenticationTimeout,
         });
     };
 
