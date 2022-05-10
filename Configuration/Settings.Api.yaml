@@ -5,8 +5,7 @@ Neos:
         'Carbon.CodePen':
           tailwindcss:
             enabled: true
-            # clientConfig: null
-            clientConfig: "${StaticResource.uri('Neos.Demo', 'Public/bundledTailwindConfig.js')}"
+            clientConfig: null
 
           afx:
             fusionObjects:
@@ -22,11 +21,3 @@ Neos:
                   <Neos.Fusion:Loop items={${1:items}}>
                     $0
                   </Neos.Fusion:Loop>
-              'Neos.Fusion:Value':
-                documentation: |
-                  Render the value.
-                  Is just useless in afx
-
-                  [Neos.Fusion:Value](https://neos.readthedocs.io/en/stable/References/NeosFusionReference.html#neos-fusion-value)
-                snippet: |
-                  <Neos.Fusion:Value value={${1:value}}/>
