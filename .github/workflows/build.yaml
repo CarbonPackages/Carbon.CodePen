@@ -28,7 +28,7 @@ jobs:
           cache-dependency-path: Resources/Private/Plugin/pnpm-lock.yaml
 
       - name: Build JS and CSS
-        run: pnpm run build -C Resources/Private/Plugin
+        run: pnpm -C Resources/Private/Plugin build
 
       - name: Push files to GitHub
         run: |
