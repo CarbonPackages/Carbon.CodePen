@@ -56,7 +56,7 @@ export class CodePenWindow extends React.PureComponent<Props, CodePenState> {
                                 this.props.codePenBloc.togglePreviewModeColumn()
                             }
                         >
-                            <TabIcon icon="sync" />
+                            <TabIcon icon="window-maximize" />
                         </TabButton>
                     </TabItem>
 
