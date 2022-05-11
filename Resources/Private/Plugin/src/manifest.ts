@@ -1,5 +1,4 @@
 import manifest from "@neos-project/neos-ui-extensibility";
-import { carbonCallbackFactory } from "./utils/carbonCallback";
 import NeosUiCodePenApp from "./NeosUiCodePenApp";
 import { CodePenWindow } from "./components/CodePenWindow";
 
@@ -36,14 +35,6 @@ export interface PackageFrontendConfiguration {
         };
     };
 }
-
-// Fixes https://github.com/neos/neos-ui/issues/3117
-declare global {
-    interface Window {
-        carbonCallback: ReturnType<typeof carbonCallbackFactory>;
-    }
-}
-window.carbonCallback = carbonCallbackFactory();
 
 manifest("Carbon.CodePen", {}, (globalRegistry) => {
     const editorsRegistry = globalRegistry.get("inspector").get("editors");

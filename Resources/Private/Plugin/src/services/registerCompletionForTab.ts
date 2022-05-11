@@ -3,6 +3,8 @@ import { Tab } from "../types";
 import once from "lodash.once";
 import { Node } from "@neos-project/neos-ts-interfaces";
 
+const CLIENT_COMPLETION_ID = "ClientCompletion:";
+
 export const registerCompletionForTab = (
     monaco: typeof import("monaco-editor"),
     node: Node,
@@ -12,39 +14,45 @@ export const registerCompletionForTab = (
         return;
     }
 
-    const getSuggestions = once(async () => {
-        let { completion } = tab;
+    const getSuggestions = once(async (): Promise<string[]> => {
+        const completionOption = tab.completion!;
+
+        let processedCompletion = completionOption;
         if (
-            typeof completion === "string" &&
-            completion.startsWith("ClientEval:")
+            typeof completionOption === "string" &&
+            completionOption.startsWith(CLIENT_COMPLETION_ID)
         ) {
-            const clientEval = new Function(
+            const clientCompletion = new Function(
                 "node",
-                "return " + completion.slice(11)
+                "return " + completionOption.slice(CLIENT_COMPLETION_ID.length)
             );
-            completion = clientEval(node);
-            console.warn(
-                `Carbon.CodePen: Hi you encountered a bug which is caused when updating a node and opening the code editor too fast. The 'ClientEval' is not evaluated by Neos yet. But we got you covered.`
+            processedCompletion = clientCompletion(node);
+        }
+
+        let suggestionPossiblePropmise = processedCompletion;
+        if (typeof processedCompletion === "function") {
+            suggestionPossiblePropmise = processedCompletion();
+        }
+
+        let suggestions = suggestionPossiblePropmise;
+        if (Array.isArray(suggestionPossiblePropmise)) {
+            suggestions = await Promise.all(suggestionPossiblePropmise);
+        }
+
+        if (
+            Array.isArray(suggestions) === false ||
+            suggestions.some((suggestion) => typeof suggestion !== "string")
+        ) {
+            console.error(
+                `Carbon.CodePen: completion must be of type  string[] or Promise<string[]>. Invalid completion option in current tab: "${tab.id}":`,
+                completionOption,
+                `resolved as:`,
+                suggestions
             );
+            return [];
         }
-        switch (typeof completion) {
-            case "function":
-                // @ts-expect-error
-                if (!completion.__carbonCallback) {
-                    console.warn(
-                        "You are most likely using callbacks in ClientEval wrong. Unless you wrap them in `ClientEval:carbonCallback(...)` performance will suffer immensely: https://github.com/neos/neos-ui/issues/3117"
-                    );
-                }
-                return Promise.all(completion({ node }));
-            case "object":
-                return Promise.all(completion);
-            default:
-                console.error(
-                    `Carbon.CodePen: invalid completion in current tab: "${tab.id}". Completion: `,
-                    completion
-                );
-                return [];
-        }
+
+        return suggestions as string[];
     });
 
     return monaco.languages.registerCompletionItemProvider(tab.language, {

@@ -1,9 +1,7 @@
-import { Node } from "@neos-project/neos-ts-interfaces";
-
 type StaticCompletion = string[] | Promise<string>[];
 
 interface LazyCompletion {
-    (params: { node: Node }): StaticCompletion;
+    (): StaticCompletion;
 }
 
 type Completion = LazyCompletion | StaticCompletion | string;
