@@ -11,13 +11,59 @@ Neos:
             fusionObjects:
               'Neos.Fusion:Loop':
                 documentation: |
-                  **Loop over the items**
-                  paramer: __items__ an array
+                  ### [Neos.Fusion:Loop](https://neos.readthedocs.io/en/stable/References/NeosFusionReference.html#neos-fusion-loop)
 
-                  the children will receive the current item as `item` unless specifed differently in itemName
+                  Render each item in `items`
 
-                  [Neos.Fusion:Loop](https://neos.readthedocs.io/en/stable/References/NeosFusionReference.html#neos-fusion-loop)
+                  | Parameter | Description |
+                  | - | - |
+                  | __`items`__ | (array/Iterable, required) The array or iterable to iterate over
+                  | __`itemName`__ | (string, defaults to `item`) Context variable name for each item
+                  | __`itemKey`__ | (string, defaults to `itemKey`) Context variable name for each item key, when working with array
+                  | __`iterationName`__ | (string, defaults to `iterator`) A context variable with iteration information will be available under the given name: `index` (zero-based), `cycle` (1-based), `isFirst`, `isLast`
+                  | __`@glue`__ | (string) The glue used to join the items together (default = ``)
                 snippet: |
                   <Neos.Fusion:Loop items={${1:props.items}}>
                     $0
                   </Neos.Fusion:Loop>
+              'Neos.Fusion:Reduce':
+                documentation: |
+                  ### [Neos.Fusion:Reduce](https://neos.readthedocs.io/en/stable/References/NeosFusionReference.html#neos-fusion-reduce)
+
+                  Reduce the given items to a single value.
+
+                  | Parameter | Description |
+                  | - | - |
+                  | __`items`__ | (array/Iterable, required) The array or iterable to iterate over
+                  | __`itemName`__ | (string, defaults to `item`) Context variable name for each item
+                  | __`itemKey`__ | (string, defaults to `itemKey`) Context variable name for each item key, when working with array
+                  | __`carryName`__ | (string, defaults to `carry`) Context variable that contains the result of the last iteration
+                  | __`iterationName`__ | (string, defaults to `iterator`) A context variable with iteration information will be available under the given name: `index` (zero-based), `cycle` (1-based), `isFirst`, `isLast`
+                  | __`initialValue`__ | (mixed, defaults to `null`) The value that is passed to the first iteration or returned if the items are empty
+                snippet: |
+                  <Neos.Fusion:Reduce items={${1:props.items}}>
+                    $0
+                  </Neos.Fusion:Reduce>
+              'Neos.Fusion:Fragment':
+                documentation: |
+                  ### [Neos.Fusion:Fragment](https://neos.readthedocs.io/en/stable/References/NeosFusionReference.html#neos-fusion-fragment)
+
+                  A fragment is a component that renders the given content without additional markup. That way conditions can be defined for bigger chunks of afx instead of single tags.
+                snippet: |
+                  <Neos.Fusion:Fragment @if={${1}}>
+                    $0
+                  </Neos.Fusion:Fragment>
+              'Neos.Fusion:Augmenter':
+                documentation: |
+                  ### [Neos.Fusion:Augmenter](https://neos.readthedocs.io/en/stable/References/NeosFusionReference.html#neos-fusion-augmenter)
+
+                  Modify given html content and add attributes. The augmenter can be used as processor or as a standalone prototype
+
+                  | Parameter | Description |
+                  | - | - |
+                  | __`fallbackTagName`__ | (string, defaults to `div`) If no single tag that can be augmented is found the content is wrapped into the fallback-tag before augmentation
+                  | __`[key]`__ | All other fusion properties are added to the html content as html attributes
+                snippet: |
+                  <Neos.Fusion:Augmenter${1: fallbackTagName="${2}"} $3>
+                    $0
+                  </Neos.Fusion:Augmenter>
