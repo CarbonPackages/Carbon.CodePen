@@ -39,7 +39,7 @@ esbuild
         watch: process.argv.includes("--watch"),
         logLevel: "info",
         minify: true,
-        sourcemap: false,
+        sourcemap: true,
         bundle: true,
         splitting: true,
         format: "esm",
