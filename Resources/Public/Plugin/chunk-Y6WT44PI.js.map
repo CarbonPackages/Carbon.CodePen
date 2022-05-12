@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../Private/Plugin/src/services/afxMappedLanguageId.ts"],
+  "sourcesContent": ["// we map `afx` to `handlebars` as we dont support handlebars, but handlebars has better support and behaves like html\nexport const afxMappedLanguageId = \"handlebars\";\n"],
+  "mappings": "AACO,GAAM,GAAsB",
+  "names": []
+}
