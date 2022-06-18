@@ -1,0 +1,16 @@
+{
+    "name": "carbon/testsite",
+    "type": "neos-site",
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Carbon\\TestSite\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Carbon.TestSite"
+        }
+    }
+}

@@ -1,0 +1,23 @@
+prototype(Carbon.TestSite:Page) < prototype(Neos.Neos:Page) {
+    body >
+    body = Neos.Fusion:Component {
+        renderer = afx`
+            TestSite
+            <Neos.Neos:ContentCollection nodePath='main' />
+        `
+    }
+}
+
+
+prototype(Carbon.TestSite:BasicCodePen) < prototype(Neos.Neos:ContentComponent) {
+
+
+    renderer = afx`
+        lets goo
+
+        {q(node).property("codePen").html}
+
+        {Json.stringify(q(node).property("codePen"))}
+
+    `
+}

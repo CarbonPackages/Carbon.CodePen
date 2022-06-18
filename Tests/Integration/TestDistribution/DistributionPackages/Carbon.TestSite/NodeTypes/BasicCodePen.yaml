@@ -1,0 +1,30 @@
+"Carbon.TestSite:BasicCodePen":
+  superTypes:
+    "Neos.Neos:Content": true
+  
+  ui:
+    inspector:
+      groups:
+        html:
+          label: 'Html'
+          icon: 'icon-code'
+          position: 100
+          tab: default
+
+  properties:
+    codePen:
+      type: array
+      ui:
+        label: Open Code Pen
+        reloadIfChanged: true
+        inspector:
+          group: 'html'
+          editor: 'Carbon.CodePen/CodeEditor'
+          editorOptions:
+            tabs:
+              html:
+                label: Template
+                icon: code
+                language: html
+                # completion: "ClientEval:Object.keys(node.properties)"
+

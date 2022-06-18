@@ -1,0 +1,8 @@
+version: '3.6'
+services:
+  web:
+    volumes:
+      # mount the root of this package, "Carbon.CodePen" into the "DistributionPackages"
+      - "../../../../:/var/www/html/DistributionPackages/Carbon.CodePen"
+      # but exclude the otherwise doubled "TestDistribution", idk i have a better feeling about it ^^
+      - "./emptyFolder:/var/www/html/DistributionPackages/Carbon.CodePen/Tests/Integration/TestDistribution"
