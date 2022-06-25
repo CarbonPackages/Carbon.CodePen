@@ -3,6 +3,8 @@
     "Neos.Neos:Content": true
   
   ui:
+    icon: icon-code
+    label: "Carbon.TestSite:BasicCodePen"
     inspector:
       groups:
         html:

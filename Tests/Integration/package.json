@@ -1,0 +1,19 @@
+{
+  "name": "integration",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test:e2e-examples": "playwright test --config tests-examples/playwright.config.ts",
+    "test:e2e": "playwright test",
+    "startNeos": "cd TestDistribution && ddev start",
+    "resetNeos": "cd TestDistribution && ddev exec './flow session:destroyall' && ddev exec './flow flow:cache:flush' && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh' && curl https://carboncodepentestdistribution.ddev.site/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.22.2",
+    "@types/node": "^18.0.0"
+  }
+}
