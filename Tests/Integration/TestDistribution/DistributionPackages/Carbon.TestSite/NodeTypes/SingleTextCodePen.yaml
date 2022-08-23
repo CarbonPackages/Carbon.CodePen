@@ -1,0 +1,16 @@
+"Carbon.TestSite:SingleTextCodePen":
+  final: true
+  superTypes:
+    "Carbon.TestSite:AbstractCodePen": true
+  ui:
+    label: "Carbon.TestSite:SingleTextCodePen"
+  properties:
+    codePen:
+      ui:
+        inspector:
+          editorOptions:
+            tabs:
+              text:
+                label: Text
+                icon: text
+                language: text

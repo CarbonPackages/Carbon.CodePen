@@ -1,7 +1,29 @@
 import { Browser, chromium, FullConfig, expect } from '@playwright/test'
 import { NeosUiNaviationHelper } from './NeosUiNaviationHelper'
 
+import child_process from "child_process";
+
+const exec = (command: string) => {
+    return new Promise((resolve, reject) => {
+        child_process.exec(command, (error, stdout, stderr) => {
+            if (error) {
+                reject(error.message);
+                return;
+            }
+            if (stderr) {
+                reject(stderr);
+                return;
+            }
+            resolve(stdout);
+        })
+    })
+}
+
 async function globalSetup(config: FullConfig) {
+
+    // console.log(await exec("cd TestDistribution && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh'"));
+    console.log(await exec("pnpm run softResetNeos"));
+
     const browser = await chromium.launch()
     await saveStorage(browser, 'storage/admin.json')
     await browser.close()

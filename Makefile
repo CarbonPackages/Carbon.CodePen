@@ -11,7 +11,8 @@ DISTRIBUTION = Tests/Integration/TestDistribution
 
 distributionSetup:
 	cd ${DISTRIBUTION} && ddev composer install
-	cd ${DISTRIBUTION} && ddev exec ./configureSite.sh
+	cd ${DISTRIBUTION} && ddev exec ./flow user:create --roles Neos.Neos:Administrator admin admin Jon Doe
+	cd ${DISTRIBUTION} && ddev exec ./softSiteDeleteAndSetup.sh
 
 distributionUp:
 	cd ${DISTRIBUTION} && ddev start
@@ -19,3 +20,6 @@ distributionUp:
 distributionDown:
 	cd ${DISTRIBUTION} && ddev stop
 
+test:
+	cd Tests/Integration && pnpm run startNeos
+	cd Tests/Integration && pnpm run test

@@ -28,7 +28,9 @@ export class NeosUiNaviationHelper {
             this.page.locator('button:has-text("Login")').click()
         ]);
 
-        await expect(this.page).toHaveTitle('testSite');
+        await expect(this.page).toHaveTitle('testSite', {
+            timeout: 10000
+        });
         await expect(this.page.locator('button:has-text("Document Tree")')).toBeTruthy();
     }
 
@@ -47,6 +49,15 @@ export class NeosUiNaviationHelper {
         ]);
     }
 
+    async createOrSetNodeActiveInCollection(nodeNameLabel: string) {
+        // try {
+        //     await this.getNodeInContentTree(nodeNameLabel).first().click();
+        //     return
+        // } catch (error) {
+        // }
+        await this.createNodeInCollection(nodeNameLabel);
+    }
+
     // getNeosContentFrame = () => this.page.frameLocator('iframe[name="neos-content-main"]');
 
     // getContentCollectionInline = () => this.getNeosContentFrame().locator('.neos-contentcollection').first()
@@ -59,20 +70,48 @@ export class NeosUiNaviationHelper {
     }
 
     async openCurrentCodePen() {
-        return this.page.locator('text=EditOpen Code Pen').click();
+        await this.page.locator('text=Open CodePen').click();
+        await expect(this.codePenPreview.locator("body")).toBeVisible();
+        await new Promise(r => setTimeout(r, 1000))
     }
 
+    async discardCurrentCodePen() {
+        await this.page.locator('button[role="button"]:has-text("Discard")').click();
+    }
+
+    async openCodPenTab(label: string) {
+        await this.secondaryInspector.locator(`text=${label}`).click()
+        await new Promise(r => setTimeout(r, 100))
+    }
+
+    async expectCodePenEditorInputToHaveScreenshot(name: string) {
+        // we make it fullscreen so we dont test the minimap and so on in this test
+        await this.expectLocatorToHaveScreenshot(name, this.codePenEditor.locator(".view-lines"))
+    }
+
+    async expectCodePenPreviewToHaveScreenshot(name: string) {
+        await this.expectLocatorToHaveScreenshot(name, this.secondaryInspector.locator('iframe[src^="/neos/codePen"]'))
+    }
+
+    async expectLocatorToHaveScreenshot(name: string, locator: Locator) {
+        await locator.evaluate((el) => el.requestFullscreen())
+        await expect(this.page).toHaveScreenshot(name, { maxDiffPixels: 50 });
+        await this.page.locator("body").evaluate((el) => el.ownerDocument.exitFullscreen())
+    }
 
     get secondaryInspector() {
         return this.page.locator(`[class^="style__secondaryInspector"]`)
     }
 
+    get codePenEditor() {
+        return this.secondaryInspector.locator('.monaco-editor[role="code"]')
+    }
 
     get codePenInput() {
-        return this.page.locator('.monaco-editor .inputarea')
+        return this.codePenEditor.locator('.inputarea')
     }
 
     get codePenPreview() {
-        return this.page.frameLocator('iframe[src^="/neos/codePen"]');
+        return this.secondaryInspector.frameLocator('iframe[src^="/neos/codePen"]');
     }
 }

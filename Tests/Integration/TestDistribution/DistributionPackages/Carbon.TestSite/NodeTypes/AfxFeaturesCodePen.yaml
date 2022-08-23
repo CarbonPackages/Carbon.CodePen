@@ -1,0 +1,16 @@
+"Carbon.TestSite:AfxFeaturesCodePen":
+  final: true
+  superTypes:
+    "Carbon.TestSite:AbstractCodePen": true
+  ui:
+    label: "Carbon.TestSite:AfxFeaturesCodePen"
+  properties:
+    codePen:
+      ui:
+        inspector:
+          editorOptions:
+            tabs:
+              afx:
+                label: AFX
+                icon: code
+                language: afx

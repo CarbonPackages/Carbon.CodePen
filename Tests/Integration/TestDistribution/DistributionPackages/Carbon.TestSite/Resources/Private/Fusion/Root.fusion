@@ -1,3 +1,44 @@
+
+codePenVirtualNode {
+  defaultCodePen {
+    @position = 'before component'
+    condition = Neos.Fusion:CanRender {
+        type = ${node.nodeType.name}
+    }
+    condition.@process.negate = ${!value}
+
+    renderer = Carbon.TestSite:DefaultCodePen
+  }
+}
+
+prototype(Neos.Neos:ContentCase) {
+  defaultCodePen {
+    @position = 'before default'
+    condition = Neos.Fusion:CanRender {
+        type = ${node.nodeType.name}
+    }
+    condition.@process.negate = ${!value}
+
+    renderer = Carbon.TestSite:DefaultCodePen
+  }
+}
+
+prototype(Carbon.TestSite:TailwindCodePen) < prototype(Neos.Neos:ContentComponent) {
+    renderer = afx`
+        Fusion ({node.nodeType.name})
+        {q(node).property("codePen").html}
+        {String.htmlSpecialChars(Json.stringify(q(node).property("codePen")))}
+    `
+}
+
+prototype(Carbon.TestSite:DefaultCodePen) < prototype(Neos.Neos:ContentComponent) {
+    renderer = afx`
+        Fusion ({node.nodeType.name})
+        {String.htmlSpecialChars(Json.stringify(q(node).property("codePen")))}
+    `
+}
+
+
 prototype(Carbon.TestSite:Page) < prototype(Neos.Neos:Page) {
     body >
     body = Neos.Fusion:Component {
@@ -6,13 +47,4 @@ prototype(Carbon.TestSite:Page) < prototype(Neos.Neos:Page) {
             <Neos.Neos:ContentCollection nodePath='main' />
         `
     }
-}
-
-
-prototype(Carbon.TestSite:BasicCodePen) < prototype(Neos.Neos:ContentComponent) {
-
-    renderer = afx`
-        Fusion (Carbon.TestSite:BasicCodePen)
-        {Json.stringify(q(node).property("codePen"))}
-    `
 }

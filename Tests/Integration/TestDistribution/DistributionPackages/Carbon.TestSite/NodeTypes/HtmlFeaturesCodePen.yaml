@@ -1,0 +1,16 @@
+"Carbon.TestSite:HtmlFeaturesCodePen":
+  final: true
+  superTypes:
+    "Carbon.TestSite:AbstractCodePen": true
+  ui:
+    label: "Carbon.TestSite:HtmlFeaturesCodePen"
+  properties:
+    codePen:
+      ui:
+        inspector:
+          editorOptions:
+            tabs:
+              html:
+                label: Html
+                icon: code
+                language: html

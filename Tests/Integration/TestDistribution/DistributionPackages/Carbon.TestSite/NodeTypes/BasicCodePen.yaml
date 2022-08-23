@@ -17,7 +17,7 @@
     codePen:
       type: array
       ui:
-        label: Open Code Pen
+        label: Open CodePen
         reloadIfChanged: true
         inspector:
           group: 'html'
