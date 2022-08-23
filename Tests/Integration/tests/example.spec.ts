@@ -1,125 +1,215 @@
-import { test, expect } from '@playwright/test';
-import child_process from "child_process";
+import { test, expect, Page } from '@playwright/test';
 import { NeosUiNaviationHelper } from './NeosUiNaviationHelper';
 
 // console.log(await exec("cd TestDistribution && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh'"));
 
-const exec = (command: string) => {
-  return new Promise((resolve, reject) => {
-    child_process.exec(command, (error, stdout, stderr) => {
-      if (error) {
-        reject(error.message);
-        return;
-      }
-      if (stderr) {
-        reject(stderr);
-        return;
-      }
-      resolve(stdout);
-    })
-  })
-}
-
-// https://github.com/remcohaszing/monaco-yaml/pull/169/files
+test.describe.configure({ mode: 'parallel' });
 
 
-test.describe.parallel('Open Backend', () => {
-  test.use({ storageState: './storage/admin.json' })
+test.use({ storageState: './storage/admin.json' })
 
-  // test.beforeEach(async ({ page }) => {
-  //   const neosUi = new NeosUiNaviationHelper(page);
-  //   await neosUi.visitSite()
-  // });
-
-  // await neosUi.openDocument("Carbon.TestSite:Page (2)");
-  // await neosUi.openDocument("1");
-  // await (await neosUi.getNodeInContentTree("Carbon.TestSite:BasicCodePen")).nth(1).click();
-
-  test('document 1 live preview behavior', async ({ page }) => {
+test.describe("Language Features HTML,AFX,YAML", () => {
+  const testSyntaxHighlightinWithScreenShot = async (page: Page, nodeTypeToBeUsed: string, code: string, fileName: string): Promise<void> => {
     const neosUi = new NeosUiNaviationHelper(page);
     await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
-    await neosUi.createNodeInCollection("Carbon.TestSite:BasicCodePen");
-
-    await page.locator('text=EditOpen Code Pen').click();
-
-    const secondaryInspector = page.locator(`[class^="style__secondaryInspector"]`)
-    const codePenPreview = page.frameLocator('iframe[src^="/neos/codePen"]').locator('body');
-    const codePenInput = page.locator('.monaco-editor .inputarea')
-
-    // better way to determing codpen ready
-    await expect(codePenPreview).toBeVisible();
-    await new Promise(r => setTimeout(r, 1000))
-
-
-    await expect(secondaryInspector).toHaveScreenshot("beforeEditing.png", { maxDiffPixels: 50 });
-
-    await expect(codePenPreview).toHaveText(`Fusion (Carbon.TestSite:BasicCodePen)null`);
-
-    await codePenInput.fill("Hallo Welt");
-
-    await expect(codePenPreview).toHaveText(`Fusion (Carbon.TestSite:BasicCodePen){"html":"Hallo Welt"}`);
-
-    await expect(secondaryInspector).toHaveScreenshot("afterEditing.png", { maxDiffPixels: 50 });
-
-  })
-
-  test('document 1 live preview behavior dreh', async ({ page }) => {
-    const neosUi = new NeosUiNaviationHelper(page);
-    await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
-    await neosUi.createNodeInCollection("Carbon.TestSite:BasicCodePen");
+    await neosUi.createOrSetNodeActiveInCollection(nodeTypeToBeUsed);
 
     await neosUi.openCurrentCodePen();
+    await neosUi.codePenInput.fill(code);
 
-    await expect(neosUi.codePenPreview.locator("body")).toBeVisible();
-    await new Promise(r => setTimeout(r, 1000))
+    await neosUi.expectCodePenEditorInputToHaveScreenshot(fileName)
+  }
 
-    await neosUi.secondaryInspector.locator("ul>li").first().click()
+  test("HTML Syntax-Highlighting", async ({ page }) => {
 
-    await expect(neosUi.secondaryInspector).toHaveScreenshot("afterDrehung.png", { maxDiffPixels: 50 });
-
-    await neosUi.secondaryInspector.locator("ul>li").first().click()
-
-    await expect(neosUi.secondaryInspector).toHaveScreenshot("afterRueckDrehung.png", { maxDiffPixels: 50 });
+    const code = `<div>Foo Bar</div>
+<div class="wieso baum">
+</div>
+<p>Darum</p>
+`
+    await testSyntaxHighlightinWithScreenShot(page, "Carbon.TestSite:HtmlFeaturesCodePen", code, "htmlSyntax.png");
   })
 
-  test('document 1 emmet', async ({ page }) => {
-    const neosUi = new NeosUiNaviationHelper(page);
-    await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
-    await neosUi.createNodeInCollection("Carbon.TestSite:BasicCodePen");
+  test("AFX Syntax-Highlighting", async ({ page }) => {
+    const code = `<div>Foo Bar</div>
+<div class="wieso baum">
+</div>
+<Neos.Fusion:Tag a="b">
+</Neos.Fusion:Tag>
+`;
+    await testSyntaxHighlightinWithScreenShot(page, "Carbon.TestSite:AfxFeaturesCodePen", code, "afxSyntax.png");
+  })
 
-    await page.locator('text=EditOpen Code Pen').click();
+  test("YAML Syntax-Highlighting", async ({ page }) => {
+    const code = `Foo: "Bar"
+wiesoBaum: Darum
+jetzt: "aber raus hier"
+`;
 
-    await new Promise(r => setTimeout(r, 2000))
+    await testSyntaxHighlightinWithScreenShot(page, "Carbon.TestSite:YamlFeaturesCodePen", code, "yamlSyntax.png");
+  })
+})
 
 
-    await neosUi.codePenInput.type("div", { delay: 100 });
-    await neosUi.codePenInput.press('Tab');
 
-    await expect(neosUi.codePenInput).toHaveValue("<div></div>")
 
-    ///////////////////////
 
-    await neosUi.codePenInput.fill("");
-    await new Promise(r => setTimeout(r, 500))
+const testCompletionForTab = async (neosUi: NeosUiNaviationHelper, tabLabel: string, triggerChars: string, fullCompletion: string) => {
+  await neosUi.openCodPenTab(tabLabel);
+  await neosUi.codePenInput.type(triggerChars, { delay: 100 })
+  await neosUi.codePenInput.press('Control+ ');
+  await new Promise(r => setTimeout(r, 100));
 
-    await neosUi.codePenInput.type("<div></div>", { delay: 100 });
+  expect(await neosUi.secondaryInspector.locator(`text=${fullCompletion}`).count()).toBe(1)
 
-    await neosUi.codePenInput.press('ArrowLeft');
-    await neosUi.codePenInput.press('ArrowLeft');
-    await neosUi.codePenInput.press('ArrowLeft');
-    await neosUi.codePenInput.press('ArrowLeft');
-    await neosUi.codePenInput.press('ArrowLeft');
-    await neosUi.codePenInput.press('ArrowLeft');
-    await neosUi.codePenInput.press('ArrowLeft');
+  expect(await neosUi.secondaryInspector.locator(`text=xxx`).count()).toBe(2)
 
-    await neosUi.codePenInput.type(" cla", { delay: 100 });
-    await neosUi.codePenInput.press('Tab');
+  await neosUi.codePenInput.press('Tab');
 
-    await neosUi.codePenInput.press('Escape');
+  await expect(neosUi.codePenInput).toHaveValue(fullCompletion)
 
-    await neosUi.codePenInput.type("bg-red-", { delay: 100 });
-    await neosUi.codePenInput.press('Tab');
+  await neosUi.codePenInput.fill("");
+}
 
-    await expect(neosUi.codePenInput).toHaveValue(`<div class="bg-red-50"></div>`)
-  });
+test('custom completion', async ({ page }) => {
+  const neosUi = new NeosUiNaviationHelper(page);
+  await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:CustomCompletionCodePen");
+  await neosUi.openCurrentCodePen();
+
+  await testCompletionForTab(neosUi, "Tab A", "xxx", "xxxCompletion1TabA");
+
+  await testCompletionForTab(neosUi, "Tab B", "xxx", "xxxCompletion1TabB");
+
+  await testCompletionForTab(neosUi, "Tab C", "xxx", "xxxCompletion1TabC");
+
+  await testCompletionForTab(neosUi, "Tab A", "xxx", "xxxCompletion1TabA");
+
+  await neosUi.discardCurrentCodePen();
+
+  await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:CustomCompletionCodePen");
+  await neosUi.openCurrentCodePen();
+
+  await testCompletionForTab(neosUi, "Tab A", "xxx", "xxxCompletion1TabA");
+})
+
+test('document 1 live preview behavior', async ({ page }) => {
+  const neosUi = new NeosUiNaviationHelper(page);
+  await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:BasicCodePen");
+
+  await neosUi.openCurrentCodePen();
+
+  await expect(neosUi.secondaryInspector).toHaveScreenshot("beforeEditing.png", { maxDiffPixels: 50 });
+
+  await expect(neosUi.codePenPreview.locator("body")).toHaveText(`Fusion (Carbon.TestSite:BasicCodePen)null`);
+
+  await neosUi.codePenInput.fill("Hallo Welt");
+
+  await expect(neosUi.codePenPreview.locator("body")).toHaveText(`Fusion (Carbon.TestSite:BasicCodePen){"html":"Hallo Welt"}`);
+
+  await expect(neosUi.secondaryInspector).toHaveScreenshot("afterEditing.png", { maxDiffPixels: 50 });
+
+})
+
+test('document 1 live preview behavior dreh', async ({ page }) => {
+  const neosUi = new NeosUiNaviationHelper(page);
+  await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:BasicCodePen");
+
+  await neosUi.openCurrentCodePen();
+
+  await expect(neosUi.codePenPreview.locator("body")).toBeVisible();
+  await new Promise(r => setTimeout(r, 1000))
+
+  await neosUi.secondaryInspector.locator("ul>li").first().click()
+
+  await expect(neosUi.secondaryInspector).toHaveScreenshot("afterDrehung.png", { maxDiffPixels: 50 });
+
+  await neosUi.secondaryInspector.locator("ul>li").first().click()
+
+  await expect(neosUi.secondaryInspector).toHaveScreenshot("afterRueckDrehung.png", { maxDiffPixels: 50 });
+})
+
+
+
+test("afxTagCompletion", async ({ page }) => {
+  const neosUi = new NeosUiNaviationHelper(page);
+  await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:AfxFeaturesCodePen");
+  await neosUi.openCurrentCodePen();
+
+  await neosUi.codePenInput.type("Loop", { delay: 100 });
+  await neosUi.codePenInput.press('Tab');
+
+  await neosUi.codePenInput.type("itemsValue", { delay: 100 });
+
+  await neosUi.codePenInput.press('Tab');
+  await neosUi.codePenInput.type("content", { delay: 100 });
+
+  await expect(neosUi.codePenInput).toHaveValue(`<Neos.Fusion:Loop items={itemsValue}>
+  content
+</Neos.Fusion:Loop>
+`)
+})
+
+
+test("afxTagHover", async ({ page }) => {
+  const neosUi = new NeosUiNaviationHelper(page);
+  await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:AfxFeaturesCodePen");
+  await neosUi.openCurrentCodePen();
+
+  await neosUi.codePenInput.fill("<Neos.Fusion:Loop />");
+
+  expect(await neosUi.codePenEditor.locator("text=Render each item in").count()).toBe(0);
+
+  await neosUi.codePenEditor.locator("text=Loop").hover({ force: true })
+  await new Promise(r => setTimeout(r, 500))
+
+  expect(await neosUi.codePenEditor.locator("text=Render each item in").count()).toBe(1);
+
+  await expect(neosUi.codePenEditor.locator("text=Render each item in")).toBeVisible();
+})
+
+
+test("tailwind css", async ({ page }) => {
+  const neosUi = new NeosUiNaviationHelper(page);
+  await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:TailwindCodePen");
+
+  await neosUi.openCurrentCodePen();
+
+  await neosUi.codePenInput.type(`<div class="`, { delay: 50 });
+
+  await neosUi.codePenInput.press('Escape');
+
+  await neosUi.codePenInput.type(`bg-red-8`, { delay: 50 });
+
+  await expect(neosUi.codePenEditor.locator("text=bg-red-800")).toBeVisible();
+
+  await neosUi.codePenInput.press('Tab');
+
+  await neosUi.codePenInput.press('ArrowRight');
+
+  await neosUi.codePenInput.type(`>Moin</div>`, { delay: 50 });
+
+  await expect(neosUi.codePenInput).toHaveValue(`<div class="bg-red-800">Moin</div>`)
+
+  await neosUi.expectCodePenEditorInputToHaveScreenshot('tailwindSyntax.png')
+
+  await neosUi.expectCodePenPreviewToHaveScreenshot('tailwindPreview.png')
+})
+
+test('document 1 emmet', async ({ page }) => {
+  const neosUi = new NeosUiNaviationHelper(page);
+  await neosUi.vistDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:HtmlFeaturesCodePen");
+
+  await neosUi.openCurrentCodePen();
+
+  await neosUi.codePenInput.type("div", { delay: 100 });
+  await neosUi.codePenInput.press('Tab');
+
+  await expect(neosUi.codePenInput).toHaveValue("<div></div>")
 });

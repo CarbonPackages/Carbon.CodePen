@@ -1,0 +1,35 @@
+"Carbon.TestSite:CustomCompletionCodePen":
+  final: true
+  superTypes:
+    "Carbon.TestSite:AbstractCodePen": true
+  ui:
+    label: "Carbon.TestSite:CustomCompletionCodePen"
+  properties:
+    text:
+      type: string
+      defaultValue: "xxxCompletion1TabC"
+    codePen:
+      ui:
+        inspector:
+          editorOptions:
+            tabs:
+              a:
+                # todo why does yaml not work without `strg+space`
+                label: Tab A
+                icon: code
+                language: yaml
+                completion:
+                  - xxxCompletion1TabA
+              b:
+                label: Tab B
+                icon: code
+                language: afx
+                completion: |
+                  ClientCompletion:["xxxCompletion1TabB"]
+              c:
+                label: Tab C
+                icon: code
+                language: html
+                completion: |
+                  ClientCompletion:[node.properties.text]
+    

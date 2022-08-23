@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:e2e-examples": "playwright test --config tests-examples/playwright.config.ts",
-    "test:e2e": "playwright test",
+    "test": "curl carboncodepentestdistribution.ddev.site && playwright test --headed",
     "startNeos": "cd TestDistribution && ddev start",
+    "softResetNeos": "cd TestDistribution && ddev exec './softSiteDeleteAndSetup.sh'",
     "resetNeos": "cd TestDistribution && ddev exec './flow session:destroyall' && ddev exec './flow flow:cache:flush' && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh' && curl https://carboncodepentestdistribution.ddev.site/"
   },
   "keywords": [],

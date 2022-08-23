@@ -1,0 +1,24 @@
+"Carbon.TestSite:AbstractCodePen":
+  abstract: true
+  superTypes:
+    "Neos.Neos:Content": true
+  ui:
+    # inlineEditable: true
+    icon: icon-code
+    inspector:
+      groups:
+        code:
+          label: 'Code'
+          icon: 'icon-code'
+          position: 100
+          tab: default
+
+  properties:
+    codePen:
+      type: array
+      ui:
+        label: 'Open CodePen'
+        reloadIfChanged: true
+        inspector:
+          group: 'code'
+          editor: 'Carbon.CodePen/CodeEditor'
