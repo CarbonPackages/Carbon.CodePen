@@ -6,7 +6,7 @@ import { NeosUiNaviationHelper } from './NeosUiNaviationHelper';
 test.describe.configure({ mode: 'parallel' });
 
 
-test.use({ storageState: './storage/admin.json' })
+test.use({ storageState: './tmpSharedNeosTestSession.json' })
 
 test.describe("Language Features HTML,AFX,YAML", () => {
   const testSyntaxHighlightinWithScreenShot = async (page: Page, nodeTypeToBeUsed: string, code: string, fileName: string): Promise<void> => {

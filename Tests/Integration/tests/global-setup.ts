@@ -25,7 +25,7 @@ async function globalSetup(config: FullConfig) {
     console.log(await exec("pnpm run softResetNeos"));
 
     const browser = await chromium.launch()
-    await saveStorage(browser, 'storage/admin.json')
+    await saveStorage(browser, 'tmpSharedNeosTestSession.json')
     await browser.close()
 }
 
