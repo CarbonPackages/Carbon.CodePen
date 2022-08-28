@@ -6,6 +6,8 @@ build:
 	cd ${PLUGIN} && pnpm install
 	cd ${PLUGIN} && pnpm run build
 
+watch:
+	cd ${PLUGIN} && pnpm run watch
 
 DISTRIBUTION = Tests/Integration/TestDistribution
 

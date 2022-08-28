@@ -6,6 +6,7 @@
   "scripts": {
     "test": "curl carboncodepentestdistribution.ddev.site && playwright test --headed",
     "startNeos": "cd TestDistribution && ddev start",
+    "flushNeosCache": "cd TestDistribution && ddev exec './flow flow:cache:flush --force'",
     "softResetNeos": "cd TestDistribution && ddev exec './softSiteDeleteAndSetup.sh'",
     "resetNeos": "cd TestDistribution && ddev exec './flow session:destroyall' && ddev exec './flow flow:cache:flush' && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh' && curl https://carboncodepentestdistribution.ddev.site/"
   },
