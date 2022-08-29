@@ -1,7 +1,9 @@
 "Carbon.TestSite:Page":
   superTypes:
     "Neos.Neos:Document": true
-  
+  ui:
+    label: "Carbon.TestSite:Page"
+
   childNodes:
     main:
       type: "Neos.Neos:ContentCollection"
