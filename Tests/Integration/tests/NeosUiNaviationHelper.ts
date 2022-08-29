@@ -2,36 +2,49 @@ import { expect, Locator, Page } from "@playwright/test";
 
 const NEOS_SITE = 'https://carboncodepentestdistribution.ddev.site';
 
+/**
+ * @example waitForDomEvent(page.locator(`iframe`), "load")
+ */
+const waitForDomEvent = (locator: Locator, eventName: keyof HTMLElementEventMap, options?: {timeout?: number}) => {
+    return locator.evaluate((element, serializedEventName) => {
+        return new Promise<void>((resolve) => {
+            element.addEventListener(serializedEventName, () => resolve(), {once: true})
+        })
+    }, eventName, options);
+}
+
 export class NeosUiNaviationHelper {
     constructor(private page: Page) {
     }
 
-    vistDocumentInBackend(documentNodeName: string) {
-        const contextPath = `/sites/testsite/${documentNodeName}@user-admin`
+    gotoDocumentInBackend(documentTitle: string) {
+        const contextPath = `/sites/testsite/${documentTitle}@user-admin`
         return this.page.goto(`${NEOS_SITE}/neos/content?node=${encodeURIComponent(contextPath)}`);
     }
 
-    visitSite() {
-        return this.page.goto(`${NEOS_SITE}/neos`);
+    async gotoBackend() {
+        await this.page.goto(`${NEOS_SITE}/neos`);
+        await this.waitForIframe()
     }
 
-    async visit() {
-        await this.visitSite()
+    waitForIframe() {
+        return waitForDomEvent(this.page.locator(`iframe[name=neos-content-main]`), "load")
+    }
 
-        await expect(this.page).toHaveTitle('Login to testSite');
+    async gotoBackendAndLogin() {
+        await this.page.goto(`${NEOS_SITE}/neos`);
 
-        await this.page.locator('#username').fill('admin');
-        await this.page.locator('#password').fill('admin');
+        await expect(this.page).toHaveTitle(/Login to .*/);
+
+        await this.page.fill('#username', 'admin');
+        await this.page.fill('#password', 'admin');
 
         await Promise.all([
             this.page.waitForNavigation(),
-            this.page.locator('button:has-text("Login")').click()
-        ]);
+            this.page.click('button:has-text("Login")')
+        ])
 
-        await expect(this.page).toHaveTitle('testSite', {
-            timeout: 10000
-        });
-        await expect(this.page.locator('button:has-text("Document Tree")')).toBeTruthy();
+        await waitForDomEvent(this.page.locator(`iframe[name=neos-content-main]`), "load", {timeout: 10000})
     }
 
     getNodeInContentTree(nodeNameLabel: string): Locator {
@@ -39,22 +52,40 @@ export class NeosUiNaviationHelper {
     }
 
     openContentTree() {
-        return this.page.locator('[class^="style__leftSideBar__bottom"] div[role="button"]:has-text("Content Tree")').click();
+        return this.page.click('[class^="style__leftSideBar__bottom"] div[role="button"]:has-text("Content Tree")');
     }
 
     openDocument(documentLabel: string) {
         return Promise.all([
             this.page.waitForNavigation(),
-            this.page.locator(`[class^="style__leftSideBar__top"] div[role="button"]:has-text(${JSON.stringify(documentLabel)})`).click()
+            this.page.click(`[class^="style__leftSideBar__top"] div[role="button"]:has-text(${JSON.stringify(documentLabel)})`)
         ]);
     }
 
-    async createOrSetNodeActiveInCollection(nodeNameLabel: string) {
-        // try {
-        //     await this.getNodeInContentTree(nodeNameLabel).first().click();
-        //     return
-        // } catch (error) {
-        // }
+    private async createDocumentAndSelect(nodeTypeName: string, title: string) {
+        await this.openDocument('testSite');
+
+        await this.page.click('#neos-ContentTree-AddNode');
+        await this.page.click(`#neos-SelectNodeTypeDialog button[role="button"]:has-text("${nodeTypeName}")`);
+    
+        await this.page.fill(`#__neos__editor__property---title--creation-dialog`, title);
+        await this.page.click(`#neos-NodeCreationDialog-CreateNew`);
+        
+        await this.waitForIframe();        
+    }
+
+    async useCleanDocument() {
+        let newDocumentName = `carbon-test-site-page-${Math.round(Math.random() * 100000)}`
+
+        await this.createDocumentAndSelect("Carbon.TestSite:Page", newDocumentName);
+    }
+
+    async createOrSetNodeActiveInCollection(nodeNameLabel: string) {        
+        if (await this.getNodeInContentTree(nodeNameLabel).count() > 0) {
+            await this.getNodeInContentTree(nodeNameLabel).first().click();
+            return
+        }
+
         await this.createNodeInCollection(nodeNameLabel);
     }
 
@@ -64,19 +95,19 @@ export class NeosUiNaviationHelper {
 
     async createNodeInCollection(nodeNameLabel: string) {
         await (await this.getNodeInContentTree("Content Collection (main)")).first().click()
-        await this.page.locator('#neos-ContentTree-AddNode').click();
-        await this.page.locator(`#neos-SelectNodeTypeDialog button[role="button"]:has-text(${JSON.stringify(nodeNameLabel)})`).click();
+        await this.page.click('#neos-ContentTree-AddNode');
+        await this.page.click(`#neos-SelectNodeTypeDialog button[role="button"]:has-text(${JSON.stringify(nodeNameLabel)})`);
         return
     }
 
     async openCurrentCodePen() {
-        await this.page.locator('text=Open CodePen').click();
+        await this.page.click('text=Open CodePen');
         await expect(this.codePenPreview.locator("body")).toBeVisible();
         await new Promise(r => setTimeout(r, 1000))
     }
 
     async discardCurrentCodePen() {
-        await this.page.locator('button[role="button"]:has-text("Discard")').click();
+        await this.page.click('button[role="button"]:has-text("Discard")');
     }
 
     async openCodPenTab(label: string) {

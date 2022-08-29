@@ -22,7 +22,7 @@ const exec = (command: string) => {
 async function globalSetup(config: FullConfig) {
 
     // console.log(await exec("cd TestDistribution && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh'"));
-    console.log(await exec("pnpm run softResetNeos"));
+    // console.log(await exec("pnpm run softResetNeos"));
 
     const browser = await chromium.launch()
     await saveStorage(browser, 'tmpSharedNeosTestSession.json')
@@ -33,11 +33,14 @@ async function saveStorage(browser: Browser, saveStoragePath: string) {
     const page = await browser.newPage();
 
     const neosUi = new NeosUiNaviationHelper(page);
-    await neosUi.visit();
+    await neosUi.gotoBackendAndLogin();
+
+    // this state change will be saved in local storage ...
     await neosUi.openContentTree();
     await expect(neosUi.getNodeInContentTree("Content Collection (main)")).toBeVisible();
 
     // wait until state is saved in local storage
+    // pi mal daumen
     await new Promise(r => setTimeout(r, 500))
 
     await page.context().storageState({ path: saveStoragePath })
