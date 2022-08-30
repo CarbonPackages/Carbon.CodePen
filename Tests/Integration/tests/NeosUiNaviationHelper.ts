@@ -3,10 +3,13 @@ import { sleep } from "./fixture";
 
 const NEOS_SITE = 'https://carboncodepentestdistribution.ddev.site';
 
+type ContentElementCallback = ((args: {contentElement: ContentElement}) => Promise<void>);
+type DocumentCallback = ((args: {document: Document}) => Promise<void>);
+
 /**
  * @example waitForDomEvent(page.locator(`iframe`), "load")
  */
- const waitForDomEvent = (locator: Locator, eventName: keyof HTMLElementEventMap, options?: {timeout?: number}) => {
+const waitForDomEvent = (locator: Locator, eventName: keyof HTMLElementEventMap, options?: {timeout?: number}) => {
     return locator.evaluate((element, serializedEventName) => {
         return new Promise<void>((resolve) => {
             element.addEventListener(serializedEventName, () => resolve(), {once: true})
@@ -18,15 +21,50 @@ class CodePen {
     constructor(private page: Page) {
     }
 
-    async type(text: string, milliseconds: number = 0) {
-        const prevText = await this.codePenInput.inputValue();
-        await this.codePenInput.type(text, { delay: milliseconds });
-        await this.expect(prevText + text)
+    async type(text: string) {
+        await this.codePenInput.type(text);
+    }
+
+    async typeSlowly(text: string) {
+        await this.codePenInput.type(text, { delay: 50 });
+    }
+
+    async pressTab() {
+        await this.codePenInput.press("Tab")
+    }
+
+    async pressEscape() {
+        await this.codePenInput.press("Escape")
+    }
+
+    async forceComplection() {
+        await this.codePenInput.press('Control+ ');
+    }
+
+    
+    async pressArrowRight() {
+        await this.codePenInput.press("ArrowRight")
+    }
+
+    async expectSuggestionsContain(text: string | RegExp) {
+        await expect(this.codePenEditor.locator(`[widgetid="editor.widget.suggestWidget"]`)).toContainText(text);
+    }
+
+    async expectDocumentationsContain(text: string | RegExp) {
+        await expect(this.codePenEditor.locator(`[widgetid="editor.contrib.contentHoverWidget"]`)).toContainText(text);
+    }
+
+    async toogleRotation() {
+        await this.secondaryInspector.locator("ul>li").first().click()
     }
 
     async fill(text: string) {
         await this.codePenInput.fill(text);
         await this.expect(text)
+    }
+
+    async hoverOverText(text: string) {
+        await this.codePenEditor.locator(`text=${text}`).hover({ force: true })
     }
 
     async undo() {
@@ -45,9 +83,13 @@ class CodePen {
         await this.expect("")
     }
 
+    async clear() {
+        this.fill("")
+    }
+
     async selectTab(label: string) {
         await this.secondaryInspector.locator(`text=${label}`).click()
-        await new Promise(r => setTimeout(r, 100))
+        await sleep(100)
     }
 
     async expectInputToHaveScreenshot(name: string) {
@@ -57,6 +99,15 @@ class CodePen {
 
     async expectPreviewToHaveScreenshot(name: string) {
         await this.expectLocatorToHaveScreenshot(name, this.secondaryInspector.locator('iframe[src^="/neos/codePen"]'))
+    }
+
+    async expectToHaveScreenshot(name: string) {
+        // is not done full screen ...
+        await expect(this.secondaryInspector).toHaveScreenshot(name, { maxDiffPixels: 50 });
+    }
+
+    async expectPreview(text: string) {
+        await expect(this.codePenPreview.locator("body")).toHaveText(text)
     }
 
     private async expectLocatorToHaveScreenshot(name: string, locator: Locator) {
@@ -82,11 +133,7 @@ class CodePen {
     }
 }
 
-
 class ContentElement {
-
-    private codePenWasOpenedOnce: boolean;
-
     constructor(private page: Page, private contentMutationAllowed: boolean, private codePenState: { isInitialized: boolean }) {
     }
 
@@ -95,45 +142,48 @@ class ContentElement {
             throw new Error("Cannot apply changes, as content mutations are not allowed.");
         }
         await this.page.click('#neos-Inspector-Apply');
-        await new Promise(r => setTimeout(r, 1000))
+        await sleep(500)
     }
 
     async discard() {
         await this.page.click('#neos-Inspector-Discard');
-        await new Promise(r => setTimeout(r, 1000))
+        await sleep(500)
     }
 
     async withCodePen(callback: ((args: {codePen: CodePen}) => Promise<void>)) {
         await this.page.click('text=Open CodePen');
 
-
-        // await sleep(1000);
-
         // await waitForDomEvent(this.codePenPreview, "load", {timeout: 10000})
-
-
-
-        // console.log("a");
-
-       //  const lol = waitForDomEvent(this.codePenPreview, "load", {timeout: 10000});
 
         await this.codePenPreview.waitFor()
 
-        if (!this.codePenState.isInitialized) {
-            this.codePenState.isInitialized = true;
-            await sleep(1000)
-        }
+        // if (!this.codePenState.isInitialized) {
+        //     this.codePenState.isInitialized = true;
+        //     await sleep(1500)
+        // }
+
+        const codePen = new CodePen(this.page);
+        
+        // while (true) {
+        //     await codePen.forceComplection()
+        //     try {
+        //         await this.codePenEditor.locator(`[widgetid="editor.widget.suggestWidget"]`).isVisible({ timeout: 100 })
+        //         break;
+        //     } catch (error) {
+        //     }
+        // }
+        // await this.codePenInput.press("Escape")
 
 
-        // console.log("b");
-        // await expect(this.codePenPreviewFrame.locator("body")).toBeVisible();
+        // todo find a relieable way to detemine
+        await sleep(1500)
 
-        await callback({codePen: new CodePen(this.page)})
+        await callback({codePen})
 
         // auto close
         if (await this.codePenEditor.count() !== 0) {
             await this.page.click('text=Open CodePen')
-            await new Promise(r => setTimeout(r, 100))
+            await sleep(100)
         }
     }
 
@@ -152,11 +202,11 @@ class ContentElement {
     private get codePenEditor() {
         return this.secondaryInspector.locator('.monaco-editor[role="code"]')
     }
+
+    private get codePenInput() {
+        return this.codePenEditor.locator('.inputarea')
+    }
 }
-
-type ContentElementCallback = ((args: {contentElement: ContentElement}) => Promise<void>);
-type DocumentCallback = ((args: {document: Document}) => Promise<void>);
-
 
 class Document {
 
@@ -199,30 +249,21 @@ class Document {
     }
 }
 
-
-
 export class NeosUiNaviationHelper {
     constructor(private page: Page) {
     }
 
-    gotoDocumentInBackend(documentTitle: string) {
-        const contextPath = `/sites/testsite/${documentTitle}@user-admin`
-        return this.page.goto(`${NEOS_SITE}/neos/content?node=${encodeURIComponent(contextPath)}`);
+    async withCleanDocument(callback: DocumentCallback) {
+        let newDocumentName = `carbon-test-site-page-${Math.round(Math.random() * 100000)}`
+        await this.createDocumentAndSelect("Carbon.TestSite:Page", newDocumentName);
+        await callback({ document: new Document(this.page, true)})
     }
 
-    gotoHomePageInBackend() {
-        const contextPath = `/sites/testsite@user-admin`
-        return this.page.goto(`${NEOS_SITE}/neos/content?node=${encodeURIComponent(contextPath)}`);
+    async withSharedDocument(callback: DocumentCallback) {
+        await this.gotoDocumentInBackend("carbon-test-site-page-1");
+        await callback({ document: new Document(this.page, false) })
     }
 
-    async gotoBackend() {
-        await this.page.goto(`${NEOS_SITE}/neos`);
-        await this.waitForIframe()
-    }
-
-    waitForIframe() {
-        return waitForDomEvent(this.page.locator(`iframe[name=neos-content-main]`), "load")
-    }
 
     async gotoBackendAndLogin() {
         await this.page.goto(`${NEOS_SITE}/neos`);
@@ -240,15 +281,37 @@ export class NeosUiNaviationHelper {
         await waitForDomEvent(this.page.locator(`iframe[name=neos-content-main]`), "load", {timeout: 10000})
     }
 
-    getNodeInContentTree(nodeNameLabel: string): Locator {
+    async openContentTree() {
+        await this.page.click('[class^="style__leftSideBar__bottom"] div[role="button"]:has-text("Content Tree")');
+        await expect(this.getNodeInContentTree("Content Collection (main)")).toBeVisible();
+    }
+
+    private getNodeInContentTree(nodeNameLabel: string): Locator {
         return this.page.locator(`[class^="style__leftSideBar__bottom"] div[role="button"]:has-text(${JSON.stringify(nodeNameLabel)})`);
     }
 
-    openContentTree() {
-        return this.page.click('[class^="style__leftSideBar__bottom"] div[role="button"]:has-text("Content Tree")');
+    private async gotoDocumentInBackend(documentTitle: string) {
+        const contextPath = `/sites/testsite/${documentTitle}@user-admin`
+        await this.page.goto(`${NEOS_SITE}/neos/content?node=${encodeURIComponent(contextPath)}`);
+        await this.waitForIframe()
     }
 
-    openDocument(documentLabel: string) {
+    private async gotoHomePageInBackend() {
+        const contextPath = `/sites/testsite@user-admin`
+        await this.page.goto(`${NEOS_SITE}/neos/content?node=${encodeURIComponent(contextPath)}`);
+        await this.waitForIframe()
+    }
+
+    private async gotoBackend() {
+        await this.page.goto(`${NEOS_SITE}/neos`);
+        await this.waitForIframe()
+    }
+
+    private waitForIframe() {
+        return waitForDomEvent(this.page.locator(`iframe[name=neos-content-main]`), "load")
+    }
+
+    private openDocument(documentLabel: string) {
         return Promise.all([
             this.page.waitForNavigation(),
             this.page.click(`[class^="style__leftSideBar__top"] div[role="button"]:has-text(${JSON.stringify(documentLabel)})`)
@@ -265,96 +328,5 @@ export class NeosUiNaviationHelper {
         await this.page.click(`#neos-NodeCreationDialog-CreateNew`);
         
         await this.waitForIframe();        
-    }
-
-    async withCleanDocument(callback: DocumentCallback) {
-        let newDocumentName = `carbon-test-site-page-${Math.round(Math.random() * 100000)}`
-        await this.createDocumentAndSelect("Carbon.TestSite:Page", newDocumentName);
-        await callback({ document: new Document(this.page, true)})
-    }
-
-    useCleanDocument() {
-        let newDocumentName = `carbon-test-site-page-${Math.round(Math.random() * 100000)}`
-        return this.createDocumentAndSelect("Carbon.TestSite:Page", newDocumentName);
-    }
-
-    async withSharedDocument(callback: DocumentCallback) {
-        await this.gotoDocumentInBackend("carbon-test-site-page-1");
-        await sleep(1000)
-        await callback({ document: new Document(this.page, false) })
-    }
-
-    async useSharedDocument() {
-        await this.gotoDocumentInBackend("carbon-test-site-page-1");
-        await sleep(1000)
-    }
-
-    async createOrSetNodeActiveInCollection(nodeNameLabel: string) {        
-        if (await this.getNodeInContentTree(nodeNameLabel).count() > 0) {
-            await this.getNodeInContentTree(nodeNameLabel).first().click();
-            return
-        }
-
-        await this.createNodeInCollection(nodeNameLabel);
-    }
-
-    // getNeosContentFrame = () => this.page.frameLocator('iframe[name="neos-content-main"]');
-
-    // getContentCollectionInline = () => this.getNeosContentFrame().locator('.neos-contentcollection').first()
-
-    async createNodeInCollection(nodeNameLabel: string) {
-        await (await this.getNodeInContentTree("Content Collection (main)")).first().click()
-        await this.page.click('#neos-ContentTree-AddNode');
-        await this.page.click(`#neos-SelectNodeTypeDialog button[role="button"]:has-text(${JSON.stringify(nodeNameLabel)})`);
-        return
-    }
-
-    async openCurrentCodePen() {
-        await this.page.click('text=Open CodePen');
-
-        // await this.codePenEditor.waitFor()
-
-        await expect(this.codePenPreview.locator("body")).toBeVisible();
-        await new Promise(r => setTimeout(r, 1000))
-    }
-
-    async discardCurrentCodePen() {
-        await this.page.click('button[role="button"]:has-text("Discard")');
-    }
-
-    async openCodPenTab(label: string) {
-        await this.secondaryInspector.locator(`text=${label}`).click()
-        await new Promise(r => setTimeout(r, 100))
-    }
-
-    async expectCodePenEditorInputToHaveScreenshot(name: string) {
-        // we make it fullscreen so we dont test the minimap and so on in this test
-        await this.expectLocatorToHaveScreenshot(name, this.codePenEditor.locator(".view-lines"))
-    }
-
-    async expectCodePenPreviewToHaveScreenshot(name: string) {
-        await this.expectLocatorToHaveScreenshot(name, this.secondaryInspector.locator('iframe[src^="/neos/codePen"]'))
-    }
-
-    async expectLocatorToHaveScreenshot(name: string, locator: Locator) {
-        await locator.evaluate((el) => el.requestFullscreen())
-        await expect(this.page).toHaveScreenshot(name, { maxDiffPixels: 50 });
-        await this.page.locator("body").evaluate((el) => el.ownerDocument.exitFullscreen())
-    }
-
-    get secondaryInspector() {
-        return this.page.locator(`[class^="style__secondaryInspector"]`)
-    }
-
-    get codePenEditor() {
-        return this.secondaryInspector.locator('.monaco-editor[role="code"]')
-    }
-
-    get codePenInput() {
-        return this.codePenEditor.locator('.inputarea')
-    }
-
-    get codePenPreview() {
-        return this.secondaryInspector.frameLocator('iframe[src^="/neos/codePen"]');
     }
 }

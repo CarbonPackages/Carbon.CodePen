@@ -1,7 +1,8 @@
-import { Browser, chromium, FullConfig, expect } from '@playwright/test'
+import { Browser, chromium, FullConfig } from '@playwright/test'
 import { NeosUiNaviationHelper } from './NeosUiNaviationHelper'
 
 import child_process from "child_process";
+import { sleep } from './fixture';
 
 const exec = (command: string) => {
     return new Promise((resolve, reject) => {
@@ -19,7 +20,7 @@ const exec = (command: string) => {
     })
 }
 
-async function globalSetup(config: FullConfig) {
+export default async function globalSetup(config: FullConfig) {
 
     // console.log(await exec("cd TestDistribution && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh'"));
     // console.log(await exec("pnpm run softResetNeos"));
@@ -32,18 +33,15 @@ async function globalSetup(config: FullConfig) {
 async function saveStorage(browser: Browser, saveStoragePath: string) {
     const page = await browser.newPage();
 
-    const neosUi = new NeosUiNaviationHelper(page);
-    await neosUi.gotoBackendAndLogin();
+    const neos = new NeosUiNaviationHelper(page);
+    await neos.gotoBackendAndLogin();
 
     // this state change will be saved in local storage ...
-    await neosUi.openContentTree();
-    await expect(neosUi.getNodeInContentTree("Content Collection (main)")).toBeVisible();
+    await neos.openContentTree();
 
     // wait until state is saved in local storage
     // pi mal daumen
-    await new Promise(r => setTimeout(r, 500))
+    await sleep(500)
 
     await page.context().storageState({ path: saveStoragePath })
 }
-
-export default globalSetup;
