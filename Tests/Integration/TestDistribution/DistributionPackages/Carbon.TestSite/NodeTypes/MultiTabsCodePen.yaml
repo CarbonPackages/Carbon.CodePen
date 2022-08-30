@@ -1,0 +1,25 @@
+"Carbon.TestSite:MultiTabsCodePen":
+  final: true
+  superTypes:
+    "Carbon.TestSite:AbstractCodePen": true
+  ui:
+    label: "Carbon.TestSite:MultiTabsCodePen"
+  properties:
+    codePen:
+      ui:
+        inspector:
+          editorOptions:
+            tabs:
+              a:
+                label: Tab A
+                icon: code
+                language: yaml
+              b:
+                label: Tab B
+                icon: code
+                language: afx
+              c:
+                label: Tab C
+                icon: code
+                language: html
+    

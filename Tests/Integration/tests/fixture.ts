@@ -10,3 +10,6 @@ export const test = base.extend<{
   },
 })
 export { expect } from '@playwright/test'
+
+
+export const sleep = (milliseconds: number) => new Promise(r => setTimeout(r, milliseconds))
