@@ -13,7 +13,6 @@ export { expect } from '@playwright/test'
 
 export const sleep = (milliseconds: number) => new Promise(r => setTimeout(r, milliseconds))
 
-
 export const configureTest = () => {
   test.use({ storageState: './tmpSharedNeosTestSession.json' })
   test.describe.configure({ mode: 'parallel' });

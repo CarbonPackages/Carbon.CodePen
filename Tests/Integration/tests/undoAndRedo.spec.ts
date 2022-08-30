@@ -1,4 +1,4 @@
-import { test, sleep, configureTest } from "./fixture"
+import { test, configureTest } from "./fixture"
 
 configureTest()
 
@@ -40,7 +40,6 @@ test("undo after discarding @new", async ({ neos }) => {
     await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
       await contentElement.withCodePen(async ({codePen}) => {
         await codePen.fill("firstWord")
-        await sleep(100)
       })
       await contentElement.discard()
       await contentElement.withCodePen(async ({codePen}) => {
