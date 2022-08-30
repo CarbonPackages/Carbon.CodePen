@@ -1,4 +1,7 @@
-import { test, expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
+
+import { test, expect } from "./fixture"
+
 import { NeosUiNaviationHelper } from './NeosUiNaviationHelper';
 
 // console.log(await exec("cd TestDistribution && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh'"));
@@ -11,7 +14,7 @@ test.use({ storageState: './tmpSharedNeosTestSession.json' })
 test.describe("Language Features HTML,AFX,YAML", () => {
   const testSyntaxHighlightinWithScreenShot = async (page: Page, nodeTypeToBeUsed: string, code: string, fileName: string): Promise<void> => {
     const neosUi = new NeosUiNaviationHelper(page);
-    await neosUi.gotoDocumentInBackend("carbon-test-site-page-1");
+    await neosUi.useSharedDocument();
     await neosUi.createOrSetNodeActiveInCollection(nodeTypeToBeUsed);
 
     await neosUi.openCurrentCodePen();
@@ -73,7 +76,7 @@ const testCompletionForTab = async (neosUi: NeosUiNaviationHelper, tabLabel: str
 
 test('custom completion', async ({ page }) => {
   const neosUi = new NeosUiNaviationHelper(page);
-  await neosUi.gotoDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.useSharedDocument();
   await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:CustomCompletionCodePen");
   await neosUi.openCurrentCodePen();
 
@@ -96,7 +99,7 @@ test('custom completion', async ({ page }) => {
 
 test('document 1 live preview behavior', async ({ page }) => {
   const neosUi = new NeosUiNaviationHelper(page);
-  await neosUi.gotoDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.useSharedDocument();
   await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:BasicCodePen");
 
   await neosUi.openCurrentCodePen();
@@ -115,7 +118,7 @@ test('document 1 live preview behavior', async ({ page }) => {
 
 test('document 1 live preview behavior dreh', async ({ page }) => {
   const neosUi = new NeosUiNaviationHelper(page);
-  await neosUi.gotoDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.useSharedDocument();
   await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:BasicCodePen");
 
   await neosUi.openCurrentCodePen();
@@ -136,7 +139,7 @@ test('document 1 live preview behavior dreh', async ({ page }) => {
 
 test("afxTagCompletion", async ({ page }) => {
   const neosUi = new NeosUiNaviationHelper(page);
-  await neosUi.gotoDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.useSharedDocument();
   await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:AfxFeaturesCodePen");
   await neosUi.openCurrentCodePen();
 
@@ -157,7 +160,7 @@ test("afxTagCompletion", async ({ page }) => {
 
 test("afxTagHover", async ({ page }) => {
   const neosUi = new NeosUiNaviationHelper(page);
-  await neosUi.gotoDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.useSharedDocument();
   await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:AfxFeaturesCodePen");
   await neosUi.openCurrentCodePen();
 
@@ -176,7 +179,7 @@ test("afxTagHover", async ({ page }) => {
 
 test("tailwind css", async ({ page }) => {
   const neosUi = new NeosUiNaviationHelper(page);
-  await neosUi.gotoDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.useSharedDocument();
   await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:TailwindCodePen");
 
   await neosUi.openCurrentCodePen();
@@ -204,7 +207,7 @@ test("tailwind css", async ({ page }) => {
 
 test('document 1 emmet', async ({ page }) => {
   const neosUi = new NeosUiNaviationHelper(page);
-  await neosUi.gotoDocumentInBackend("carbon-test-site-page-1");
+  await neosUi.useSharedDocument();
   await neosUi.createOrSetNodeActiveInCollection("Carbon.TestSite:HtmlFeaturesCodePen");
 
   await neosUi.openCurrentCodePen();

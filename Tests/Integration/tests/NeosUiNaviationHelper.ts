@@ -78,6 +78,9 @@ export class NeosUiNaviationHelper {
         let newDocumentName = `carbon-test-site-page-${Math.round(Math.random() * 100000)}`
 
         await this.createDocumentAndSelect("Carbon.TestSite:Page", newDocumentName);
+
+    useSharedDocument() {
+        return this.gotoDocumentInBackend("carbon-test-site-page-1");
     }
 
     async createOrSetNodeActiveInCollection(nodeNameLabel: string) {        
