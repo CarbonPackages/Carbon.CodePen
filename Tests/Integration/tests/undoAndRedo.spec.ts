@@ -92,7 +92,7 @@ test("redo after applying (with at least one undo) @new", async ({ neos }) => {
     await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
       await contentElement.withCodePen(async ({codePen}) => {
         await codePen.fill("firstWord")
-        await codePen.type(" secondWord")
+        await codePen.insert(" secondWord")
         await codePen.undo()
         await codePen.expect("firstWord")
       })

@@ -13,7 +13,7 @@ test("custom completion", async ({ neos }) => {
                     ["Tab A", "xxx", "xxxCompletion1TabA"]
                 ]) {
                     await codePen.selectTab(tabName)
-                    await codePen.typeSlowly(triggerCharacters)
+                    await codePen.type(triggerCharacters)
                     if (tabName === "Tab A") {
                         // todo
                         // only yaml needs force completion
@@ -33,7 +33,7 @@ test("custom completion", async ({ neos }) => {
                 const [tabName, triggerCharacters, fullCompletion] = ["Tab A", "xxx", "xxxCompletion1TabA"];
 
                 await codePen.selectTab(tabName)
-                await codePen.typeSlowly(triggerCharacters)
+                await codePen.type(triggerCharacters)
                 await codePen.forceComplection()
                 await codePen.expectSuggestionsContain(fullCompletion)
                 await codePen.pressTab()

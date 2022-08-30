@@ -6,7 +6,7 @@ test('emmet', async ({ neos }) => {
     await neos.withSharedDocument(async ({document}) => {
         await document.withContentElement("Carbon.TestSite:HtmlFeaturesCodePen", async ({contentElement}) => {
             await contentElement.withCodePen(async ({codePen}) => {
-                await codePen.typeSlowly("div")
+                await codePen.type("div")
                 await codePen.expect("div")
                 await codePen.pressTab()
                 await codePen.expect("<div></div>")
