@@ -1,7 +1,9 @@
 import { Browser, chromium, FullConfig } from '@playwright/test'
-import { NeosUiNaviationHelper } from './NeosUiNaviationHelper'
+import { Neos } from './fixture'
 
+// @ts-expect-error
 import child_process from "child_process";
+
 import { sleep } from './fixture';
 
 const exec = (command: string) => {
@@ -33,7 +35,7 @@ export default async function globalSetup(config: FullConfig) {
 async function saveStorage(browser: Browser, saveStoragePath: string) {
     const page = await browser.newPage();
 
-    const neos = new NeosUiNaviationHelper(page);
+    const neos = new Neos(page, 'https://carboncodepentestdistribution.ddev.site');
     await neos.gotoBackendAndLogin();
 
     // this state change will be saved in local storage ...
