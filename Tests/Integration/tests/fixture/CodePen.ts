@@ -5,11 +5,11 @@ export class CodePen {
     constructor(private page: Page) {
     }
 
-    async type(text: string) {
+    async insert(text: string) {
         await this.codePenInput.type(text);
     }
 
-    async typeSlowly(text: string) {
+    async type(text: string) {
         await this.codePenInput.type(text, { delay: 50 });
     }
 

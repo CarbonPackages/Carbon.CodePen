@@ -6,13 +6,13 @@ test("afxTagCompletion", async ({ neos }) => {
     await neos.withSharedDocument(async ({document}) => {
         await document.withContentElement("Carbon.TestSite:AfxFeaturesCodePen", async ({contentElement}) => {
             await contentElement.withCodePen(async ({codePen}) => {
-                await codePen.typeSlowly("Loop")
+                await codePen.type("Loop")
                 await codePen.pressTab()
 
-                await codePen.typeSlowly("itemsValue")
+                await codePen.type("itemsValue")
                 await codePen.pressTab()
 
-                await codePen.typeSlowly("content")
+                await codePen.type("content")
 
                 await codePen.expect(
                     `<Neos.Fusion:Loop items={itemsValue}>\n` +
