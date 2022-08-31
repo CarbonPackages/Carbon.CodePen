@@ -1,6 +1,10 @@
 import { PlaywrightTestConfig, devices } from '@playwright/test';
 import path from 'path';
 
+import * as dotenv from 'dotenv'
+dotenv.config()
+
+
 // Reference: https://playwright.dev/docs/test-configuration
 const config: PlaywrightTestConfig = {
   // workers: 1,
@@ -11,16 +15,20 @@ const config: PlaywrightTestConfig = {
   timeout: 30000,                        /* Timeout per test */
   // outputDir: 'test-results/',                /* Artifacts folder where screenshots, videos, and traces are stored. */
 
-  // webServer: {                               /* Run your local dev server before starting the tests: */
-  //   command: 'npm run start',                /* https://playwright.dev/docs/test-advanced#launching-a-development-web-server-during-the-tests */
-  //   port: 3000,
+  /* Run your local dev server before starting the tests: */
+  /* https://playwright.dev/docs/test-advanced#launching-a-development-web-server-during-the-tests */
+  // webServer: {
+  //   command: 'pnpm run startNeos',
+  //   url: 'https://carboncodepentestdistribution.ddev.site',
+  //   timeout: 120 * 1000,
+  //   reuseExistingServer: true,
   // },
 
   use: {
-    trace: 'on-first-retry',                    /* Retry a test if its failing with enabled tracing (analyse the DOM, console logs, network traffic): https://playwright.dev/docs/trace-viewer */
-    // contextOptions: {                        /* All available context options: https://playwright.dev/docs/api/class-browser#browser-new-context */
-    //   ignoreHTTPSErrors: true,
-    // },
+    trace: 'on-first-retry',
+    storageState: 'tmpSharedNeosTestSession.json',
+    screenshot: "only-on-failure",
+    baseURL: process.env.BASE_URL
   },
 
   projects: [

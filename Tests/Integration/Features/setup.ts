@@ -1,4 +1,4 @@
-import { Browser, chromium, FullConfig } from '@playwright/test'
+import { chromium, FullConfig, Page } from '@playwright/test'
 import { Neos } from './fixture'
 
 // @ts-expect-error
@@ -22,20 +22,22 @@ const exec = (command: string) => {
     })
 }
 
-export default async function globalSetup(config: FullConfig) {
+export default async function globalSetup(config: FullConfig) {    
 
     // console.log(await exec("cd TestDistribution && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh'"));
     // console.log(await exec("pnpm run softResetNeos"));
 
     const browser = await chromium.launch()
-    await saveStorage(browser, 'tmpSharedNeosTestSession.json')
+
+    const { baseURL } = config.projects[0].use;
+    const page = await browser.newPage({baseURL});
+
+    await saveStorage(page, 'tmpSharedNeosTestSession.json')
     await browser.close()
 }
 
-async function saveStorage(browser: Browser, saveStoragePath: string) {
-    const page = await browser.newPage();
-
-    const neos = new Neos(page, 'https://carboncodepentestdistribution.ddev.site');
+async function saveStorage(page: Page, saveStoragePath: string) {
+    const neos = new Neos(page);
     await neos.gotoBackendAndLogin();
 
     // this state change will be saved in local storage ...
