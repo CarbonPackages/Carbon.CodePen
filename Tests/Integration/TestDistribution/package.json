@@ -1,0 +1,14 @@
+{
+  "name": "test-distribution",
+  "version": "1.0.0",
+  "scripts": {
+    "buildClientTailwind": "node buildBundledTailwindConfig.js ./DistributionPackages/Carbon.TestSite/Resources/Public/bundledTailwindConfig.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "esbuild": "^0.15.6",
+    "tailwindcss": "^3.1.8"
+  }
+}

@@ -1,0 +1,31 @@
+Neos:
+  Neos:
+    Ui:
+      frontendConfiguration:
+        'Carbon.CodePen':
+
+          #
+          # Options for the tailwindcss support
+          #
+          tailwindcss:
+
+            #
+            # Enable Tailwind css support for the monaco editor.
+            #
+            # @var boolean
+            #
+            enabled: true
+
+            #
+            # Provide a custom tailwind configuartion for the editor.
+            # You can decide to insert a Json string or a http URI to a Javascript bundle of your config.
+            #
+            # @example:
+            #   - using Json:
+            #     "${File.readFile('resource://Neos.Demo/Public/clientTailwindConfig.json')}"
+            #   - using JavaScript:
+            #     "${StaticResource.uri('Neos.Demo', 'Public/bundledTailwindConfig.js')}"
+            #
+            # @var string | null
+            #
+            clientConfig: ${StaticResource.uri('Carbon.TestSite', 'Public/bundledTailwindConfig.js')}

@@ -2,6 +2,7 @@
     "name": "carbon/testsite",
     "type": "neos-site",
     "require": {
+        "carbon/codepen": "*"
     },
     "autoload": {
         "psr-4": {
