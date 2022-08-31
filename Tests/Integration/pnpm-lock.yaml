@@ -3,10 +3,12 @@ lockfileVersion: 5.4
 specifiers:
   '@playwright/test': ^1.25.1
   '@types/node': ^16
+  dotenv: ^16.0.2
 
 devDependencies:
   '@playwright/test': 1.25.1
   '@types/node': 16.11.56
+  dotenv: 16.0.2
 
 packages:
 
@@ -25,6 +27,11 @@ packages:
 
   /@types/node/18.0.0:
     resolution: {integrity: sha512-cHlGmko4gWLVI27cGJntjs/Sj8th9aYwplmZFwmmgYQQvL5NUsgVJG7OddLvNfLqYS31KFN0s3qlaD9qCaxACA==}
+    dev: true
+
+  /dotenv/16.0.2:
+    resolution: {integrity: sha512-JvpYKUmzQhYoIFgK2MOnF3bciIZoItIIoryihy0rIA+H4Jy0FmgyKYAHCTN98P5ybGSJcIFbh6QKeJdtZd1qhA==}
+    engines: {node: '>=12'}
     dev: true
 
   /playwright-core/1.25.1:

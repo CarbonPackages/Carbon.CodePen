@@ -5,7 +5,7 @@ import { Document } from "./Document";
 type DocumentCallback = ((args: {document: Document}) => Promise<void>);
 
 export class Neos {
-    constructor(private page: Page, private siteUrl: string) {
+    constructor(private page: Page) {
     }
 
     async withCleanDocument(callback: DocumentCallback) {
@@ -20,7 +20,7 @@ export class Neos {
     }
 
     async gotoBackendAndLogin() {
-        await this.page.goto(`${this.siteUrl}/neos`);
+        await this.page.goto(`/neos`);
 
         await expect(this.page).toHaveTitle(/Login to .*/);
 
@@ -46,18 +46,18 @@ export class Neos {
 
     private async gotoDocumentInBackend(documentTitle: string) {
         const contextPath = `/sites/testsite/${documentTitle}@user-admin`
-        await this.page.goto(`${this.siteUrl}/neos/content?node=${encodeURIComponent(contextPath)}`);
+        await this.page.goto(`/neos/content?node=${encodeURIComponent(contextPath)}`);
         await this.waitForIframe()
     }
 
     private async gotoHomePageInBackend() {
         const contextPath = `/sites/testsite@user-admin`
-        await this.page.goto(`${this.siteUrl}/neos/content?node=${encodeURIComponent(contextPath)}`);
+        await this.page.goto(`/neos/content?node=${encodeURIComponent(contextPath)}`);
         await this.waitForIframe()
     }
 
     private async gotoBackend() {
-        await this.page.goto(`${this.siteUrl}/neos`);
+        await this.page.goto(`/neos`);
         await this.waitForIframe()
     }
 
