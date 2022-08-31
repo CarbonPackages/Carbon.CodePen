@@ -117,11 +117,11 @@
         },
         {
             "name": "carbon/codepen",
-            "version": "dev-main",
+            "version": "dev-e2eTesting",
             "dist": {
                 "type": "path",
                 "url": "./DistributionPackages/Carbon.CodePen",
-                "reference": "22b9a7c663b5796de263587be8d0892b0eb2d0bd"
+                "reference": "62fb2950e4a0be05a6f0eb4b0e2187f5ab25758b"
             },
             "require": {
                 "neos/neos-ui": "^7.0 || ^8.0"
@@ -148,7 +148,10 @@
             "dist": {
                 "type": "path",
                 "url": "./DistributionPackages/Carbon.TestSite",
-                "reference": "eb03323feb0a7d000adcff4f63ab02b88e6451ef"
+                "reference": "1eeb91ef9923613920e7111bcad96f56a238badf"
+            },
+            "require": {
+                "carbon/codepen": "*"
             },
             "type": "neos-site",
             "extra": {
