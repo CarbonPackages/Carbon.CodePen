@@ -4,8 +4,8 @@ import path from 'path';
 // Reference: https://playwright.dev/docs/test-configuration
 const config: PlaywrightTestConfig = {
   // workers: 1,
-  globalSetup: "./tests/setup.ts",
-  testDir: path.join(__dirname, 'tests'), /* Test directory */
+  globalSetup: "./Features/setup.ts",
+  testDir: path.join(__dirname, 'Features'), /* Test directory */
   forbidOnly: !!process.env.CI,                 /* Whether to exit with an error if any tests or groups are marked as test.only() or test.describe.only(). Useful on CI. */
   retries: process.env.CI ? 2 : 0,              /* If a test fails on CI, retry it additional 2 times */
   timeout: 30000,                        /* Timeout per test */
