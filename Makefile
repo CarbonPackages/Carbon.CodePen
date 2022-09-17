@@ -23,5 +23,4 @@ distributionDown:
 	cd ${DISTRIBUTION} && ddev stop
 
 test:
-	cd Tests/Integration && pnpm run startNeos
 	cd Tests/Integration && pnpm run test

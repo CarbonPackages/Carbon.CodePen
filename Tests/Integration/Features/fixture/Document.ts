@@ -35,11 +35,11 @@ export class Document {
     private async createNodeInCollection(nodeNameLabel: string) {
         await (await this.getNodeInContentTree("Content Collection (main)")).first().click()
         await this.page.click('#neos-ContentTree-AddNode');
-        await this.page.click(`#neos-SelectNodeTypeDialog button[role="button"]:has-text(${JSON.stringify(nodeNameLabel)})`);
+        await this.page.click(`#neos-SelectNodeTypeDialog button[role="button"] >> text=${JSON.stringify(nodeNameLabel)}`);
         return
     }
 
     private getNodeInContentTree(nodeNameLabel: string): Locator {
-        return this.page.locator(`[class^="style__leftSideBar__bottom"] div[role="button"]:has-text(${JSON.stringify(nodeNameLabel)})`);
+        return this.page.locator(`[class^="style__leftSideBar__bottom"] div[role="button"] >> text=${JSON.stringify(nodeNameLabel)}`);
     }
 }

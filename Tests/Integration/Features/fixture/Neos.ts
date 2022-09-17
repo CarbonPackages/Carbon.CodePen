@@ -5,7 +5,22 @@ import { Document } from "./Document";
 type DocumentCallback = ((args: {document: Document}) => Promise<void>);
 
 export class Neos {
+    private consoleMessages: string [] = [];
+
     constructor(private page: Page) {
+    }
+
+    async initializeObject() {
+        this.page.on('console', (message) => {
+            if (message.type() === "info" && message.text() === "1 change successfully applied.") {
+                return;
+            }
+            this.consoleMessages.push(`[${message.type()}] ${message.text()}`)
+        });
+    }
+
+    async shutdownObject() {
+        expect(this.consoleMessages).toStrictEqual([]);
     }
 
     async withCleanDocument(callback: DocumentCallback) {

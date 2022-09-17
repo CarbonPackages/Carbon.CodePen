@@ -17,18 +17,20 @@ const config: PlaywrightTestConfig = {
 
   /* Run your local dev server before starting the tests: */
   /* https://playwright.dev/docs/test-advanced#launching-a-development-web-server-during-the-tests */
-  // webServer: {
-  //   command: 'pnpm run startNeos',
-  //   url: 'https://carboncodepentestdistribution.ddev.site',
-  //   timeout: 120 * 1000,
-  //   reuseExistingServer: true,
-  // },
+  webServer: {
+    command: 'pnpm run startNeos',
+    url: 'https://carboncodepentestdistribution.ddev.site',
+    timeout: 120 * 1000,
+    reuseExistingServer: true,
+    ignoreHTTPSErrors: true,
+  },
 
   use: {
     trace: 'on-first-retry',
     storageState: 'tmpSharedNeosTestSession.json',
     screenshot: "only-on-failure",
-    baseURL: process.env.BASE_URL
+    baseURL: process.env.BASE_URL,
+    ignoreHTTPSErrors: true
   },
 
   projects: [
