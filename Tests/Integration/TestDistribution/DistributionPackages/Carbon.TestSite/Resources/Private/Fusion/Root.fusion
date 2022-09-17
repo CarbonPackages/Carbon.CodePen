@@ -44,6 +44,7 @@ prototype(Carbon.TestSite:Page) < prototype(Neos.Neos:Page) {
     body = Neos.Fusion:Component {
         renderer = afx`
             Fusion (Carbon.TestSite:Page)
+            {Configuration.setting("Neos.Flow.core.context")}
             <Neos.Neos:ContentCollection nodePath='main' />
         `
     }

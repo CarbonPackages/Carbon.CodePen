@@ -2,7 +2,8 @@
   "name": "test-distribution",
   "version": "1.0.0",
   "scripts": {
-    "buildClientTailwind": "node buildBundledTailwindConfig.js ./DistributionPackages/Carbon.TestSite/Resources/Public/bundledTailwindConfig.js"
+    "buildClientTailwind": "cat ../../../Documentation/buildBundledTailwindConfig.js | node - ./DistributionPackages/Carbon.TestSite/Resources/Public/bundledTailwindConfig.js",
+    "jsonTailwindConfig": "cat ../../../Documentation/buildJsonTailwindConfig.js | node - ./DistributionPackages/Carbon.TestSite/Resources/Public/jsonTailwindConfig.json"
   },
   "keywords": [],
   "author": "",

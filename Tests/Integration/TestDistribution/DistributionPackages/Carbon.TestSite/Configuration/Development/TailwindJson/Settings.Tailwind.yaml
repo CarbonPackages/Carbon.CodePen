@@ -1,0 +1,7 @@
+Neos:
+  Neos:
+    Ui:
+      frontendConfiguration:
+        'Carbon.CodePen':
+          tailwindcss:
+            clientConfig: ${File.readFile('resource://Carbon.TestSite/Public/jsonTailwindConfig.json')}
