@@ -7,10 +7,10 @@ type DocumentCallback = ((args: {document: Document}) => Promise<void>);
 export class Neos {
     private consoleMessages: string [] = [];
 
-    constructor(private page: Page) {
+    public constructor(private page: Page) {
     }
 
-    async initializeObject() {
+    public async initializeObject() {
         this.page.on('console', (message) => {
             if (message.type() === "info" && message.text() === "1 change successfully applied.") {
                 return;
@@ -19,22 +19,28 @@ export class Neos {
         });
     }
 
-    async shutdownObject() {
+    public async shutdownObject() {
         expect(this.consoleMessages).toStrictEqual([]);
     }
 
-    async withCleanDocument(callback: DocumentCallback) {
+    public async withCleanDocument(callback: DocumentCallback) {
         let newDocumentName = `carbon-test-site-page-${Math.round(Math.random() * 100000)}`
         await this.createDocumentAndSelect("Carbon.TestSite:Page", newDocumentName);
         await callback({ document: new Document(this.page, true)})
     }
 
-    async withSharedDocument(callback: DocumentCallback) {
+    public async withCleanDocumentInContext(context: "TailwindJson", callback: DocumentCallback) {
+        await this.page.setExtraHTTPHeaders({ 'FLOWSUBCONTEXT': context })
+        await this.withCleanDocument(callback)
+        await this.page.setExtraHTTPHeaders({})
+    }
+
+    public async withSharedDocument(callback: DocumentCallback) {
         await this.gotoDocumentInBackend("carbon-test-site-page-1");
         await callback({ document: new Document(this.page, false) })
     }
 
-    async gotoBackendAndLogin() {
+    public async gotoBackendAndLogin() {
         await this.page.goto(`/neos`);
 
         await expect(this.page).toHaveTitle(/Login to .*/);
@@ -50,7 +56,7 @@ export class Neos {
         await waitForDomEvent(this.page.locator(`iframe[name=neos-content-main]`), "load", {timeout: 10000})
     }
 
-    async openContentTree() {
+    public async openContentTree() {
         await this.page.click('[class^="style__leftSideBar__bottom"] div[role="button"]:has-text("Content Tree")');
         await expect(this.getNodeInContentTree("Content Collection (main)")).toBeVisible();
     }

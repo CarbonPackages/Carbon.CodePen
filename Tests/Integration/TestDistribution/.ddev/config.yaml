@@ -18,10 +18,11 @@ composer_version: "2"
 nodejs_version: "16"
 
 web_environment:
- - FLOW_CONTEXT=Development/Ddev
+ - FLOW_CONTEXT=Development
  - FLOW_PATH_TEMPORARY_BASE=/tmp/Flow
  - FLOW_REWRITEURLS=1
 
+disable_settings_management: true
 # Key features of ddev's config.yaml:
 
 # name: <projectname> # Name of the project, automatically provides

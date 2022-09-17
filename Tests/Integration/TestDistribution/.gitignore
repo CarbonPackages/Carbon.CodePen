@@ -1,7 +1,11 @@
 /Build/
+/Configuration/**/*.example
+/Configuration/Testing/
+/Configuration/README
 /Data/
 /Packages/
-/Web/
+/Web/_Resources
+/Web/.htaccess
 /bin/
 /flow
 /flow.bat
