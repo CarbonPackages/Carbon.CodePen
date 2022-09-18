@@ -1,32 +1,16 @@
 "Carbon.TestSite:BasicCodePen":
+  final: true
   superTypes:
-    "Neos.Neos:Content": true
-  
+    "Carbon.TestSite:AbstractCodePen": true
   ui:
-    icon: icon-code
     label: "Carbon.TestSite:BasicCodePen"
-    inspector:
-      groups:
-        html:
-          label: 'Html'
-          icon: 'icon-code'
-          position: 100
-          tab: default
-
   properties:
     codePen:
-      type: array
       ui:
-        label: Open CodePen
-        reloadIfChanged: true
         inspector:
-          group: 'html'
-          editor: 'Carbon.CodePen/CodeEditor'
           editorOptions:
             tabs:
               html:
                 label: Template
                 icon: code
                 language: html
-                # completion: "ClientEval:Object.keys(node.properties)"
-
