@@ -1,18 +1,6 @@
 {
   "name": "integration",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "playwright test --headed",
-    "startNeos": "cd TestDistribution && ddev start &&  ddev exec './softSiteDeleteAndSetup.sh'",
-    "softResetNeos": "cd TestDistribution && ddev exec './softSiteDeleteAndSetup.sh'",
-    "flushNeosCache": "cd TestDistribution && ddev exec './flow flow:cache:flush --force'",
-    "resetNeos": "cd TestDistribution && ddev exec './flow session:destroyall' && ddev exec './flow flow:cache:flush' && ddev exec './flow flow:cache:flush --force' && ddev exec './deleteAndSetupDb.sh' && curl https://carboncodepentestdistribution.ddev.site/"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.25.1",
     "@types/node": "^16",
