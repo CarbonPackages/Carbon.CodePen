@@ -15,6 +15,9 @@ export class Neos {
             if (message.type() === "info" && message.text() === "1 change successfully applied.") {
                 return;
             }
+            if (message.type() === "info" && message.text().startsWith("Slow network is detected.")) {
+                return;
+            }
             this.consoleMessages.push(`[${message.type()}] ${message.text()}`)
         });
     }

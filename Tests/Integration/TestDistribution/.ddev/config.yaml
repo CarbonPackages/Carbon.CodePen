@@ -22,6 +22,10 @@ web_environment:
  - FLOW_PATH_TEMPORARY_BASE=/tmp/Flow
  - FLOW_REWRITEURLS=1
 
+hooks:
+  post-start:
+    - exec: ./flow cache:warmup
+
 disable_settings_management: true
 # Key features of ddev's config.yaml:
 

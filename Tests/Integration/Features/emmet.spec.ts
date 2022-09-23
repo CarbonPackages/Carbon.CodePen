@@ -1,4 +1,4 @@
-import { test, configureTest, optional } from "./fixture"
+import { test, configureTest, optional, sleep } from "./fixture"
 
 configureTest()
 
@@ -9,6 +9,7 @@ for (const nodeTypeName of ["Carbon.TestSite:HtmlFeaturesCodePen", ...optional("
                 await contentElement.withCodePen(async ({codePen}) => {
                     await codePen.type("div")
                     await codePen.expect("div")
+                    await sleep(500);
                     await codePen.pressTab()
                     await codePen.expect("<div></div>")
                 })
