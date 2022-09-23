@@ -24,6 +24,7 @@ web_environment:
 
 hooks:
   post-start:
+    - exec: ./flow flow:cache:flush --force
     - exec: ./flow cache:warmup
 
 disable_settings_management: true

@@ -1,39 +1,36 @@
-import { test } from "./fixture"
+import { test, NodeType } from "./fixture"
 
-test.describe("Language Features HTML,AFX,YAML", () => {
-
-    const html = `<div>Foo Bar</div>
+const html = `<div>Foo Bar</div>
 <div class="wieso baum">
 </div>
 <p>Darum</p>
 `;
 
-    const afx = `<div>Foo Bar</div>
+const afx = `<div>Foo Bar</div>
 <div class="wieso baum">
 </div>
 <Neos.Fusion:Tag a="b">
 </Neos.Fusion:Tag>
 `;
 
-    const yaml = `Foo: "Bar"
+const yaml = `Foo: "Bar"
 wiesoBaum: Darum
 jetzt: "aber raus hier"
 `;
 
-    for (const [testName, nodeTypeName, code, screenshotName] of [
-        ["HTML Syntax-Highlighting", "Carbon.TestSite:HtmlFeaturesCodePen", html, "htmlSyntax.png"],
-        ["AFX Syntax-Highlighting", "Carbon.TestSite:AfxFeaturesCodePen", afx, "afxSyntax.png"],
-        ["YAML Syntax-Highlighting", "Carbon.TestSite:YamlFeaturesCodePen", yaml, "yamlSyntax.png"],
-    ]) {
-        test(testName, async ({ neos }) => {
-            await neos.withSharedDocument(async ({document}) => {
-                await document.withContentElement(nodeTypeName, async ({contentElement}) => {
-                    await contentElement.withCodePen(async ({codePen}) => {
-                        await codePen.fill(code)
-                        await codePen.expectInputToHaveScreenshot(screenshotName)
-                    })
+for (const [nodeType, codeSnippet, screenshotName] of [
+    [new NodeType("Carbon.TestSite:HtmlFeaturesCodePen").optional(), html, "htmlSyntax.png"],
+    [new NodeType("Carbon.TestSite:AfxFeaturesCodePen"), afx, "afxSyntax.png"],
+    [new NodeType("Carbon.TestSite:YamlFeaturesCodePen"), yaml, "yamlSyntax.png"],
+] as const) {
+    test(`Syntax-Highlighting ${nodeType}`, async ({ neos }) => {
+        await neos.withSharedDocument(async ({document}) => {
+            await document.withContentElement(nodeType, async ({contentElement}) => {
+                await contentElement.withCodePen(async ({codePen}) => {
+                    await codePen.fill(codeSnippet)
+                    await codePen.expectInputToHaveScreenshot(screenshotName)
                 })
             })
-        });
-    }
-})
+        })
+    });
+}

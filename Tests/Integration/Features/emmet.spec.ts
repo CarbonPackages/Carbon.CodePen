@@ -1,9 +1,12 @@
-import { test, optional, sleep } from "./fixture"
+import { test, sleep, NodeType } from "./fixture"
 
-for (const nodeTypeName of ["Carbon.TestSite:HtmlFeaturesCodePen", ...optional("Carbon.TestSite:AfxFeaturesCodePen")]) {
-    test(`emmet ${nodeTypeName}`, async ({ neos }) => {            
+for (const nodeType of [
+    new NodeType("Carbon.TestSite:HtmlFeaturesCodePen").optional(),
+    new NodeType("Carbon.TestSite:AfxFeaturesCodePen")
+]) {
+    test(`emmet ${nodeType}`, async ({ neos }) => {            
         await neos.withSharedDocument(async ({document}) => {
-            await document.withContentElement(nodeTypeName, async ({contentElement}) => {
+            await document.withContentElement(nodeType, async ({contentElement}) => {
                 await contentElement.withCodePen(async ({codePen}) => {
                     await codePen.type("div")
                     await codePen.expect("div")

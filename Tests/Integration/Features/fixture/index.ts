@@ -19,10 +19,4 @@ export { expect } from '@playwright/test'
 
 export { sleep } from './sleep'
 
-export const optional = <T>(...items: T[]): T[] => {
-  const skipOptional = process.env.SKIP_OPTIONAL;
-  if (skipOptional && (skipOptional === "1" || skipOptional.toLowerCase() === "true")) {
-    return [];
-  }
-  return items;
-}
+export { NodeType } from "./NodeType"
