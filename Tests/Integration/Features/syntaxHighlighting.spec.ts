@@ -1,7 +1,4 @@
-import { test, configureTest } from "./fixture"
-
-configureTest()
-
+import { test } from "./fixture"
 
 test.describe("Language Features HTML,AFX,YAML", () => {
 

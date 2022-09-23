@@ -1,6 +1,4 @@
-import { test, configureTest } from "./fixture"
-
-configureTest()
+import { test } from "./fixture"
 
 test("undo and redo @new", async ({ neos }) => {
     await neos.withSharedDocument(async ({document}) => {

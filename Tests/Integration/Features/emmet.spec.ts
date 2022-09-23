@@ -1,6 +1,4 @@
-import { test, configureTest, optional, sleep } from "./fixture"
-
-configureTest()
+import { test, optional, sleep } from "./fixture"
 
 for (const nodeTypeName of ["Carbon.TestSite:HtmlFeaturesCodePen", ...optional("Carbon.TestSite:AfxFeaturesCodePen")]) {
     test(`emmet ${nodeTypeName}`, async ({ neos }) => {            

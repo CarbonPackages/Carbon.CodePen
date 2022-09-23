@@ -1,6 +1,4 @@
-import { test, configureTest } from "./fixture"
-
-configureTest()
+import { test } from "./fixture"
 
 test("afxTagCompletion", async ({ neos }) => {
     await neos.withSharedDocument(async ({document}) => {

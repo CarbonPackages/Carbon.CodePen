@@ -7,10 +7,10 @@ type DocumentCallback = ((args: {document: Document}) => Promise<void>);
 export class Neos {
     private consoleMessages: string [] = [];
 
-    public constructor(private page: Page) {
+    constructor(private page: Page) {
     }
 
-    public async initializeObject() {
+    async initializeObject() {
         this.page.on('console', (message) => {
             if (message.type() === "info" && message.text() === "1 change successfully applied.") {
                 return;
@@ -22,28 +22,28 @@ export class Neos {
         });
     }
 
-    public async shutdownObject() {
+    async shutdownObject() {
         expect(this.consoleMessages).toStrictEqual([]);
     }
 
-    public async withCleanDocument(callback: DocumentCallback) {
+    async withCleanDocument(callback: DocumentCallback) {
         let newDocumentName = `carbon-test-site-page-${Math.round(Math.random() * 100000)}`
         await this.createDocumentAndSelect("Carbon.TestSite:Page", newDocumentName);
         await callback({ document: new Document(this.page, true)})
     }
 
-    public async withCleanDocumentInContext(context: "TailwindJson", callback: DocumentCallback) {
+    async withCleanDocumentInContext(context: "TailwindJson", callback: DocumentCallback) {
         await this.page.setExtraHTTPHeaders({ 'FLOWSUBCONTEXT': context })
         await this.withCleanDocument(callback)
         await this.page.setExtraHTTPHeaders({})
     }
 
-    public async withSharedDocument(callback: DocumentCallback) {
+    async withSharedDocument(callback: DocumentCallback) {
         await this.gotoDocumentInBackend("carbon-test-site-page-1");
         await callback({ document: new Document(this.page, false) })
     }
 
-    public async gotoBackendAndLogin() {
+    async gotoBackendAndLogin() {
         await this.page.goto(`/neos`);
 
         try {
@@ -61,11 +61,10 @@ export class Neos {
             this.page.waitForNavigation(),
             this.page.click('button:has-text("Login")')
         ])
-
-        await waitForDomEvent(this.page.locator(`iframe[name=neos-content-main]`), "load", {timeout: 10000})
+        await this.waitForIframe(10000)
     }
 
-    public async openContentTree() {
+    async openContentTree() {
         await this.page.click('[class^="style__leftSideBar__bottom"] div[role="button"]:has-text("Content Tree")');
         await expect(this.getNodeInContentTree("Content Collection (main)")).toBeVisible();
     }
@@ -83,23 +82,11 @@ export class Neos {
     private async gotoHomePageInBackend() {
         const contextPath = `/sites/testsite@user-admin`
         await this.page.goto(`/neos/content?node=${encodeURIComponent(contextPath)}`);
-        await this.waitForIframe()
+        await this.waitForIframe();
     }
 
-    private async gotoBackend() {
-        await this.page.goto(`/neos`);
-        await this.waitForIframe()
-    }
-
-    private waitForIframe() {
-        return waitForDomEvent(this.page.locator(`iframe[name=neos-content-main]`), "load")
-    }
-
-    private openDocument(documentLabel: string) {
-        return Promise.all([
-            this.page.waitForNavigation(),
-            this.page.click(`[class^="style__leftSideBar__top"] div[role="button"]:has-text(${JSON.stringify(documentLabel)})`)
-        ]);
+    private waitForIframe(timeout?: number) {
+        return waitForDomEvent(this.page.locator(`iframe[name=neos-content-main]`), "load", { timeout })
     }
 
     private async createDocumentAndSelect(nodeTypeName: string, title: string) {
@@ -111,6 +98,6 @@ export class Neos {
         await this.page.fill(`#__neos__editor__property---title--creation-dialog`, title);
         await this.page.click(`#neos-NodeCreationDialog-CreateNew`);
         
-        await this.waitForIframe();        
+        await this.waitForIframe()
     }
 }
