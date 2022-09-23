@@ -6,7 +6,8 @@ export class CodePen {
     }
 
     async insert(text: string) {
-        await this.codePenInput.type(text);
+        await this.page.evaluate((text) => navigator.clipboard.writeText(text), text)
+        await this.codePenInput.press("Control+KeyV")
     }
 
     async type(text: string) {
@@ -25,7 +26,6 @@ export class CodePen {
         await this.codePenInput.press('Control+ ');
     }
 
-    
     async pressArrowRight() {
         await this.codePenInput.press("ArrowRight")
     }
@@ -45,8 +45,7 @@ export class CodePen {
     async fill<T extends string>(text: T extends "" ? never : T) {
         // this works on firefox in contrary to `codePenInput.fill()`
         await this.codePenInput.press("Control+KeyA")
-        await this.page.evaluate((text) => navigator.clipboard.writeText(text), text)
-        await this.codePenInput.press("Control+KeyV")
+        await this.insert(text)
         await this.expect(text)
     }
 
@@ -62,12 +61,12 @@ export class CodePen {
         await this.codePenInput.press('Control+Shift+Z');
     }
 
-    async expect(text: string) {
+    async expect<T extends string>(text: T extends "" ? never : T) {
         await expect(this.codePenInput).toHaveValue(text)
     }
 
     async expectEmpty() {
-        await this.expect("")
+        await expect(this.codePenInput).toHaveValue("")
     }
 
     async clear() {
