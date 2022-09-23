@@ -10,7 +10,7 @@ const config: PlaywrightTestConfig = {
   globalSetup: "./Features/setup.ts",
   testDir: path.join(__dirname, 'Features'),
   retries: 0,
-  timeout: 10000,
+  timeout: 30000,
 
   webServer: {
     command: 'cd ../.. && make up && make cleanSite',
@@ -30,17 +30,21 @@ const config: PlaywrightTestConfig = {
 
   projects: [
     {
-      name: 'chromium',
+      // firefox works better headless - fullscreen api doesnt work headed
+      name: 'firefoxHeadless',
       use: {
-        ...devices['Desktop Chrome'],
+        ...devices['Desktop Firefox'],
+        headless: true
       },
     },
-    // {
-    //   name: 'firefox',
-    //   use: {
-    //     ...devices['Desktop Firefox'],
-    //   },
-    // },
+    {
+      // chromium works better headed - fullscreen api doesnt work headless
+      name: 'chromiumHeaded',
+      use: {
+        ...devices['Desktop Chrome'],
+        headless: false,
+      },
+    },
   ],
 };
 export default config;

@@ -42,8 +42,11 @@ export class CodePen {
         await this.secondaryInspector.locator("ul>li").first().click()
     }
 
-    async fill(text: string) {
-        await this.codePenInput.fill(text);
+    async fill<T extends string>(text: T extends "" ? never : T) {
+        // this works on firefox in contrary to `codePenInput.fill()`
+        await this.codePenInput.press("Control+KeyA")
+        await this.page.evaluate((text) => navigator.clipboard.writeText(text), text)
+        await this.codePenInput.press("Control+KeyV")
         await this.expect(text)
     }
 
@@ -68,7 +71,8 @@ export class CodePen {
     }
 
     async clear() {
-        this.fill("")
+        await this.codePenInput.press("Control+KeyA")
+        await this.codePenInput.press("Delete")
     }
 
     async selectTab(label: string) {

@@ -29,7 +29,6 @@ installDistribution:
 	
 up:
 	cd ${DISTRIBUTION} && ddev start
-	cd ${DISTRIBUTION} && ddev exec ./flow || echo "Hmmm"
 
 down:
 	cd ${DISTRIBUTION} && ddev stop
@@ -46,15 +45,27 @@ cleanSite:
 # @param {g} grep select a test
 # @example
 # 	test g="typing"
-test:
-	make testChromiumHeaded
+testAll:
+	cd Tests/Integration/ && pnpm playwright test -g "${g}"
+
 
 # @param {g} grep select a test
+test:
+	make testFirefoxHeadless
+
+
+# chromium works better headed
+# @param {g} grep select a test
 testChromiumHeaded:
-	cd Tests/Integration/ && pnpm playwright test --headed --project chromium -g "${g}"
+	cd Tests/Integration/ && pnpm playwright test --project chromiumHeaded -g "${g}"
+
+# firefox works better headless
+# @param {g} grep select a test
+testFirefoxHeadless:
+	cd Tests/Integration/ && pnpm playwright test --project firefoxHeadless -g "${g}"
 
 smokeTest:
-	cd Tests/Integration/ && pnpm playwright test --project chromium -g 'typing'
+	cd Tests/Integration/ && pnpm playwright test --project firefoxHeadless -g 'typing'
 
 installTests:
 	cd Tests/Integration/ && pnpm i
