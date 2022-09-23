@@ -46,7 +46,13 @@ export class Neos {
     public async gotoBackendAndLogin() {
         await this.page.goto(`/neos`);
 
-        await expect(this.page).toHaveTitle(/Login to .*/);
+        try {
+            await expect(this.page).toHaveTitle(/Login to .*/, { timeout: 500 })
+        } catch (error) {
+            await this.page.reload();
+        } finally {
+            await expect(this.page).toHaveTitle(/Login to .*/);
+        }
 
         await this.page.fill('#username', 'admin');
         await this.page.fill('#password', 'admin');
