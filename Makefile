@@ -42,30 +42,32 @@ cleanSite:
 # Playwright tests 	#
 #					#
 
-# @param {g} grep select a test
+# @param {only} grep select a test by (partial) name
+# @param {skip} grep ignore a test by (partial) name
 # @example
-# 	test g="typing"
-testAll:
-	cd Tests/Integration/ && pnpm playwright test -g "${g}"
-
-
-# @param {g} grep select a test
+# 	make test only="emmet" skip="@optional"
 test:
 	make testFirefoxHeadless
 
+# @param {only}
+# @param {skip}
+testAll:
+	cd Tests/Integration/ && pnpm playwright test -g "${only}" --grep-invert "${skip}"
 
 # chromium works better headed
-# @param {g} grep select a test
+# @param {only}
+# @param {skip}
 testChromiumHeaded:
-	cd Tests/Integration/ && pnpm playwright test --project chromiumHeaded -g "${g}"
+	cd Tests/Integration/ && pnpm playwright test --project chromiumHeaded -g "${only}" --grep-invert "${skip}"
 
 # firefox works better headless
-# @param {g} grep select a test
+# @param {only}
+# @param {skip}
 testFirefoxHeadless:
-	cd Tests/Integration/ && pnpm playwright test --project firefoxHeadless -g "${g}"
+	cd Tests/Integration/ && pnpm playwright test --project firefoxHeadless -g "${only}" --grep-invert "${skip}"
 
 smokeTest:
-	cd Tests/Integration/ && pnpm playwright test --project firefoxHeadless -g 'typing'
+	make testFirefoxHeadless only="typing" skip="@optional"
 
 installTests:
 	cd Tests/Integration/ && pnpm i
