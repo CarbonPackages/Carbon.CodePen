@@ -1,6 +1,4 @@
-import { test, configureTest } from "./fixture"
-
-configureTest()
+import { test } from "./fixture"
 
 test(`tailwind css own styles via json`, async ({ neos }) => {
     await neos.withCleanDocumentInContext("TailwindJson", async ({document}) => {

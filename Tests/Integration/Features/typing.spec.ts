@@ -1,10 +1,8 @@
-import { test, configureTest } from "./fixture"
-
-configureTest()
+import { test } from "./fixture"
 
 test('typing', async ({ neos }) => {
     await neos.withSharedDocument(async ({document}) => {
-        await document.withContentElement("Carbon.TestSite:BasicCodepen", async ({contentElement}) => {
+        await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
             await contentElement.withCodePen(async ({codePen}) => {
                 await codePen.fill("Hello")
                 await codePen.expect("Hello")

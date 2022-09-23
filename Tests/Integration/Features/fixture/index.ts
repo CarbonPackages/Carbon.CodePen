@@ -19,10 +19,6 @@ export { expect } from '@playwright/test'
 
 export { sleep } from './sleep'
 
-export const configureTest = () => {
-  test.describe.configure({ mode: 'parallel' });
-}
-
 export const optional = <T>(...items: T[]): T[] => {
   const skipOptional = process.env.SKIP_OPTIONAL;
   if (skipOptional && (skipOptional === "1" || skipOptional.toLowerCase() === "true")) {

@@ -10,8 +10,8 @@ const config: PlaywrightTestConfig = {
   globalSetup: "./Features/setup.ts",
   testDir: path.join(__dirname, 'Features'),
   retries: 0,
-  timeout: 30000,
-
+  timeout: 40000,
+  fullyParallel: true,
   webServer: {
     command: 'cd ../.. && make up && make cleanSite',
     url: process.env.BASE_URL,

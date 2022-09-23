@@ -1,6 +1,4 @@
-import { test, configureTest } from "./fixture"
-
-configureTest()
+import { test } from "./fixture"
 
 test('editor gui and preview', async ({ neos }) => {
     await neos.withSharedDocument(async ({document}) => {
