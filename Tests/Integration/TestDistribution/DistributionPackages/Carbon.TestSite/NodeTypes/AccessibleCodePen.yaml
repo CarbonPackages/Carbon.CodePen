@@ -1,0 +1,15 @@
+"Carbon.TestSite:AccessibleCodePen":
+  final: true
+  superTypes:
+    "Carbon.TestSite:AbstractCodePen": true
+  ui:
+    label: "Carbon.TestSite:AccessibleCodePen"
+  properties:
+    codePen:
+      ui:
+        label: 'i18n'
+
+      # not implemented!
+      # inspector:
+      #   help:
+      #     message: "Here you can edit the code"
