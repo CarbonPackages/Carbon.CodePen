@@ -1,22 +1,24 @@
 import { test, NodeType } from "./fixture"
 
 test(`tailwind css own styles via json`, async ({ neos }) => {
-    await neos.withCleanDocumentInContext("TailwindJson", async ({document}) => {
-        await document.withContentElement("Carbon.TestSite:HtmlFeaturesCodePen", async ({contentElement}) => {
-            await contentElement.withCodePen(async ({codePen}) => {
-                await codePen.type(`<div class="`)
+    await neos.withFlowSubContext("TailwindJson", async () => {
+        await neos.withCleanDocument(async ({document}) => {
+            await document.withContentElement("Carbon.TestSite:HtmlFeaturesCodePen", async ({contentElement}) => {
+                await contentElement.withCodePen(async ({codePen}) => {
+                    await codePen.type(`<div class="`)
 
-                await codePen.pressEscape()
+                    await codePen.pressEscape()
 
-                await codePen.type(`w-make`)
-                await codePen.expectSuggestionsContain("w-makeTheButtonBiggerJson")
-                await codePen.pressTab()
+                    await codePen.type(`w-make`)
+                    await codePen.expectSuggestionsContain("w-makeTheButtonBiggerJson")
+                    await codePen.pressTab()
 
-                await codePen.type(` bg-marc`)
-                await codePen.expectSuggestionsContain("bg-marcherryJson")
-                await codePen.pressTab()
+                    await codePen.type(` bg-marc`)
+                    await codePen.expectSuggestionsContain("bg-marcherryJson")
+                    await codePen.pressTab()
 
-                await codePen.expect(`<div class="w-makeTheButtonBiggerJson bg-marcherryJson"`)
+                    await codePen.expect(`<div class="w-makeTheButtonBiggerJson bg-marcherryJson"`)
+                })
             })
         })
     })

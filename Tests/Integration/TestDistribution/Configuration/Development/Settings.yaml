@@ -14,3 +14,6 @@ Neos:
     http:
       trustedProxies:
         proxies: "*"
+
+    session:
+      inactivityTimeout: 0
