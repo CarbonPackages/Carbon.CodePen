@@ -12,7 +12,7 @@ const [, , outfile] = process.argv;
 const { theme } = config;
 
 // we select only the theme option for json, as plugins cannot be converted to json.
-// if you need plugins, look at building a worker with embedded config
+// if you need plugins, look at buildBundledTailwindConfig
 const clientTailwind = {
     theme,
 };

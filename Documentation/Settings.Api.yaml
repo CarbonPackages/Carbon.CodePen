@@ -2,7 +2,7 @@ Neos:
   Neos:
     Ui:
       frontendConfiguration:
-        'Carbon.CodeEditor':
+        'Carbon.CodePen':
 
           #
           # Options for the tailwindcss support
