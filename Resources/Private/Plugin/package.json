@@ -9,7 +9,7 @@
     "pipeline": "pnpm delete && pnpm install && pnpm build"
   },
   "devDependencies": {
-    "@mhsdesign/esbuild-neos-ui-extensibility": "^0.1.2-beta.1",
+    "@mhsdesign/esbuild-neos-ui-extensibility": "^0.2.0",
     "@neos-project/react-ui-components": "^8.0.0",
     "@types/react": "^18.0.0",
     "@types/react-redux": "^7.1.23",
