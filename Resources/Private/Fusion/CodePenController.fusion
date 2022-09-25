@@ -14,6 +14,14 @@ codePenPreviewFrame = Neos.Fusion:Case {
 }
 
 codePenVirtualNode = Neos.Fusion:Case {
+    // we dont need any (possible layout changing) script tags and content element wrapping etc...
+    prototype(Neos.Neos:ContentElementWrapping) {
+        @if.render = false
+    }
+    prototype(Neos.Neos:ContentElementEditable) {
+        @if.render = false
+    }
+
     nodeSpecificComponent {
         condition = Neos.Fusion:CanRender {
             type = ${node.nodeType + '.CodePen'}
