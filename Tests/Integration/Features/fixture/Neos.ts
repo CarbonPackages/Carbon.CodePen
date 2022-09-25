@@ -23,6 +23,9 @@ export class Neos {
             if (message.type() === "warning" && message.text().startsWith("Something went wrong with requesting additional node metadata")) {
                 return;
             }
+            if (message.type() === "warning" && message.text() === "Without `from` option PostCSS could generate wrong source map and will not find Browserslist config. Set it to CSS file path or to `undefined` to prevent this warning.") {
+                return;
+            }
             this.consoleMessages.push(message)
         });
     }

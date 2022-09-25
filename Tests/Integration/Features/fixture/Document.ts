@@ -1,6 +1,7 @@
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import { ContentElement } from "./ContentElement";
 import { NodeType, NodeTypeLike } from "./NodeType";
+import { sleep } from "./sleep";
 
 type ContentElementCallback = ((args: {contentElement: ContentElement}) => Promise<void>);
 
@@ -24,7 +25,18 @@ export class Document {
      */
     async withContentElement(nodeType: NodeTypeLike, callback: ContentElementCallback) {        
         if (await this.getNodeInContentTree(nodeType).count() > 0) {
-            await this.getNodeInContentTree(nodeType).first().click();
+            const contentElementInTree = this.getNodeInContentTree(nodeType).first();
+            await contentElementInTree.click();
+            
+            try {
+                await expect(contentElementInTree).toHaveClass(/isActive/, { timeout: 500 })
+            } catch (error) {
+                console.log("withContentElement retry activating node");
+                await sleep(500)
+                await contentElementInTree.click();
+            }
+            
+            await expect(contentElementInTree).toHaveClass(/isActive/)
         } else {
             await this.createNodeInCollection(nodeType);
         }
