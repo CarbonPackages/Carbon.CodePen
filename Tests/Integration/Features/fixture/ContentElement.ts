@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import { CodePen } from "./CodePen";
 import { sleep } from "./sleep";
 
@@ -33,6 +33,26 @@ export class ContentElement {
             await this.page.click('text=Open CodePen')
             await sleep(100)
         }
+    }
+
+    async previewToHaveScreenshot(name: string) {
+        await this.iframe.locator(`[id="neos-backend-container"]`)
+            .evaluate((el) => el.style.display = "none")
+        await expect(this.iframeRendering).toHaveScreenshot(name, { maxDiffPixels: 100 , maxDiffPixelRatio: .2 });
+        await this.iframe.locator(`[id="neos-backend-container"]`)
+            .evaluate((el) => el.style.display = "")        
+    }
+
+    async previewToContainText(contents: string) {
+        await expect(this.iframeRendering).toContainText(contents)
+    }
+
+    private get iframeRendering() {
+        return this.iframe.locator(`[class^="style__markActiveNodeAsFocused--focusedNode"]`)
+    }
+
+    private get iframe() {
+        return this.page.frameLocator(`iframe[name="neos-content-main"]`)
     }
 
     private get codePenPreview() {

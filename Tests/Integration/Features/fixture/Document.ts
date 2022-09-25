@@ -8,18 +8,20 @@ export class Document {
     constructor(private page: Page, private contentMutationAllowed: boolean) {
     }
 
-    private async discardPendingChanges() {
-        if (await this.page.isEnabled('#neos-Inspector-Discard')) {
-            await this.page.click('#neos-Inspector-Discard')
-        }
-    }
-
-    async withNewContentElement(nodeType: NodeTypeLike, callback: ContentElementCallback) {
-        await this.createNodeInCollection(nodeType)
+    /**
+     * Asserts, that a content element
+     * has already been created fx. via {@link withContentElement} on this page
+     * and uses it.
+     */
+    async withExistingContentElement(nodeType: NodeTypeLike, callback: ContentElementCallback) {        
+        await this.getNodeInContentTree(nodeType).first().click();
         await callback({contentElement: new ContentElement(this.page, this.contentMutationAllowed)})
         await this.discardPendingChanges()
     }
 
+    /**
+     * Creates either a new content element, or reuses existing ones (for performance)
+     */
     async withContentElement(nodeType: NodeTypeLike, callback: ContentElementCallback) {        
         if (await this.getNodeInContentTree(nodeType).count() > 0) {
             await this.getNodeInContentTree(nodeType).first().click();
@@ -28,6 +30,16 @@ export class Document {
         }
         await callback({contentElement: new ContentElement(this.page, this.contentMutationAllowed)})
         await this.discardPendingChanges()
+    }
+
+    async reload() {
+        await this.page.reload()
+    }
+
+    private async discardPendingChanges() {
+        if (await this.page.isEnabled('#neos-Inspector-Discard')) {
+            await this.page.click('#neos-Inspector-Discard')
+        }
     }
 
     private async createNodeInCollection(nodeType: NodeTypeLike) {
