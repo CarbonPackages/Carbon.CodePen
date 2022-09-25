@@ -49,6 +49,6 @@ class PreviewController extends ActionController
      */
     private function getMockedNodeWithProperty(Node $node, string $propertyName, $propertyValue)
     {
-        return new VirtualNodeWithProperty($node, $propertyName, $propertyValue);
+        return new VirtualNodeWithProperty($node->getNodeData(), $node->getContext(), $propertyName, $propertyValue);
     }
 }
