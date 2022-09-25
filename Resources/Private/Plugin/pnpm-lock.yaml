@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@mhsdesign/esbuild-neos-ui-extensibility': ^0.1.2-beta.1
+  '@mhsdesign/esbuild-neos-ui-extensibility': ^0.2.0
   '@neos-project/react-ui-components': ^8.0.0
   '@types/lodash.debounce': ^4.0.7
   '@types/lodash.once': ^4.1.7
@@ -30,7 +30,7 @@ dependencies:
   styled-components: 5.3.5
 
 devDependencies:
-  '@mhsdesign/esbuild-neos-ui-extensibility': 0.1.2-beta.2_esbuild@0.14.34
+  '@mhsdesign/esbuild-neos-ui-extensibility': 0.2.0_esbuild@0.14.34
   '@neos-project/react-ui-components': 8.0.0_lodash.debounce@4.0.8
   '@types/react': 18.0.0
   '@types/react-redux': 7.1.23
@@ -219,18 +219,17 @@ packages:
     resolution: {integrity: sha512-GryiOJmNcWbovBxTfZSF71V/mXbgcV3MewDe3kIMCLyIh5e7SKAeUZs+rMnJ8jkMolZ/4/VsdBmMrw3l+VdZ3w==}
     dev: false
 
-  /@mhsdesign/esbuild-neos-ui-extensibility/0.1.2-beta.2_esbuild@0.14.34:
-    resolution: {integrity: sha512-QDTLiChW86bNd1h+s5oDbkkVS2AO6++dSlA+iZmFoablY1ap+hV1CiGz9bUmZLoHIOQOzYyXcYX6QFkUO4+UHA==}
+  /@mhsdesign/esbuild-neos-ui-extensibility/0.2.0_esbuild@0.14.34:
+    resolution: {integrity: sha512-vc9f5qp63FR4S+OhS+lnh7XbM+0TYC/ZZjU1uzeMIE728r+V/GrceSSfZWPvRshVksjkH9UGHtRmnxH9s4WXXw==}
     peerDependencies:
-      esbuild: ^0.14.31
+      esbuild: ^0.15
     dependencies:
-      '@neos-project/positional-array-sorter': 5.2.5
+      '@neos-project/positional-array-sorter': 8.1.0
       esbuild: 0.14.34
-      tslib: 1.14.1
     dev: true
 
-  /@neos-project/positional-array-sorter/5.2.5:
-    resolution: {integrity: sha512-dhcXB/o6hzDHAl01XmtpT42LbU3Z9tOFhE9ZlxlJOHu8Z9Lsg8sbxNLbnTnIzaODwdJiA1UlJGLZXQqMUg6IBg==}
+  /@neos-project/positional-array-sorter/8.1.0:
+    resolution: {integrity: sha512-LbdaZac52qvGvWiiaDCr5z9z0xD+tcSLhvAMNW3CtEBX/Klf9vhaWvWB0akBQSflS3vAK7GAJSxg/C2mdbkHtA==}
     dev: true
 
   /@neos-project/react-ui-components/8.0.0_lodash.debounce@4.0.8:
@@ -703,7 +702,6 @@ packages:
 
   /lodash.debounce/4.0.8:
     resolution: {integrity: sha1-gteb/zCmfEAF/9XiUVMArZyk168=}
-    dev: false
 
   /lodash.once/4.1.1:
     resolution: {integrity: sha1-DdOXEhPHxW34gJd9UEyI+0cal6w=}
@@ -923,10 +921,6 @@ packages:
     resolution: {integrity: sha1-3F5pjL0HkmW8c+A3doGk5Og/YW4=}
     engines: {node: '>=4'}
     dev: false
-
-  /tslib/1.14.1:
-    resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
-    dev: true
 
   /typescript/4.6.3:
     resolution: {integrity: sha512-yNIatDa5iaofVozS/uQJEl3JRWLKKGJKh6Yaiv0GLGSuhpFJe7P3SbHZ8/yjAHRQwKRoA6YZqlfjXWmVzoVSMw==}
