@@ -47,6 +47,10 @@ export class ContentElement {
         await expect(this.iframeRendering).toContainText(contents)
     }
 
+    async toHaveTranslatedOpener() {
+        await expect(this.page.locator(`text="Open CodePen [Translated]"`)).toBeVisible()
+    }
+
     private get iframeRendering() {
         return this.iframe.locator(`[class^="style__markActiveNodeAsFocused--focusedNode"]`)
     }

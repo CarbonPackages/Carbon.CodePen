@@ -9,6 +9,7 @@ export type NodeTypeName = "Carbon.TestSite:AfxFeaturesCodePen"
     | "Carbon.TestSite:TailwindCodePen"
     | "Carbon.TestSite:YamlFeaturesCodePen"
     | "Carbon.TestSite:MultiplePropertiesCodePen"
+    | "Carbon.TestSite:AccessibleCodePen"
 
 export class NodeType {
     private isOptional: boolean = false;
