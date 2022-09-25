@@ -73,3 +73,16 @@ prototype(Carbon.TestSite:Page) < prototype(Neos.Neos:Page) {
         `
     }
 }
+
+prototype(Carbon.CodePen:PreviewFrame) < prototype(Neos.Fusion:Http.Message) {
+    head {
+        javascripts = Neos.Fusion:Join {
+            customMiddlewarePreviewHandler = afx`
+                <script>
+                    {StaticResource.content('Carbon.TestSite', 'Private/Fusion/customMiddlewarePreviewHandler.js')}
+                </script>
+            `
+            customMiddlewarePreviewHandler.@if.1 = ${node.nodeType.name == "Carbon.TestSite:CustomMiddlewareCodePen"}
+        }
+    }
+}
