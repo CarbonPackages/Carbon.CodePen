@@ -51,6 +51,13 @@ export class ContentElement {
         await expect(this.page.locator(`text="Open CodePen [Translated]"`)).toBeVisible()
     }
 
+    async hideTheCodePenOpener() {
+        await expect(this.page.locator(`text="Open CodePen"`)).toHaveCount(1)
+        await this.page.click(`section > div[role="button"]:has-text("Code")`)
+        await sleep(500)
+        await expect(this.page.locator(`text="Open CodePen"`)).toHaveCount(0)
+    }
+
     private get iframeRendering() {
         return this.iframe.locator(`[class^="style__markActiveNodeAsFocused--focusedNode"]`)
     }
