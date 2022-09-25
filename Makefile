@@ -25,6 +25,7 @@ installDistribution:
 	cd ${DISTRIBUTION} && ddev composer install
 	cd ${DISTRIBUTION} && ddev exec ./flow doctrine:migrate
 	cd ${DISTRIBUTION} && ddev exec ./flow user:create --roles Neos.Neos:Administrator admin admin Jon Doe
+	cd ${DISTRIBUTION} && ddev exec ./flow user:create --roles Neos.Neos:Administrator admin2 admin2 Hauke Haien
 	cd ${DISTRIBUTION} && ddev exec ./flow site:import --package-key Carbon.TestSite
 	
 up:
@@ -34,7 +35,7 @@ down:
 	cd ${DISTRIBUTION} && ddev stop
 
 cleanSite:
-	cd ${DISTRIBUTION} && ddev exec ./flow site:prune testsite
+	cd ${DISTRIBUTION} && ddev exec ./flow site:prune testsite || ddev exec ./flow site:prune testsite
 	cd ${DISTRIBUTION} && ddev exec ./flow site:import --package-key Carbon.TestSite
 
 

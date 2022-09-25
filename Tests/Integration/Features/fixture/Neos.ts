@@ -1,13 +1,15 @@
-import { Page, expect, Locator } from "@playwright/test";
+import { Page, expect, Locator, ConsoleMessage } from "@playwright/test";
 import { waitForDomEvent } from "./waitForDomEvent";
 import { Document } from "./Document";
 
 type DocumentCallback = ((args: {document: Document}) => Promise<void>);
 
-export class Neos {
-    private consoleMessages: string [] = [];
+type Account = { username: string, password: string };
 
-    constructor(private page: Page) {
+export class Neos {
+    private consoleMessages: ConsoleMessage [] = [];
+
+    constructor(private page: Page, private account: Account) {
     }
 
     async initializeObject() {
@@ -18,24 +20,43 @@ export class Neos {
             if (message.type() === "info" && message.text().startsWith("Slow network is detected.")) {
                 return;
             }
-            this.consoleMessages.push(`[${message.type()}] ${message.text()}`)
+            this.consoleMessages.push(message)
         });
     }
 
     async shutdownObject() {
-        expect(this.consoleMessages).toStrictEqual([]);
+        expect(this.consoleMessages.map((message) => `[${message.type()}] ${message.text()}`)).toStrictEqual([]);
+    }
+
+    async dangerouslyRemoveConsoleMessagesThatAreNoErrors() {
+        this.consoleMessages = this.consoleMessages.filter((message) => message.type() === "error")
+    }
+
+    async changeAccountAndDestroySession(account: Account) {
+        await this.page.context().clearCookies(),
+        this.account = account;
+    }
+
+    async expectSessionToBeTimedOut() {
+        await expect(this.page.locator(`#neos-ReloginDialog >> text="Your login has expired. Please log in again."`)).toBeVisible()
+    }
+
+    async reloginAfterTimedOutSession() {
+        await this.page.locator(`#neos-ReloginDialog [placeholder="Username"]`).fill("admin2")
+        await this.page.locator(`#neos-ReloginDialog [placeholder="Password"]`).fill("admin2")
+        await this.page.locator(`#neos-ReloginDialog >> button >> text="Login"`).click()
+    }
+
+    async withFlowSubContext(context: "TailwindJson" | "SessionExpired", callback: () => Promise<void>) {
+        await this.page.setExtraHTTPHeaders({ 'FLOWSUBCONTEXT': context })
+        await callback();
+        await this.page.setExtraHTTPHeaders({})
     }
 
     async withCleanDocument(callback: DocumentCallback) {
         let newDocumentName = `carbon-test-site-page-${Math.round(Math.random() * 100000)}`
         await this.createDocumentAndSelect("Carbon.TestSite:Page", newDocumentName);
         await callback({ document: new Document(this.page, true)})
-    }
-
-    async withCleanDocumentInContext(context: "TailwindJson", callback: DocumentCallback) {
-        await this.page.setExtraHTTPHeaders({ 'FLOWSUBCONTEXT': context })
-        await this.withCleanDocument(callback)
-        await this.page.setExtraHTTPHeaders({})
     }
 
     async withSharedDocument(callback: DocumentCallback) {
@@ -54,8 +75,8 @@ export class Neos {
             await expect(this.page).toHaveTitle(/Login to .*/);
         }
 
-        await this.page.fill('#username', 'admin');
-        await this.page.fill('#password', 'admin');
+        await this.page.fill('#username', this.account.username);
+        await this.page.fill('#password', this.account.password);
 
         await Promise.all([
             this.page.waitForNavigation(),
@@ -74,13 +95,13 @@ export class Neos {
     }
 
     private async gotoDocumentInBackend(documentTitle: string) {
-        const contextPath = `/sites/testsite/${documentTitle}@user-admin`
+        const contextPath = `/sites/testsite/${documentTitle}@user-${this.account.username}`
         await this.page.goto(`/neos/content?node=${encodeURIComponent(contextPath)}`);
         await this.waitForIframe()
     }
 
     private async gotoHomePageInBackend() {
-        const contextPath = `/sites/testsite@user-admin`
+        const contextPath = `/sites/testsite@user-${this.account.username}`
         await this.page.goto(`/neos/content?node=${encodeURIComponent(contextPath)}`);
         await this.waitForIframe();
     }

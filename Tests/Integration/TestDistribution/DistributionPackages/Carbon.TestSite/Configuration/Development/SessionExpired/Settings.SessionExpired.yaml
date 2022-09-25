@@ -1,0 +1,7 @@
+Neos:
+  Flow:
+    session:
+      # Specifies the number of seconds a user must be idle before the session
+      # automatically expires. If set to "0", a session will never expire
+      # automatically.
+      inactivityTimeout: 2

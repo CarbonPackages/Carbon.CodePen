@@ -13,7 +13,10 @@ export default async function globalSetup(config: FullConfig) {
 }
 
 async function saveStorage(page: Page, saveStoragePath: string) {
-    const neos = new Neos(page);
+    const neos = new Neos(page, {
+        username: "admin",
+        password: "admin"
+    });
     await neos.initializeObject();
     await neos.gotoBackendAndLogin();
 
