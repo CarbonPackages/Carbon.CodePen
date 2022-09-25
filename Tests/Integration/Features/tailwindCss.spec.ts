@@ -1,4 +1,4 @@
-import { test, NodeType } from "./fixture"
+import { test, NodeType, sleep } from "./fixture"
 
 test(`tailwind css own styles via json`, async ({ neos }) => {
     await neos.withFlowSubContext("TailwindJson", async () => {
@@ -42,6 +42,7 @@ test("tailwind css completion and live generation", async ({ neos }) => {
 
                 await codePen.expect(`<div class="bg-red-800">Moin</div>`)
               
+                await sleep(250)
                 await codePen.expectInputToHaveScreenshot('tailwindSyntax.png')
             
                 await codePen.expectPreviewToHaveScreenshot('tailwindPreview.png')

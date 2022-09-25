@@ -31,6 +31,30 @@ prototype(Carbon.TestSite:TailwindCodePen) < prototype(Neos.Neos:ContentComponen
     `
 }
 
+prototype(Carbon.TestSite:MultiplePropertiesCodePen) < prototype(Neos.Neos:ContentComponent) {
+
+    properties = Neos.Fusion:DataStructure {
+        codePen1 = ${q(node).property("codePen").html}
+        codePen2 = ${node.properties.codePen.html}
+
+        text1 = Neos.Neos:Editable {
+            property = "text"
+            block = false
+        }
+        text2 = ${q(node).property("text")}
+        text3 = ${node.properties.text}
+    }
+
+    renderer = afx`
+        Fusion ({node.nodeType.name})
+        <Neos.Fusion:Loop items={props.properties} @process={'{' + value + '}'} @glue=",">
+            {itemKey}:{item || "empty"}
+        </Neos.Fusion:Loop>
+    `
+
+    @process.uris = Neos.Neos:ConvertUris
+}
+
 prototype(Carbon.TestSite:DefaultCodePen) < prototype(Neos.Neos:ContentComponent) {
     renderer = afx`
         Fusion ({node.nodeType.name})

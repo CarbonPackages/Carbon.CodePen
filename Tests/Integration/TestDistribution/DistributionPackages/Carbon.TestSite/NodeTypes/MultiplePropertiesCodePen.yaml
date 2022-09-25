@@ -1,0 +1,21 @@
+"Carbon.TestSite:MultiplePropertiesCodePen":
+  final: true
+  superTypes:
+    "Carbon.TestSite:AbstractCodePen": true
+  ui:
+    label: "Carbon.TestSite:MultiplePropertiesCodePen"
+  properties:
+    text:
+      type: string
+      defaultValue: 'valueText'
+      ui:
+        inlineEditable: true
+    codePen:
+      ui:
+        inspector:
+          editorOptions:
+            tabs:
+              html:
+                label: Template
+                icon: code
+                language: html

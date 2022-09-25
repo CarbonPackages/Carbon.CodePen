@@ -1,6 +1,8 @@
 import { sleep, test } from "./fixture"
 
 test('session expires and relogin is possible', async ({ neos }) => {
+    test.slow()
+
     await neos.changeAccountAndDestroySession({
         username: "admin2",
         password: "admin2"
@@ -8,7 +10,7 @@ test('session expires and relogin is possible', async ({ neos }) => {
 
     await neos.withFlowSubContext("SessionExpired", async () => {
         await neos.gotoBackendAndLogin();
-        await neos.withSharedDocument(async ({document}) => {
+        await neos.withCleanDocument(async ({document}) => {
             await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
                 await contentElement.withCodePen(async ({codePen}) => {
                     await codePen.expectPreview(`Fusion (Carbon.TestSite:BasicCodePen)null`)
@@ -36,6 +38,13 @@ test('session expires and relogin is possible', async ({ neos }) => {
         })
         
     })
+
+    // todo raisses sometimes:
+
+    // [error] uncaught at watchReloadState 
+    //      at takeLatest 
+    //      at reloadState 
+    // Neos.Neos.Ui/packages/neos-ui-sagas/src/CR/NodeOperations/reloadState.js
 
     await neos.dangerouslyRemoveConsoleMessagesThatAreNoErrors();
 })
