@@ -121,9 +121,10 @@
             "dist": {
                 "type": "path",
                 "url": "./DistributionPackages/Carbon.CodePen",
-                "reference": "62fb2950e4a0be05a6f0eb4b0e2187f5ab25758b"
+                "reference": "617ae83d2501957a1462f9e88ac3f880571bdfa9"
             },
             "require": {
+                "mhsdesign/proposal-neos-ui-esm-plugin-loader": "^1.0",
                 "neos/neos-ui": "^7.0 || ^8.0"
             },
             "type": "neos-carbon",
@@ -2403,6 +2404,45 @@
                 }
             ],
             "time": "2022-06-06T11:26:02+00:00"
+        },
+        {
+            "name": "mhsdesign/proposal-neos-ui-esm-plugin-loader",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mhsdesign/MhsDesign.ProposalNeosUiEsmPluginLoader.git",
+                "reference": "49eb5e6c215bd0b44101d957273a2802368147e7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mhsdesign/MhsDesign.ProposalNeosUiEsmPluginLoader/zipball/49eb5e6c215bd0b44101d957273a2802368147e7",
+                "reference": "49eb5e6c215bd0b44101d957273a2802368147e7",
+                "shasum": ""
+            },
+            "require": {
+                "neos/neos-ui": "^7.0 || ^8.0"
+            },
+            "type": "neos-plugin",
+            "extra": {
+                "neos": {
+                    "package-key": "MhsDesign.ProposalNeosUiEsmPluginLoader"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "MhsDesign\\ProposalNeosUiEsmPluginLoader\\": "Classes/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Allows ES-Module Plugins to be loaded in the Neos.Ui",
+            "support": {
+                "issues": "https://github.com/mhsdesign/MhsDesign.ProposalNeosUiEsmPluginLoader/issues",
+                "source": "https://github.com/mhsdesign/MhsDesign.ProposalNeosUiEsmPluginLoader/tree/1.0.0"
+            },
+            "time": "2022-09-07T09:29:56+00:00"
         },
         {
             "name": "neos/cache",

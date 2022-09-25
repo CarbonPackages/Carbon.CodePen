@@ -22,8 +22,10 @@ Neos:
         javascript:
           'Carbon.CodePen:Plugin':
             resource: 'resource://Carbon.CodePen/Public/Plugin/Plugin.js'
-            # TODO add `type` option in Neos ui
-            type: 'module'
+            # TODO add `attributes` option in Neos Ui
+            # https://github.com/neos/neos-ui/issues/3097
+            attributes:
+              type: "module"
         stylesheets:
           'Carbon.CodePen:Plugin':
             resource: 'resource://Carbon.CodePen/Public/Plugin/Plugin.css'

@@ -1,5 +1,0 @@
-
-Neos\Neos\Ui\Controller\BackendController:
-  properties:
-    styleAndJavascriptInclusionService:
-      object: 'Carbon\CodePen\ModuleStyleAndJavascriptInclusionService'
