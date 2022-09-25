@@ -10,7 +10,7 @@ const config: PlaywrightTestConfig = {
   globalSetup: "./Features/setup.ts",
   testDir: path.join(__dirname, 'Features'),
   retries: 0,
-  timeout: 40000,
+  timeout: 16 * 1000,
   fullyParallel: true,
   webServer: {
     command: 'cd ../.. && make up && make cleanSite',
@@ -34,7 +34,7 @@ const config: PlaywrightTestConfig = {
       name: 'firefoxHeadless',
       use: {
         ...devices['Desktop Firefox'],
-        headless: true
+        headless: true,
       },
     },
     {
