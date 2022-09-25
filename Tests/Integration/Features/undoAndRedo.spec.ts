@@ -1,6 +1,6 @@
 import { test } from "./fixture"
 
-test("undo and redo @new", async ({ neos }) => {
+test("undo and redo", async ({ neos }) => {
     await neos.withSharedDocument(async ({document}) => {
       await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
         await contentElement.withCodePen(async ({codePen}) => {
@@ -14,7 +14,7 @@ test("undo and redo @new", async ({ neos }) => {
     });
 })
 
-test("undo after closing @new", async ({ neos }) => {
+test("undo after closing", async ({ neos }) => {
   await neos.withSharedDocument(async ({document}) => {
     await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
       await contentElement.withCodePen(async ({codePen}) => {
@@ -29,11 +29,24 @@ test("undo after closing @new", async ({ neos }) => {
   });
 })
 
+test("redo after closing", async ({ neos }) => {
+  test.skip(true, 'If undo stack is empty and applied one cant redo...')
+  await neos.withSharedDocument(async ({document}) => {
+    await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
+      await contentElement.withCodePen(async ({codePen}) => {
+        await codePen.fill("firstWord")
+        await codePen.undo()
+      })
+      await contentElement.withCodePen(async ({codePen}) => {
+        await codePen.expectEmpty()
+        await codePen.redo()
+        await codePen.expect("firstWord")
+      })
+    })
+  });
+})
 
-
-test("undo after discarding @new", async ({ neos }) => {
-  test.skip(true, 'Last word is not available in undo stack ...')
-
+test("undo after discarding", async ({ neos }) => {
   await neos.withSharedDocument(async ({document}) => {
     await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
       await contentElement.withCodePen(async ({codePen}) => {
@@ -49,7 +62,7 @@ test("undo after discarding @new", async ({ neos }) => {
   });
 })
 
-test("undo after applying @new", async ({ neos }) => {
+test("undo after applying", async ({ neos }) => {
   await neos.withCleanDocument(async ({document}) => {
     await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
       await contentElement.withCodePen(async ({codePen}) => {
@@ -65,7 +78,7 @@ test("undo after applying @new", async ({ neos }) => {
   });
 })
 
-test("redo after applying (with no further undos) @new", async ({ neos }) => {
+test("redo after applying - with no further undos", async ({ neos }) => {
   test.skip(true, 'If undo stack is empty and applied one cant redo...')
 
   await neos.withCleanDocument(async ({document}) => {
@@ -85,7 +98,7 @@ test("redo after applying (with no further undos) @new", async ({ neos }) => {
   });
 })
 
-test("redo after applying (with at least one undo) @new", async ({ neos }) => {
+test("redo after applying - with at least one undo", async ({ neos }) => {
   await neos.withCleanDocument(async ({document}) => {
     await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
       await contentElement.withCodePen(async ({codePen}) => {
@@ -104,8 +117,61 @@ test("redo after applying (with at least one undo) @new", async ({ neos }) => {
   });
 })
 
+test("undo after switching back from other codepen", async ({ neos }) => {
+  await neos.withCleanDocument(async ({document}) => {
+    await document.withContentElement("Carbon.TestSite:MultiTabsCodePen", async ({contentElement}) => {
+      await contentElement.withCodePen(async ({codePen}) => {
+        await codePen.selectTab("Tab A")
+        await codePen.fill("firstWord")
+        await codePen.fill("secondWord")
+      })
+      await contentElement.apply()
+    })
 
-test("das volle programm @new", async ({ neos }) => {
+    await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
+      await contentElement.withCodePen(async ({codePen}) => {
+        await codePen.fill("thirdWord")
+      })
+    })
+
+    await document.withExistingContentElement("Carbon.TestSite:MultiTabsCodePen", async ({contentElement}) => {
+      await contentElement.withCodePen(async ({codePen}) => {
+        await codePen.selectTab("Tab A")
+        await codePen.expect("secondWord")
+        await codePen.undo()
+        await codePen.expect("firstWord")
+      })
+    })
+  })
+})
+
+test("undo redo multiple tabs", async ({ neos }) => {
+  await neos.withSharedDocument(async ({document}) => {
+    await document.withContentElement("Carbon.TestSite:MultiTabsCodePen", async ({contentElement}) => {
+      await contentElement.withCodePen(async ({codePen}) => {
+        await codePen.selectTab("Tab A")
+        await codePen.fill("firstWord")
+        await codePen.fill("secondWord")
+
+        await codePen.selectTab("Tab B")
+        await codePen.fill("thirdWord")
+        await codePen.fill("forthWord")
+
+        await codePen.selectTab("Tab A")
+        await codePen.expect("secondWord")
+        await codePen.undo()
+        await codePen.expect("firstWord")
+
+        await codePen.selectTab("Tab B")
+        await codePen.expect("forthWord")
+        await codePen.undo()
+        await codePen.expect("thirdWord")
+      })
+    })
+  })
+})
+
+test("complex undo and redo", async ({ neos }) => {
   test.skip(true, 'If undo stack is empty and applied one cant redo...')
 
   await neos.withCleanDocument(async ({document}) => {
@@ -135,7 +201,7 @@ test("das volle programm @new", async ({ neos }) => {
       await contentElement.apply()
     })
 
-    await document.withContentElement("Carbon.TestSite:MultiTabsCodePen", async ({contentElement}) => {
+    await document.withExistingContentElement("Carbon.TestSite:MultiTabsCodePen", async ({contentElement}) => {
       await contentElement.withCodePen(async ({codePen}) => {
         await codePen.selectTab("Tab A")
         await codePen.undo()
@@ -148,7 +214,7 @@ test("das volle programm @new", async ({ neos }) => {
       await contentElement.apply()
     })
 
-    await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
+    await document.withExistingContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
       await contentElement.withCodePen(async ({codePen}) => {
         await codePen.undo()
         await codePen.expectEmpty()
