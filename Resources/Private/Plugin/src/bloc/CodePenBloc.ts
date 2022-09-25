@@ -260,19 +260,20 @@ export class CodePenBloc extends Bloc<CodePenState> {
 
     private createOrRetriveModel(tab: Tab): editor.ITextModel {
         const { language } = tab;
-        const value = this.neosUiEditorApi!.tabValues[tab.id];
+        const value = this.neosUiEditorApi!.tabValues[tab.id] ?? '';
 
         const cacheIdentifier = this.getCacheIdForTab(tab);
         const cachedModel = this.activeCachedModels[cacheIdentifier];
 
         if (cachedModel) {
+            // both values are `strings` and empty ones "" if there is no content.
             if (cachedModel.getValue() !== value) {
                 cachedModel.pushEditOperations(
                     [],
                     [
                         {
                             range: cachedModel.getFullModelRange(),
-                            text: value ?? null,
+                            text: value,
                         },
                     ],
                     () => null
