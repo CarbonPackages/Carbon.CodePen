@@ -20,6 +20,9 @@ export class Neos {
             if (message.type() === "info" && message.text().startsWith("Slow network is detected.")) {
                 return;
             }
+            if (message.type() === "warning" && message.text().startsWith("Something went wrong with requesting additional node metadata")) {
+                return;
+            }
             this.consoleMessages.push(message)
         });
     }
@@ -29,6 +32,9 @@ export class Neos {
     }
 
     async dangerouslyRemoveConsoleMessagesThatAreNoErrors() {
+        if (this.consoleMessages.some((message) => message.type() === "error")) {
+            return
+        }
         this.consoleMessages = this.consoleMessages.filter((message) => message.type() === "error")
     }
 
