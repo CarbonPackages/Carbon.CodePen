@@ -95,12 +95,12 @@ export class Neos {
     }
 
     async openContentTree() {
-        await this.page.click('[class^="style__leftSideBar__bottom"] div[role="button"]:has-text("Content Tree")');
+        await this.page.click('[class^="_leftSideBar__bottom"] div[role="button"]:has-text("Content Tree")');
         await expect(this.getNodeInContentTree("Content Collection (main)")).toBeVisible();
     }
 
     private getNodeInContentTree(nodeNameLabel: string): Locator {
-        return this.page.locator(`[class^="style__leftSideBar__bottom"] div[role="button"]:has-text(${JSON.stringify(nodeNameLabel)})`);
+        return this.page.locator(`[class^="_leftSideBar__bottom"] div[role="button"]:has-text(${JSON.stringify(nodeNameLabel)})`);
     }
 
     private async gotoDocumentInBackend(documentTitle: string) {

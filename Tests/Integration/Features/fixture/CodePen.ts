@@ -112,7 +112,7 @@ export class CodePen {
     }
 
     private get secondaryInspector() {
-        return this.page.locator(`[class^="style__secondaryInspector"]`)
+        return this.page.locator(`[class^="_secondaryInspector"]`)
     }
 
     private get codePenEditor() {

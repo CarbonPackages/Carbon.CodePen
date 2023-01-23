@@ -69,7 +69,7 @@ export class ContentElement {
     }
 
     private get iframeRendering() {
-        return this.iframe.locator(`[class^="style__markActiveNodeAsFocused--focusedNode"]`)
+        return this.iframe.locator(`[class^="_markActiveNodeAsFocused--focusedNode"]`)
     }
 
     private get iframe() {
@@ -81,7 +81,7 @@ export class ContentElement {
     }
 
     private get secondaryInspector() {
-        return this.page.locator(`[class^="style__secondaryInspector"]`)
+        return this.page.locator(`[class^="_secondaryInspector"]`)
     }
 
     private get codePenEditor() {

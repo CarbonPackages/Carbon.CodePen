@@ -62,7 +62,7 @@ export class Document {
     }
 
     private getNodeInContentTree(nodeType: NodeTypeLike | string): Locator {
-        return this.page.locator(`[class^="style__leftSideBar__bottom"] div[role="button"]:has-text(${this.nodeTypeToSelector(nodeType)})`);
+        return this.page.locator(`[class^="_leftSideBar__bottom"] div[role="button"]:has-text(${this.nodeTypeToSelector(nodeType)})`);
     }
 
     private nodeTypeToSelector(nodeType: NodeTypeLike | string) {
