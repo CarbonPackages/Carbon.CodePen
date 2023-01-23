@@ -23,6 +23,7 @@ if ($rootPath === false) {
 $composerAutoloader = require($rootPath . 'Packages/Libraries/autoload.php');
 
 $context = \Neos\Flow\Core\Bootstrap::getEnvironmentConfigurationSetting('FLOW_CONTEXT') ?: 'Development';
+/* Carbon.CodePen Tests: magic to handle dynamic context switches via http header */
 $context .= (isset($_SERVER['HTTP_FLOWSUBCONTEXT']) ? '/' . $_SERVER['HTTP_FLOWSUBCONTEXT'] : '');
 $bootstrap = new \Neos\Flow\Core\Bootstrap($context, $composerAutoloader);
 $bootstrap->run();
