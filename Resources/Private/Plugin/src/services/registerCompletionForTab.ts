@@ -1,9 +1,35 @@
 import { IDisposable } from "monaco-editor";
-import { Tab } from "../types";
+import { Tab, RawCompletion } from "../types";
 import once from "lodash.once";
 import { Node } from "@neos-project/neos-ts-interfaces";
 
-const CLIENT_COMPLETION_ID = "ClientCompletion:";
+const CLIENT_COMPLETION_PREFIX = "ClientCompletion:";
+
+type MaybePromise<Value> = Promise<Value> | Value
+
+type MaybeFunction<Value> = (() => Value) | Value
+
+type WrappedCompletions = MaybePromise<Array<MaybePromise<string>>>
+
+const handleClientCompletion = (rawCompletion: RawCompletion, node: Node): WrappedCompletions | RawCompletion => {
+    if (
+        typeof rawCompletion === "string" &&
+        rawCompletion.startsWith(CLIENT_COMPLETION_PREFIX)
+    ) {
+        const evaluator = new Function(
+            "node",
+            "return " + rawCompletion.slice(CLIENT_COMPLETION_PREFIX.length)
+        );
+        const maybeFunction = evaluator(node) as MaybeFunction<WrappedCompletions>
+        if (typeof maybeFunction === "function") {
+            // legacy - remove me? why return a higher oder function like:
+            // ClientCompletion:() => "Hi"
+            return maybeFunction();
+        }
+        return maybeFunction;
+    }
+    return rawCompletion;
+}
 
 export const registerCompletionForTab = (
     monaco: typeof import("monaco-editor"),
@@ -15,44 +41,31 @@ export const registerCompletionForTab = (
     }
 
     const getSuggestions = once(async (): Promise<string[]> => {
-        const completionOption = tab.completion!;
+        const rawCompletion = tab.completion!;
 
-        let processedCompletion = completionOption;
-        if (
-            typeof completionOption === "string" &&
-            completionOption.startsWith(CLIENT_COMPLETION_ID)
-        ) {
-            const clientCompletion = new Function(
-                "node",
-                "return " + completionOption.slice(CLIENT_COMPLETION_ID.length)
-            );
-            processedCompletion = clientCompletion(node);
-        }
+        const maybeOuterPromiseCompletions = handleClientCompletion(rawCompletion, node)
 
-        let suggestionPossiblePropmise = processedCompletion;
-        if (typeof processedCompletion === "function") {
-            suggestionPossiblePropmise = processedCompletion();
-        }
+        const maybeInnerPromiseCompletions = await maybeOuterPromiseCompletions
 
-        let suggestions = suggestionPossiblePropmise;
-        if (Array.isArray(suggestionPossiblePropmise)) {
-            suggestions = await Promise.all(suggestionPossiblePropmise);
-        }
+        const completions = Array.isArray(maybeInnerPromiseCompletions)
+            ? await Promise.all(maybeInnerPromiseCompletions)
+            : maybeInnerPromiseCompletions
 
         if (
-            Array.isArray(suggestions) === false ||
-            suggestions.some((suggestion) => typeof suggestion !== "string")
+            typeof completions === "string"
+            || Array.isArray(completions) === false
+            || completions.some((completion) => typeof completion !== "string")
         ) {
             console.error(
-                `Carbon.CodePen: completion must be of type  string[] or Promise<string[]>. Invalid completion option in current tab: "${tab.id}":`,
-                completionOption,
+                `Carbon.CodePen: completion must be of string[] or better expressed: MaybePromise<array<MaybePromise<string>>>. Invalid completion option in current tab: "${tab.id}":`,
+                rawCompletion,
                 `resolved as:`,
-                suggestions
+                completions
             );
             return [];
         }
 
-        return suggestions as string[];
+        return completions;
     });
 
     return monaco.languages.registerCompletionItemProvider(tab.language, {

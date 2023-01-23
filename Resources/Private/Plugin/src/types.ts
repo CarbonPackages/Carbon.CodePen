@@ -1,10 +1,5 @@
-type StaticCompletion = string[] | Promise<string>[];
 
-interface LazyCompletion {
-    (): StaticCompletion;
-}
-
-type Completion = LazyCompletion | StaticCompletion | string;
+export type RawCompletion = string | string[];
 
 export type CodePenEditorOptions = Readonly<{
     tabs?: {
@@ -12,7 +7,7 @@ export type CodePenEditorOptions = Readonly<{
             label?: string;
             icon?: string;
             language?: string;
-            completion?: Completion;
+            completion?: RawCompletion;
         };
     };
     disabled?: boolean;
@@ -23,7 +18,7 @@ export type Tab = Readonly<{
     language: string;
     label: string;
     icon: string;
-    completion?: Completion;
+    completion?: RawCompletion;
 }>;
 
 export type ContentChangeListener = (args: {
