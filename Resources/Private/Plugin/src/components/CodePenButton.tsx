@@ -11,10 +11,8 @@ type Props = {
 };
 
 export const CodePenButton = ({ label, disabled, onClick, className }: Props) => (
-    <div>
-        <Button className={className} onClick={onClick} disabled={disabled}>
-            <Icon icon="pencil" padded="right" title="Edit" />
-            <I18n id={label} />
-        </Button>
-    </div>
+    <Button className={className} onClick={onClick} disabled={disabled}>
+        <Icon icon="pencil" padded="right" title="Edit" />
+        <I18n id={label} />
+    </Button>
 );

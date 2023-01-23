@@ -158,12 +158,15 @@ class NeosUiCodePenApp extends React.PureComponent<Props> {
 
     public render() {
         return (
-            <CodePenButton
-                className={this.props.className}
-                disabled={this.props.options.disabled}
-                label={this.props.label}
-                onClick={this.handleClick}
-            />
+            <div>
+                <CodePenButton
+                    className={this.props.className}
+                    disabled={this.props.options.disabled}
+                    label={this.props.label}
+                    onClick={this.handleClick}
+                />
+                {this.props.renderHelpIcon()}
+            </div>
         );
     }
 }

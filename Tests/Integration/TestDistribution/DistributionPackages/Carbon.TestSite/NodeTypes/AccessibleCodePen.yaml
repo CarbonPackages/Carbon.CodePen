@@ -8,8 +8,12 @@
     codePen:
       ui:
         label: 'i18n'
-
-      # not implemented!
-      # inspector:
-      #   help:
-      #     message: "Here you can edit the code"
+        help:
+          message: "Here you can edit the code"
+        inspector:
+          editorOptions:
+            tabs:
+              html:
+                label: Template
+                icon: code
+                language: html
