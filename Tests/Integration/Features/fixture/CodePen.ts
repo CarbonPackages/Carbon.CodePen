@@ -22,6 +22,14 @@ export class CodePen {
         await this.codePenInput.press("Escape")
     }
 
+    async saveShortcut() {
+        await this.codePenInput.press("Control+KeyS")
+    }
+
+    async closeShortcut() {
+        await this.codePenInput.press("Control+KeyQ")
+    }
+
     async forceComplection() {
         await this.codePenInput.press('Control+ ');
     }
