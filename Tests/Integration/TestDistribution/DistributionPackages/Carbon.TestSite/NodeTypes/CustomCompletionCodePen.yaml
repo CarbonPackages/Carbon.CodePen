@@ -25,7 +25,7 @@
                 icon: code
                 language: afx
                 completion: |
-                  ClientCompletion:["xxxCompletion1TabB"]
+                  ClientCompletion:[new Promise((r) => r("xxxCompletion1TabB"))]
               c:
                 label: Tab C
                 icon: code
