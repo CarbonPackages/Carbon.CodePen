@@ -30,7 +30,8 @@ export class ContentElement {
 
         // auto close
         if (await this.codePenEditor.count() !== 0) {
-            await this.page.click('text=Open CodePen')
+            // selector for x button of secondary editor:
+            await this.secondaryInspector.locator("> button").click()
             await sleep(100)
         }
     }
