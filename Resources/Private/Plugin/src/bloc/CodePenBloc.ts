@@ -235,8 +235,7 @@ export class CodePenBloc extends Bloc<CodePenState> {
                     tabId: activeTab.id,
                     tabValues: this.neosUiEditorApi!.tabValues,
                 });
-            }),
-            this.fixNeosSecondEditorPortalHangingToLow(monacoContainer),
+            })
         ];
     }
 
@@ -370,31 +369,5 @@ export class CodePenBloc extends Bloc<CodePenState> {
             return;
         }
         this.neosUiEditorApi!.commitTabValues(newValue);
-    }
-
-    /**
-     * Currently the secondary editor is rendered via a React Portal and absolutely positioned with css
-     * see image https://github.com/neos/neos-ui/issues/3095#issuecomment-1085740348
-     * but the css `top` property is with `82px` px to high and we would cut off content of the bottom from the editor
-     * so we hackily set the top property to `41px` for this editor.
-     */
-    private fixNeosSecondEditorPortalHangingToLow(
-        monacoContainer: HTMLElement
-    ): IDisposable | undefined {
-        const secondaryEditorFrame = document.querySelector(
-            "[class*=secondaryInspector]"
-        ) as HTMLElement | null;
-
-        if (!secondaryEditorFrame?.contains(monacoContainer)) {
-            return;
-        }
-
-        secondaryEditorFrame.style.top = "41px";
-
-        return {
-            dispose() {
-                secondaryEditorFrame.style.top = "";
-            },
-        };
     }
 }

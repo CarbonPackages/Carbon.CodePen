@@ -4,6 +4,8 @@ import styled, { css } from "styled-components";
 export const CodePenContainer = styled.div`
     height: 100%;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 `;
 
 export const EditorAndPreviewContainer = styled.div<{ column: boolean }>`
