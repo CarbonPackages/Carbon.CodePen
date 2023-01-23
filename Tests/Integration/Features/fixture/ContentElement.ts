@@ -62,6 +62,11 @@ export class ContentElement {
         await expect(this.page.locator(`text="Open CodePen"`)).toHaveCount(0)
     }
 
+    async expectHelpTextToContain(text: string) {
+        await this.page.click('#neos-Inspector >> [data-icon="question-circle"]');
+        await expect(this.page.locator(`text="${text}"`)).toBeVisible()
+    }
+
     private get iframeRendering() {
         return this.iframe.locator(`[class^="style__markActiveNodeAsFocused--focusedNode"]`)
     }
