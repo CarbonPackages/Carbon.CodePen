@@ -38,7 +38,7 @@ open:
 	cd ${DISTRIBUTION} && ddev launch && sleep 1
 
 cleanSite:
-	cd ${DISTRIBUTION} && ddev exec ./flow site:prune testsite || ddev exec ./flow site:prune testsite
+	cd ${DISTRIBUTION} && ddev exec ./flow site:prune testsite || true
 	cd ${DISTRIBUTION} && ddev exec ./flow site:import --package-key Carbon.TestSite
 
 
