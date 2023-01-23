@@ -7,11 +7,12 @@ type Props = {
     label: string;
     disabled?: boolean;
     onClick(): void;
+    className: string;
 };
 
-export const CodePenButton = ({ label, disabled, onClick }: Props) => (
+export const CodePenButton = ({ label, disabled, onClick, className }: Props) => (
     <div>
-        <Button onClick={onClick} disabled={disabled}>
+        <Button className={className} onClick={onClick} disabled={disabled}>
             <Icon icon="pencil" padded="right" title="Edit" />
             <I18n id={label} />
         </Button>
