@@ -35,6 +35,10 @@ export class ContentElement {
         }
     }
 
+    async expectCodePenToBeClosed() {
+        await expect(this.codePenEditor).toHaveCount(0)
+    }
+
     async previewToHaveScreenshot(name: string) {
         await this.iframe.locator(`[id="neos-backend-container"]`)
             .evaluate((el) => el.style.display = "none")

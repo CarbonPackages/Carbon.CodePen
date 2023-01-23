@@ -22,6 +22,7 @@ test('session expires and relogin is possible', async ({ neos }) => {
                     await codePen.type("Moin")
                     await neos.expectSessionToBeTimedOut()
                     // codepen window auto closes, when relogin dialog is shown
+                    await contentElement.expectCodePenToBeClosed()
                 })
     
                 await neos.reloginAfterTimedOutSession();
