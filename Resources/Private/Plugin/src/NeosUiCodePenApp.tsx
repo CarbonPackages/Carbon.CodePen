@@ -58,6 +58,8 @@ class NeosUiCodePenApp extends React.PureComponent<Props> {
     }
 
     public componentWillUnmount() {
+        // this line is the reason for test "editor doesnt crash when CodePen opener is hidden" to crash,
+        // and on first sight a removal helps, but then the out-of-band rendering stops working...
         this.codePenBloc?.detatchNeosUiEditor();
         window.removeEventListener(
             "beforeunload",
