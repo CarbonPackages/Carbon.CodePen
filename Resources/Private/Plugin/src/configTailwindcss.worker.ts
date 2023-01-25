@@ -35,7 +35,7 @@ initialize({
 
 const handleJsScriptConfig = (tailwindConfigUri: string) => {
     try {
-        self.importScripts(tailwindConfigUri);
+        (self as any).importScripts(tailwindConfigUri);
     } catch (e) {
         console.error(
             `Carbon.CodeEditor: 'tailwindcss.clientConfig' is not a valid URI to a 'tailwindConfig'.${
@@ -44,13 +44,13 @@ const handleJsScriptConfig = (tailwindConfigUri: string) => {
         );
     }
 
-    if (!self.tailwindConfig) {
+    if (!(self as any).tailwindConfig) {
         console.error(
             `Carbon.CodeEditor: 'tailwindcss.clientConfig' URI was fetched but it doesnt expose 'self.tailwindConfig'.`
         );
     }
 
-    return self.tailwindConfig;
+    return (self as any).tailwindConfig;
 };
 
 const handleJsonConfig = (tailwindConfig: string) => {
