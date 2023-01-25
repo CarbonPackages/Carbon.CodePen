@@ -24,16 +24,6 @@ const includedLanguages = [
     "markdown",
 ];
 
-const handleBuild = (result) => {
-    if (result.errors.length > 0) {
-        console.error(result.errors);
-    }
-    if (result.warnings.length > 0) {
-        console.error(result.warnings);
-    }
-    console.info("build done");
-};
-
 esbuild
     .build({
         watch: process.argv.includes("--watch"),
@@ -43,6 +33,7 @@ esbuild
         bundle: true,
         splitting: true,
         format: "esm",
+        target: "es2020",
         entryPoints: {
             Plugin: "src/index.ts",
         },
@@ -96,8 +87,7 @@ esbuild
                 },
             },
         ],
-    })
-    .then(handleBuild);
+    });
 
 esbuild
     .build({
@@ -118,5 +108,4 @@ esbuild
         bundle: true,
         format: "iife",
         minify: production,
-    })
-    .then(handleBuild);
+    });

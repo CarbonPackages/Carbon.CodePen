@@ -4,9 +4,10 @@
   "scripts": {
     "delete": "rm -rf ../../Public/Plugin",
     "build": "pnpm delete && node build.mjs --production",
+    "lint": "tsc --noEmit",
     "dev": "pnpm delete && node build.mjs",
     "watch": "pnpm delete && node build.mjs --watch",
-    "pipeline": "pnpm delete && pnpm install && pnpm build"
+    "pipeline": "pnpm lint && pnpm delete && pnpm install && pnpm build"
   },
   "devDependencies": {
     "@mhsdesign/esbuild-neos-ui-extensibility": "^0.2.0",
