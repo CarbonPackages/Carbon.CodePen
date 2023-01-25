@@ -3,7 +3,7 @@
   "name": "carbon-code-editor",
   "scripts": {
     "delete": "rm -rf ../../Public/Plugin",
-    "build": "pnpm delete && node build.mjs --production",
+    "build": "pnpm delete && node build.mjs --production && pnpm lint",
     "lint": "tsc --noEmit",
     "dev": "pnpm delete && node build.mjs",
     "watch": "pnpm delete && node build.mjs --watch",

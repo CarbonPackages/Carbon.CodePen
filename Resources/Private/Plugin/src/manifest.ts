@@ -3,29 +3,28 @@ import NeosUiCodePenApp from "./NeosUiCodePenApp";
 import { CodePenWindow } from "./components/CodePenWindow";
 
 export interface PackageFrontendConfiguration {
+    /**
+     * Options for the tailwindcss support
+     */
     tailwindcss: {
         /**
          * Enable Tailwind css support for the monaco editor.
          */
         enabled: boolean;
-
         /**
-         * Uri for the worker to be used.
-         * Its possible to configure this to a custom worker with embedded Tailwind config.
-         * This way plugins from the tailwind config are preserved.
-         */
-        workerUri: string;
-
-        /**
-         * To be used with the default worker implementation.
-         * A simple way to provide config as json.
-         * Plugins (eg functions) of the tailwind config cannot not be preserved.
+         * Provide a custom tailwind configuartion for the editor.
+         * You can decide to insert a Json string or a http URI to a Javascript bundle of your config.
          */
         clientConfig?: string;
     };
+    /**
+     * Options for the afx support
+     */
     afx: {
         /**
-         * Define fusion Objects to have auto completion and hover examples
+         * Configure the fusion objects relevant for AFX
+         * you can add a custom expand snippet ala vscode syntax
+         * or provide some markdown configuration
          */
         fusionObjects: {
             [fusionObject: string]: {
