@@ -84,7 +84,7 @@ export const initializeMonacoFromConfig = (
     let monacoTailwindCss: MonacoTailwindcss | undefined;
 
     if (packageConfig.tailwindcss.enabled) {
-        monacoTailwindCss = configureMonacoTailwindcss({
+        monacoTailwindCss = configureMonacoTailwindcss(monaco, {
             languageSelector: ["html", afxMappedLanguageId],
             // configTailwindcss.worker.ts handles the input.
             tailwindConfig: packageConfig.tailwindcss.clientConfig,

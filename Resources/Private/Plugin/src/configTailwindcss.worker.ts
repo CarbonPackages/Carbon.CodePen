@@ -1,4 +1,4 @@
-import { TailwindConfig } from "tailwindcss/tailwind-config";
+import { Config } from "tailwindcss";
 import { initialize } from "monaco-tailwindcss/tailwindcss.worker.js";
 
 initialize({
@@ -59,7 +59,7 @@ const handleJsonConfig = (tailwindConfig: string) => {
         if (typeof tailwindConfigJson !== "object" || tailwindConfig === null) {
             throw Error("Config is not a JS object.");
         }
-        return tailwindConfigJson as TailwindConfig;
+        return tailwindConfigJson as Config;
     } catch (e) {
         console.error(
             `Carbon.CodeEditor: 'tailwindcss.clientConfig' is not valid JSON object.${

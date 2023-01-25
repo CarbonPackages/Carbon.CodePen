@@ -15,6 +15,8 @@ export class CodePen {
     }
 
     async pressTab() {
+        // @todo better remove the sleep
+        await sleep(500)
         await this.codePenInput.press("Tab")
     }
 
@@ -88,15 +90,21 @@ export class CodePen {
     }
 
     async expectInputToHaveScreenshot(name: string) {
+        // @todo better remove the sleep
+        await sleep(500)
         // we make it fullscreen so we dont test the minimap and so on in this test
         await this.expectLocatorToHaveScreenshot(name, this.codePenEditor.locator(".view-lines"))
     }
 
     async expectPreviewToHaveScreenshot(name: string) {
+        // @todo better remove the sleep
+        await sleep(500)
         await this.expectLocatorToHaveScreenshot(name, this.secondaryInspector.locator('iframe[src^="/neos/codePen"]'))
     }
 
     async expectToHaveScreenshot(name: string) {
+        // @todo better remove the sleep
+        await sleep(500)
         // is not done full screen ...
         await expect(this.secondaryInspector).toHaveScreenshot(name, { maxDiffPixels: 50 });
     }
@@ -106,6 +114,8 @@ export class CodePen {
     }
 
     private async expectLocatorToHaveScreenshot(name: string, locator: Locator) {
+        // @todo better remove the sleep
+        await sleep(500)
         await locator.evaluate((el) => el.requestFullscreen())
         await expect(this.page).toHaveScreenshot(name, { maxDiffPixels: 50 });
         await this.page.evaluate(() => document.exitFullscreen())
