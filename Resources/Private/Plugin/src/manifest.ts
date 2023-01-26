@@ -1,5 +1,5 @@
 import manifest from "@neos-project/neos-ui-extensibility";
-import NeosUiCodePenApp from "./NeosUiCodePenApp";
+import { createCodePenEditorApp } from "./CodePenEditorApp";
 import { CodePenWindow } from "./components/CodePenWindow";
 
 export interface PackageFrontendConfiguration {
@@ -35,14 +35,17 @@ export interface PackageFrontendConfiguration {
     };
 }
 
-manifest("Carbon.CodePen", {}, (globalRegistry) => {
+manifest("Carbon.CodePen", {}, (globalRegistry, { store, frontendConfiguration}) => {
     const editorsRegistry = globalRegistry.get("inspector").get("editors");
     const secondaryEditorsRegistry = globalRegistry
         .get("inspector")
         .get("secondaryEditors");
 
     editorsRegistry.set("Carbon.CodePen/CodeEditor", {
-        component: NeosUiCodePenApp,
+        component: createCodePenEditorApp({
+            store,
+            frontendConfiguration: frontendConfiguration["Carbon.CodePen"] as PackageFrontendConfiguration
+        }),
         hasOwnLabel: true,
     });
 

@@ -14,6 +14,9 @@ build:
 watch:
 	cd ${PLUGIN} && pnpm run watch
 
+lint:
+	cd ${PLUGIN} && pnpm run lint
+
 
 #								#
 # Ddev local test distribution	#
@@ -52,6 +55,10 @@ cleanSite:
 # 	make test only="emmet" skip="@optional"
 test:
 	make testFirefoxHeadless
+
+# one needs to do this from time to time
+fixTests:
+	make cleanSite
 
 # @param {only}
 # @param {skip}
