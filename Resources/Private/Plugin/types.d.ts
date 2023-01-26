@@ -84,6 +84,16 @@ declare module "@neos-project/neos-ui-i18n" {
     export default class I18n extends React.PureComponent<I18nProps> {}
 }
 
+declare module "@neos-project/neos-ui" {
+    type Unsubscribe = () => void;
+    // we dont require the @types/redux as they are deprecated
+    export interface Store {
+        dispatch(action: any): void;
+        getState(): any;
+        subscribe(listener: () => void): Unsubscribe;
+    }
+}
+
 declare module "@neos-project/neos-ui-redux-store" {
     import { Node } from "@neos-project/neos-ts-interfaces";
     import { DefaultRootState } from "react-redux";
@@ -103,7 +113,7 @@ declare module "@neos-project/neos-ui-redux-store" {
 
     type Actions = {
         System: {
-            authenticationTimeout(): void;
+            authenticationTimeout(): any;
         };
         UI: {
             FlashMessages: {
@@ -154,8 +164,7 @@ declare module "@neos-project/neos-ui-decorators" {
 }
 
 declare module "@neos-project/neos-ui-extensibility" {
-    // @ts-ignore we dont require the @types/redux as they are deprecated
-    import { Store } from "redux";
+    import type { Store } from "@neos-project/neos-ui";
     import {
         GlobalRegistry,
         FrontendConfigurationRaw,

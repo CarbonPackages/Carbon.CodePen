@@ -54,7 +54,6 @@ test('editor rotation', async ({ neos }) => {
 })
 
 test('editor doesnt crash when CodePen opener is hidden', async ({ neos }) => {
-    test.fixme()
     await neos.withSharedDocument(async ({document}) => {
         await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
             await contentElement.withCodePen(async ({codePen}) => {
@@ -69,22 +68,21 @@ test('editor doesnt crash when CodePen opener is hidden', async ({ neos }) => {
 })
 
 
-// only to test against connection of editor to codepen - fails because above is failing too
-// test('editor can be discarded even when CodePen opener is hidden', async ({ neos }) => {
-//     await neos.withCleanDocument(async ({document}) => {
-//         await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
-//             await contentElement.withCodePen(async ({codePen}) => {
-//                 await contentElement.hideTheCodePenOpener()
-//                 await codePen.fill("Hallo Welt")
-//             })
-// 
-//             await contentElement.discard()
-// 
-//             await contentElement.showTheCodePenOpener()
-//             await contentElement.withCodePen(async ({codePen}) => {
-//                 await codePen.expectToHaveScreenshot("plain.png")
-//                 await codePen.expectPreview(`Fusion (Carbon.TestSite:BasicCodePen)null`)
-//             })
-//         })
-//     })
-// })
+test('editor can be discarded even when CodePen opener is hidden', async ({ neos }) => {
+    await neos.withCleanDocument(async ({document}) => {
+        await document.withContentElement("Carbon.TestSite:BasicCodePen", async ({contentElement}) => {
+            await contentElement.withCodePen(async ({codePen}) => {
+                await contentElement.hideTheCodePenOpener()
+                await codePen.fill("Hallo Welt")
+            })
+
+            await contentElement.discard()
+
+            await contentElement.showTheCodePenOpener()
+            await contentElement.withCodePen(async ({codePen}) => {
+                await codePen.expectToHaveScreenshot("plain.png")
+                await codePen.expectPreview(`Fusion (Carbon.TestSite:BasicCodePen)null`)
+            })
+        })
+    })
+})

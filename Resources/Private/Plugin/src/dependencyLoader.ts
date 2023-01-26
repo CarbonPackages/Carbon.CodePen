@@ -1,22 +1,25 @@
 import { PackageFrontendConfiguration } from "./manifest";
-import { CodePenBloc } from "./bloc/CodePenBloc";
+import { MonacoTailwindcss } from "monaco-tailwindcss";
 
-let codePenBloc: CodePenBloc;
+let monacoEditorAndPlugins: {
+    monaco: typeof import("monaco-editor");
+    monacoTailwindCss?: MonacoTailwindcss;
+};
 
-export const provideCodePenPlock = async (
-    frontendConfiguration: PackageFrontendConfiguration
+export const retrieveMonacoEditorAndPlugins = async (
+    deps: {frontendConfiguration: PackageFrontendConfiguration}
 ) => {
-    if (codePenBloc) {
-        return codePenBloc;
+    if (monacoEditorAndPlugins) {
+        return monacoEditorAndPlugins;
     }
 
     const { initializeMonacoFromConfig } = await import(
         "./services/initializeMonaco"
     );
 
-    const { monaco, monacoTailwindCss } = initializeMonacoFromConfig(
-        frontendConfiguration
+    monacoEditorAndPlugins = initializeMonacoFromConfig(
+        deps.frontendConfiguration
     );
 
-    return (codePenBloc = new CodePenBloc(monaco, monacoTailwindCss));
+    return monacoEditorAndPlugins;
 };

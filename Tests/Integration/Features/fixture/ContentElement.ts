@@ -63,6 +63,13 @@ export class ContentElement {
         await expect(this.page.locator(`text="Open CodePen"`)).toHaveCount(0)
     }
 
+    async showTheCodePenOpener() {
+        await expect(this.page.locator(`text="Open CodePen"`)).toHaveCount(0)
+        await this.page.click(`section > div[role="button"]:has-text("Code")`)
+        await sleep(500)
+        await expect(this.page.locator(`text="Open CodePen"`)).toHaveCount(1)
+    }
+
     async expectHelpTextToContain(text: string) {
         await this.page.click('#neos-Inspector >> [data-icon="question-circle"]');
         await expect(this.page.locator(`text="${text}"`)).toBeVisible()
