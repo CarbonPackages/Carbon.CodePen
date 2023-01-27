@@ -1,7 +1,7 @@
 
 codePenVirtualNode {
   defaultCodePen {
-    @position = 'before component'
+    @position = 'before default'
     condition = Neos.Fusion:CanRender {
         type = ${node.nodeType.name}
     }
