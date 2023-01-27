@@ -13,7 +13,7 @@ codePenPreviewFrame = Neos.Fusion:Case {
     }
 }
 
-codePenVirtualNode = Neos.Fusion:Case {
+codePenVirtualNode = Neos.Neos:ContentCase {
     // we dont need any (possible layout changing) script tags and content element wrapping etc...
     prototype(Neos.Neos:ContentElementWrapping) {
         @if.render = false
@@ -23,15 +23,10 @@ codePenVirtualNode = Neos.Fusion:Case {
     }
 
     nodeSpecificComponent {
+        @position = "start 1000"
         condition = Neos.Fusion:CanRender {
             type = ${node.nodeType + '.CodePen'}
         }
         type = ${node.nodeType + '.CodePen'}
-    }
-
-    component {
-        @position = "end"
-        condition = true
-        type = ${node.nodeType}
     }
 }
