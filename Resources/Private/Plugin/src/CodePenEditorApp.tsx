@@ -11,6 +11,7 @@ import { CodePenPresenter, createCodePenPresenter } from "./presenter/CodePenPre
 import { CodePenWindow } from "./components/CodePenWindow";
 import { createRetrieveOrCreateMonacoEditorModel } from "./services/retrieveOrCreateMonacoEditorModel";
 import { Store } from "@neos-project/neos-ui";
+import { usePreventAccidentalExit } from "./utils/usePreventAccidentalExit";
 
 const transformTabsConfiguration = (rawTabConfig: CodePenEditorOptions["tabs"]) => {
     if (!rawTabConfig) {
@@ -47,6 +48,8 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
     })
 
     const CodePenEditorApp = (props: Props) => {
+
+        usePreventAccidentalExit();
 
         const codePenPresenter = useRef<CodePenPresenter>()
 
