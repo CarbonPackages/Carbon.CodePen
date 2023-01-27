@@ -6,7 +6,7 @@ import { CodePenEditorOptions, Tab } from "./types";
 import { CodePenButton } from "./components/CodePenButton";
 import { retrieveMonacoEditorAndPlugins } from "./dependencyLoader";
 import { afxMappedLanguageId } from "./services/afxMappedLanguageId";
-import { Observable, shareReplay } from "rxjs";
+import { distinctUntilChanged, map, Observable, shareReplay, takeWhile, throttleTime } from "rxjs";
 import { CodePenPresenter, createCodePenPresenter } from "./presenter/CodePenPresenter";
 import { CodePenWindow } from "./components/CodePenWindow";
 import { createRetrieveOrCreateModel } from "./MonacoEditorModelCache";
@@ -38,56 +38,25 @@ type TabValues = Record<string, string>;
 type Props = EditorProps<CodePenEditorOptions, TabValues>;
 
 export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguration: PackageFrontendConfiguration}) => {
+    const neosStoreTick$ = new Observable<void>((subscriber) => {
+        subscriber.next();
+        const unsubscribe = deps.store.subscribe(() => {
+            subscriber.next();
+        });
+        return unsubscribe;
+    })
 
     const CodePenEditorApp = (props: Props) => {
 
         const codePenPresenter = useRef<CodePenPresenter>()
 
-        const toggleCodePenWindow = () => {
-            props.renderSecondaryInspector(
-                "CARBON_CODEPEN_WINDOW",
-                () => <CodePenWindow codePenPresenter={codePenPresenter.current!} />
-            );
-        };
+        // will not change and update its properties
+        const node = useMemo(() => selectors.CR.Nodes.focusedSelector(deps.store.getState())!, [])
 
-        const tabValues$ = useMemo(() => {
-            // todo i think its never fully closed? eg memory leak?
-            return new Observable<TabValues>((subscriber) => {
-                subscriber.next(props.value)
-                let lastValue;
-                const unsubscribe = deps.store.subscribe(() => {
-                    const transientValuesByPropertyId = selectors.UI.Inspector.transientValues(deps.store.getState());
-                    let newValue;
-                    if (transientValuesByPropertyId && props.identifier in transientValuesByPropertyId) {
-                        newValue = transientValuesByPropertyId[props.identifier].value;
-                    } else {
-                        const currentNode = selectors.CR.Nodes.focusedSelector(deps.store.getState())!;
-                        newValue = currentNode.properties[props.identifier]
-                    }
-                    if (newValue !== lastValue) {
-                        subscriber.next(newValue)
-                    }
-                    lastValue = newValue
-                })
-                return unsubscribe
-            }).pipe(
-                shareReplay(1)
-            )
-        }, [])
-
-        const handleClick = useCallback(async () => {
-            if (codePenPresenter.current) {
-                codePenPresenter.current.toggleCodePenWindow()
-                return;
-            }
-
+        const createCodePenPresenterFromContext = async (): Promise<CodePenPresenter | undefined> => {
             const {monaco, monacoTailwindCss} = await retrieveMonacoEditorAndPlugins({
                 frontendConfiguration: deps.frontendConfiguration
             });
-
-            // waht if not on current node anymore?
-
-            const node = selectors.CR.Nodes.focusedSelector(deps.store.getState())!;
 
             const applyTabValues = props.onEnterKey
 
@@ -98,6 +67,11 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
 
             const requestLogin = () => deps.store.dispatch(actions.System.authenticationTimeout());
 
+            const toggleCodePenWindow = () => props.renderSecondaryInspector(
+                "CARBON_CODEPEN_WINDOW",
+                () => <CodePenWindow codePenPresenter={codePenPresenter.current!} />
+            );
+    
             let tabs: Tab[];
             try {
                 tabs = transformTabsConfiguration(props.options.tabs);
@@ -106,9 +80,25 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                 return;
             }
 
-            const retrieveOrCreateModel = createRetrieveOrCreateModel({monaco, cacheIdPrefix: node.contextPath + props.identifier})
+            const tabValues$ = neosStoreTick$.pipe(
+                throttleTime(50),
+                takeWhile(() => selectors.CR.Nodes.focusedSelector(deps.store.getState())?.contextPath === node.contextPath),
+                map(() => {
+                    const transientValuesByPropertyId = selectors.UI.Inspector.transientValues(deps.store.getState()) as Record<string, { value: any }> | undefined;
+                    if (transientValuesByPropertyId && props.identifier in transientValuesByPropertyId) {
+                        return transientValuesByPropertyId[props.identifier].value as TabValues;
+                    } else {
+                        const possiblyUpdatedNode = selectors.CR.Nodes.focusedSelector(deps.store.getState())!;
+                        return possiblyUpdatedNode.properties[props.identifier] as TabValues
+                    }
+                }),
+                distinctUntilChanged(),
+                shareReplay(1)
+            )
 
-            codePenPresenter.current = createCodePenPresenter({
+            const retrieveOrCreateModel = createRetrieveOrCreateModel({monaco, cacheIdPrefix: node.contextPath + props.identifier});
+
+            return createCodePenPresenter({
                 node,
                 tabs,
                 nodeTabProperty: props.identifier,
@@ -122,10 +112,12 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                 monaco,
                 monacoTailwindCss,
                 retrieveOrCreateModel,
-            })
+            });
+        }
 
-            codePenPresenter.current.toggleCodePenWindow()
-
+        const handleClick = useCallback(async () => {
+            codePenPresenter.current ??= await createCodePenPresenterFromContext();
+            codePenPresenter.current?.toggleCodePenWindow();
         }, [])
 
         return (
