@@ -84,7 +84,9 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                 throttleTime(50),
                 takeWhile(() => selectors.CR.Nodes.focusedSelector(deps.store.getState())?.contextPath === node.contextPath),
                 map(() => {
-                    const transientValuesByPropertyId = selectors.UI.Inspector.transientValues(deps.store.getState()) as Record<string, { value: any }> | undefined;
+                    // same logic as how the value will normally be acquired:
+                    // https://github.com/neos/neos-ui/blob/6aa5c74e75e4813ffd798905811d099df30d5705/packages/neos-ui/src/Containers/RightSideBar/Inspector/InspectorEditorEnvelope/index.js#L81
+                    const transientValuesByPropertyId = selectors.UI.Inspector.transientValues(deps.store.getState());
                     if (transientValuesByPropertyId && props.identifier in transientValuesByPropertyId) {
                         return transientValuesByPropertyId[props.identifier].value as TabValues;
                     } else {

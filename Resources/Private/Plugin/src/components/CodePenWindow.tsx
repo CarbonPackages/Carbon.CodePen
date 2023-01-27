@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { CodePenPresenter } from "../presenter/CodePenPresenter";
+import { CodePenPresenter, initalState } from "../presenter/CodePenPresenter";
 import { useLatestValueFrom } from "../useLatestValueFrom";
 import {
     CodePenContainer,
@@ -19,7 +19,7 @@ export const CodePenWindow = (props: Props) => {
     const monacoContainer = useRef<HTMLElement | null>(null);
     const iframePreview = useRef<HTMLIFrameElement | null>(null);
 
-    const state = useLatestValueFrom(props.codePenPresenter.state$);
+    const state = useLatestValueFrom(props.codePenPresenter.state$, initalState);
 
     useEffect(() => {
         if (!monacoContainer.current || !codePenContainer.current || !iframePreview.current) {
@@ -42,7 +42,7 @@ export const CodePenWindow = (props: Props) => {
         <CodePenContainer ref={(el) => (codePenContainer.current = el)}>
             <TabNavigation>
                 <TabItem
-                    active={state?.previewModeColumn}
+                    active={state.previewModeColumn}
                     role="presentation"
                 >
                     <TabButton
@@ -54,7 +54,7 @@ export const CodePenWindow = (props: Props) => {
 
                 {state?.tabs.map((tab) => (
                     <TabItem
-                        active={tab.id === state.activeTab!.id}
+                        active={tab.id === state.activeTab?.id}
                         role="presentation"
                         key={tab.id}
                         style={{ padding: "0 16px" }}
@@ -76,7 +76,7 @@ export const CodePenWindow = (props: Props) => {
             </TabNavigation>
 
             <EditorAndPreviewContainer
-                column={state?.previewModeColumn}
+                column={state.previewModeColumn}
             >
                 <div ref={(el) => (monacoContainer.current = el)} />
                 <div>
