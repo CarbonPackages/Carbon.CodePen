@@ -3,7 +3,7 @@ import { fetchWithErrorHandling } from "@neos-project/neos-ui-backend-connector"
 import debounce from "lodash.debounce";
 import { editor as monacoEditor, IDisposable } from "monaco-editor";
 import { MonacoTailwindcss } from "monaco-tailwindcss";
-import { BehaviorSubject, combineLatest, first, lastValueFrom, map, Observable, withLatestFrom } from "rxjs";
+import { BehaviorSubject, combineLatest, first, lastValueFrom, map, Observable, of, withLatestFrom } from "rxjs";
 import { getEditorConfigForLanguage } from "../services/editorConfig";
 import { registerCompletionForTab } from "../services/registerCompletionForTab";
 import {
@@ -52,15 +52,15 @@ export type CodePenState = {
     tabs: Tab[];
     activeTab?: Tab;
     previewModeColumn: boolean;
-    iframePreviewUri?: string;
 };
 
-// todo global state for previewModeColumn
-
-const initalState: CodePenState = {
+export const initalState: CodePenState = {
     tabs: [],
     previewModeColumn: false,
+    activeTab: undefined,
 };
+
+const previewModeColumn$ = new BehaviorSubject(false);
 
 type PropertyValue = Record<string, string>;
 
@@ -92,25 +92,15 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
 
     const staticIframePreviewUri = createIframePreviewUriForNode(props.node);
 
-    const stateWithoutActiveTab$ = new BehaviorSubject({
-        ...initalState,
-        tabs: props.tabs
-    });
+    const tabs$ = of(props.tabs);
 
-    const state$ = combineLatest([stateWithoutActiveTab$, activeTab$]).pipe(
-        map(([stateWithoutActiveTab, activeTab]) => ({
-            ...stateWithoutActiveTab,
-            activeTab
+    const state$ = combineLatest([tabs$, activeTab$, previewModeColumn$]).pipe(
+        map(([tabs, activeTab, previewModeColumn]) => ({
+            tabs,
+            activeTab,
+            previewModeColumn
         }))
     )
-
-    const updateState = (updater: (state: CodePenState) => CodePenState) => {
-        stateWithoutActiveTab$.pipe(
-            first()
-        ).subscribe((stateWithoutActiveTab) => {
-            stateWithoutActiveTab$.next(updater(stateWithoutActiveTab))
-        })
-    }
 
     // todo without changes there should be no pending changes
 
@@ -138,7 +128,8 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
     }
 
     const togglePreviewModeColumn = () => {
-        updateState((state) => ({...state, previewModeColumn: !state.previewModeColumn}))
+        previewModeColumn$.pipe(first())
+            .subscribe((previewModeColumn) => previewModeColumn$.next(!previewModeColumn))
     }
 
     const monacoChangeEditorToTab = (activeTab: Tab, currentTabValue: string | undefined) => {

@@ -109,6 +109,12 @@ declare module "@neos-project/neos-ui-redux-store" {
         System: {
             authenticationTimeout: Selector<boolean>;
         };
+
+        UI: {
+            Inspector: {
+                transientValues: Selector<Record<string, { value: any }> | undefined>
+            }
+        }
     };
 
     type Actions = {

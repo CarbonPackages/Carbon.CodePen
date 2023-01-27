@@ -1,10 +1,8 @@
 import React from "react";
 import { Observable } from "rxjs";
 
-export const useLatestValueFrom = <V>(
-    observable$: Observable<V>,
-) => {
-    const [value, setValue] = React.useState<null | V>(null);
+export const useLatestValueFrom = <T>(observable$: Observable<T>, initalState: T) => {
+    const [value, setValue] = React.useState(initalState);
 
     React.useEffect(() => {
         const subscription = observable$.subscribe({
