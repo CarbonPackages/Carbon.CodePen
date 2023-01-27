@@ -1,6 +1,5 @@
 import manifest from "@neos-project/neos-ui-extensibility";
 import { createCodePenEditorApp } from "./CodePenEditorApp";
-import { CodePenWindow } from "./components/CodePenWindow";
 
 export interface PackageFrontendConfiguration {
     /**
@@ -37,9 +36,6 @@ export interface PackageFrontendConfiguration {
 
 manifest("Carbon.CodePen", {}, (globalRegistry, { store, frontendConfiguration}) => {
     const editorsRegistry = globalRegistry.get("inspector").get("editors");
-    const secondaryEditorsRegistry = globalRegistry
-        .get("inspector")
-        .get("secondaryEditors");
 
     editorsRegistry.set("Carbon.CodePen/CodeEditor", {
         component: createCodePenEditorApp({
@@ -47,9 +43,5 @@ manifest("Carbon.CodePen", {}, (globalRegistry, { store, frontendConfiguration})
             frontendConfiguration: frontendConfiguration["Carbon.CodePen"] as PackageFrontendConfiguration
         }),
         hasOwnLabel: true,
-    });
-
-    secondaryEditorsRegistry.set("Carbon.CodePen/CodeEditorWrap", {
-        component: CodePenWindow,
     });
 });
