@@ -9,7 +9,7 @@ import { afxMappedLanguageId } from "./services/afxMappedLanguageId";
 import { distinctUntilChanged, map, Observable, shareReplay, takeWhile, throttleTime } from "rxjs";
 import { CodePenPresenter, createCodePenPresenter } from "./presenter/CodePenPresenter";
 import { CodePenWindow } from "./components/CodePenWindow";
-import { createRetrieveOrCreateModel } from "./MonacoEditorModelCache";
+import { createRetrieveOrCreateMonacoEditorModel } from "./services/retrieveOrCreateMonacoEditorModel";
 import { Store } from "@neos-project/neos-ui";
 
 const transformTabsConfiguration = (rawTabConfig: CodePenEditorOptions["tabs"]) => {
@@ -98,7 +98,7 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                 shareReplay(1)
             )
 
-            const retrieveOrCreateModel = createRetrieveOrCreateModel({monaco, cacheIdPrefix: node.contextPath + props.identifier});
+            const retrieveOrCreateMonacoEditorModel = createRetrieveOrCreateMonacoEditorModel({monaco, cacheIdPrefix: node.contextPath + props.identifier});
 
             return createCodePenPresenter({
                 node,
@@ -113,7 +113,7 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                 requestLogin,
                 monaco,
                 monacoTailwindCss,
-                retrieveOrCreateModel,
+                retrieveOrCreateMonacoEditorModel,
             });
         }
 
