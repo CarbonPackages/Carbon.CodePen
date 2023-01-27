@@ -118,8 +118,6 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
      * Notifies the Neos UI that a tab content changed.
      * commit expects the final array value of the combined tabs,
      * so we instert the new change into the known values.
-     *
-     * The `this.neosUiEditorApi.tabValues` prop will be refreshed automatically by the ui.
      */
     const mutateValueOfTab = ({ id }: Tab, newTabValue: string, tabValues: TabValues) => {    
         let newValue;
