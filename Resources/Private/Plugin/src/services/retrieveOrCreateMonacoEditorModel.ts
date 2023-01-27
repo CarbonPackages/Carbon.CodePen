@@ -1,10 +1,10 @@
 import { editor } from "monaco-editor";
-import { Tab } from "./types";
+import { Tab } from "../types";
 
 const activeCachedModels: Record<string, editor.ITextModel> = {};
 
-export const createRetrieveOrCreateModel = (deps: {cacheIdPrefix: string, monaco: typeof import("monaco-editor")}) => {
-    const retrieveOrCreateModel = (tab: Tab, currentTabValue: string | undefined) => {
+export const createRetrieveOrCreateMonacoEditorModel = (deps: {cacheIdPrefix: string, monaco: typeof import("monaco-editor")}) => {
+    const retrieveOrCreateMonacoEditorModel = (tab: Tab, currentTabValue: string | undefined) => {
         const { language } = tab;
         const value = currentTabValue ?? '';
 
@@ -33,5 +33,5 @@ export const createRetrieveOrCreateModel = (deps: {cacheIdPrefix: string, monaco
         activeCachedModels[cacheIdentifier] = model;
         return model;
     }
-    return retrieveOrCreateModel;
+    return retrieveOrCreateMonacoEditorModel;
 }

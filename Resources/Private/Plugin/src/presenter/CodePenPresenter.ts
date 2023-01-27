@@ -45,7 +45,7 @@ type Deps = {
 
     monaco: typeof import("monaco-editor");
     monacoTailwindCss?: MonacoTailwindcss;
-    retrieveOrCreateModel(tab: Tab, currentTabValue: string | undefined): monacoEditor.ITextModel;
+    retrieveOrCreateMonacoEditorModel(tab: Tab, currentTabValue: string | undefined): monacoEditor.ITextModel;
 }
 
 export type CodePenState = {
@@ -102,8 +102,6 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
         }))
     )
 
-    // todo without changes there should be no pending changes
-
     /**
      * Notifies the Neos UI that a tab content changed.
      * commit expects the final array value of the combined tabs,
@@ -133,7 +131,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
     }
 
     const monacoChangeEditorToTab = (activeTab: Tab, currentTabValue: string | undefined) => {
-        editor.setModel(deps.retrieveOrCreateModel(activeTab, currentTabValue));
+        editor.setModel(deps.retrieveOrCreateMonacoEditorModel(activeTab, currentTabValue));
         editor.updateOptions(getEditorConfigForLanguage(activeTab.language));
 
         for (const disposeable of activeTabDisposables) {
@@ -237,7 +235,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
         iframeWindow.addEventListener(
             "load",
             () => {
-                // TODO: Find a more reliable way to determine login page
+                // find a more reliable way to determine login page
                 if (iframeWindow.document.querySelector(".neos-login-main")) {
                     closeWindowAndReloginOnSessionTimeOut();
                 }
@@ -323,7 +321,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
         // hack to check on out of band render if the session was timed out,
         // then we close the editor (destroy the iframe) and show the relogin
 
-        // TODO: Find a more reliable way to determine login page
+        // find a more reliable way to determine login page
         if (html.includes("neos-login-main")) {
             closeWindowAndReloginOnSessionTimeOut();
             // @ts-expect-error this is not a problem for us ;)

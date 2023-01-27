@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { CodePenPresenter, initalState } from "../presenter/CodePenPresenter";
-import { useLatestValueFrom } from "../useLatestValueFrom";
+import { useLatestValueFrom } from "../utils/useLatestValueFrom";
 import {
     CodePenContainer,
     EditorAndPreviewContainer,
