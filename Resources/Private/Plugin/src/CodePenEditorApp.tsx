@@ -6,14 +6,14 @@ import { CodePenEditorOptions, Tab } from "./types";
 import { CodePenButton } from "./components/CodePenButton";
 import { retrieveMonacoEditorAndPlugins } from "./dependencyLoader";
 import { afxMappedLanguageId } from "./services/afxMappedLanguageId";
-import { distinctUntilChanged, map, Observable } from "rxjs";
 import { CodePenPresenter, createCodePenPresenter } from "./presenter/CodePenPresenter";
 import { CodePenWindow } from "./components/CodePenWindow";
-import { makeCreateMonacoEditorModel } from "./services/makeCreateMonacoEditorModel";
+import { makeCreateMonacoEditorModel } from "./services/createMonacoEditorModel";
 import { Store } from "@neos-project/neos-ui";
 import { usePreventAccidentalExit } from "./utils/usePreventAccidentalExit";
 import { Icon } from "@neos-project/react-ui-components";
 import styled from "styled-components";
+import { makeCreateValueStreamFromNodeProperty } from "./services/createValueStreamFromNodeProperty";
 
 const transformTabsConfiguration = (rawTabConfig: CodePenEditorOptions["tabs"]) => {
     if (!rawTabConfig) {
@@ -41,6 +41,8 @@ type TabValues = Record<string, string>;
 type Props = EditorProps<CodePenEditorOptions, TabValues>;
 
 export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguration: PackageFrontendConfiguration}) => {
+    const createValueStreamFromNodeProperty = makeCreateValueStreamFromNodeProperty({ store: deps.store })
+
     const CodePenEditorApp = (props: Props) => {
         const SecondaryInspector = useCallback(() => {
             const [loading, setLoading] = useState(true);
@@ -72,28 +74,7 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                         return;
                     }
 
-                    const neosStoreTick$ = new Observable<void>((subscriber) => {
-                        subscriber.next();
-                        const unsubscribe = deps.store.subscribe(() => {
-                            subscriber.next();
-                        });
-                        return unsubscribe;
-                    })
-
-                    const tabValues$ = neosStoreTick$.pipe(
-                        map(() => {
-                            // same logic as how the value will normally be acquired:
-                            // https://github.com/neos/neos-ui/blob/6aa5c74e75e4813ffd798905811d099df30d5705/packages/neos-ui/src/Containers/RightSideBar/Inspector/InspectorEditorEnvelope/index.js#L81
-                            const transientValuesByPropertyId = selectors.UI.Inspector.transientValues(deps.store.getState());
-                            if (transientValuesByPropertyId && props.identifier in transientValuesByPropertyId) {
-                                return transientValuesByPropertyId[props.identifier].value as TabValues;
-                            } else {
-                                const possiblyUpdatedNode = selectors.CR.Nodes.focusedSelector(deps.store.getState())!;
-                                return possiblyUpdatedNode.properties[props.identifier] as TabValues
-                            }
-                        }),
-                        distinctUntilChanged(),
-                    )
+                    const tabValues$ = createValueStreamFromNodeProperty<TabValues>(props.identifier);
 
                     const createMonacoEditorModel = makeCreateMonacoEditorModel({monaco, cacheIdPrefix: node.contextPath + props.identifier});
 
