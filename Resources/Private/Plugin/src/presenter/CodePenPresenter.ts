@@ -3,7 +3,7 @@ import { fetchWithErrorHandling } from "@neos-project/neos-ui-backend-connector"
 import debounce from "lodash.debounce";
 import { editor as monacoEditor, IDisposable } from "monaco-editor";
 import { MonacoTailwindcss } from "monaco-tailwindcss";
-import { BehaviorSubject, combineLatest, first, lastValueFrom, map, Observable, of, withLatestFrom } from "rxjs";
+import { BehaviorSubject, first, lastValueFrom, Observable, withLatestFrom } from "rxjs";
 import { getEditorConfigForLanguage } from "../services/editorConfig";
 import { registerCompletionForTab } from "../services/registerCompletionForTab";
 import {
@@ -15,7 +15,6 @@ import {
 import { objectIsEmpty } from "../utils/helper";
 
 export interface CodePenPresenter {
-    state$: Observable<CodePenState>;
     changeToTab(tab: Tab): void;
     togglePreviewModeColumn(): void;
     configureIframePreviewBeforeLoad(iframe: HTMLIFrameElement): void;
@@ -25,17 +24,18 @@ export interface CodePenPresenter {
         codePenContainer: HTMLElement
     ): void;
     codePenWindowDidClose(): void;
-    staticIframePreviewUri: string;
+    iFramePreviewUri: string;
+    tabs: Tab[];
+    activeTab$: Observable<Tab>;
+    previewModeColumn$: Observable<boolean>;
 }
 
-type Props = {
+type Deps = {
     node: Node;
     nodeTabProperty: string;
     tabValues$: Observable<TabValues>;
     tabs: Tab[];
-};
 
-type Deps = {
     toggleCodePenWindow(): void;
 
     applyTabValues(): void;
@@ -48,18 +48,6 @@ type Deps = {
     retrieveOrCreateMonacoEditorModel(tab: Tab, currentTabValue: string | undefined): monacoEditor.ITextModel;
 }
 
-export type CodePenState = {
-    tabs: Tab[];
-    activeTab?: Tab;
-    previewModeColumn: boolean;
-};
-
-export const initalState: CodePenState = {
-    tabs: [],
-    previewModeColumn: false,
-    activeTab: undefined,
-};
-
 const previewModeColumn$ = new BehaviorSubject(false);
 
 type PropertyValue = Record<string, string>;
@@ -67,7 +55,7 @@ type PropertyValue = Record<string, string>;
 type TabValues = Record<string, string>;
 
 
-export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresenter => {
+export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
     const { monaco } = deps;
 
     let editor: monacoEditor.IStandaloneCodeEditor;
@@ -76,7 +64,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
 
     let codePenWindowDisposables: (IDisposable | undefined)[] = [];
 
-    const activeTab$ = new BehaviorSubject(props.tabs[0])
+    const activeTab$ = new BehaviorSubject(deps.tabs[0])
 
     const createIframePreviewUriForNode = (node: Node) => {
         const action = "renderPreviewFrame";
@@ -90,24 +78,14 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
         }
     }
 
-    const staticIframePreviewUri = createIframePreviewUriForNode(props.node);
-
-    const tabs$ = of(props.tabs);
-
-    const state$ = combineLatest([tabs$, activeTab$, previewModeColumn$]).pipe(
-        map(([tabs, activeTab, previewModeColumn]) => ({
-            tabs,
-            activeTab,
-            previewModeColumn
-        }))
-    )
+    const iFramePreviewUri = createIframePreviewUriForNode(deps.node);
 
     /**
      * Notifies the Neos UI that a tab content changed.
      * commit expects the final array value of the combined tabs,
      * so we instert the new change into the known values.
      */
-    const mutateValueOfTab = ({ id }: Tab, newTabValue: string, tabValues: TabValues) => {    
+    const mutateValueOfTab = ({ id }: Tab, newTabValue: string, tabValues: TabValues) => {
         let newValue;
         if (newTabValue === "") {
             const {[id]: _omit, ...rest} = tabValues;
@@ -126,8 +104,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
     }
 
     const togglePreviewModeColumn = () => {
-        previewModeColumn$.pipe(first())
-            .subscribe((previewModeColumn) => previewModeColumn$.next(!previewModeColumn))
+        previewModeColumn$.next(!previewModeColumn$.getValue());
     }
 
     const monacoChangeEditorToTab = (activeTab: Tab, currentTabValue: string | undefined) => {
@@ -138,7 +115,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
             disposeable?.dispose();
         }
         activeTabDisposables = [
-            registerCompletionForTab(deps.monaco, props.node, activeTab),
+            registerCompletionForTab(deps.monaco, deps.node, activeTab),
         ];
     }
 
@@ -157,10 +134,10 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
 
         const subscription1 = activeTab$.pipe(
             withLatestFrom(
-                props.tabValues$
+                deps.tabValues$
             ),
         ).subscribe(([activeTab, tabValues]) => monacoChangeEditorToTab(activeTab, tabValues[activeTab.id]))
-    
+
         editor.addCommand(
             monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd,
             () => editor.trigger("keyboard", "editor.action.fontZoomIn", {})
@@ -201,7 +178,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
         const modelContentWithActiveTabAndTabValues$ = modelContent$.pipe(
             withLatestFrom(
                 activeTab$,
-                props.tabValues$
+                deps.tabValues$
             )
         )
 
@@ -215,7 +192,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
             { dispose: () => subscription1.unsubscribe() },
             { dispose: () => subscription2.unsubscribe() }
         ];
-    } 
+    }
 
     const changeToTab = (tab: Tab) => {
         activeTab$.next(tab);
@@ -271,7 +248,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
 
         bootstrap(codePenContext);
 
-        const subscription = props.tabValues$.pipe(
+        const subscription = deps.tabValues$.pipe(
             withLatestFrom(
                 activeTab$
             ),
@@ -287,13 +264,13 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
 
     const renderComponentOutOfBand = async () => {
         const tabValues = await lastValueFrom(
-            props.tabValues$.pipe(
+            deps.tabValues$.pipe(
                 first()
             )
         )
         return fetchAction("renderVirtualNode", {
-            node: props.node.contextPath,
-            additionalPropertyName: props.nodeTabProperty,
+            node: deps.node.contextPath,
+            additionalPropertyName: deps.nodeTabProperty,
             additionalPropertyValue: JSON.stringify(
                 tabValues
             ),
@@ -316,7 +293,7 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
                 fetchWithErrorHandling.generalErrorHandler(reason)
             );
 
-        const html = (await result.text()) as string;        
+        const html = (await result.text()) as string;
 
         // hack to check on out of band render if the session was timed out,
         // then we close the editor (destroy the iframe) and show the relogin
@@ -340,10 +317,12 @@ export const createCodePenPresenter = (props: Props, deps: Deps): CodePenPresent
         toggleCodePenWindow: deps.toggleCodePenWindow,
         configureAndRenderMonaco,
         changeToTab,
-        state$,
         togglePreviewModeColumn,
         codePenWindowDidClose,
         configureIframePreviewBeforeLoad,
-        staticIframePreviewUri
+        iFramePreviewUri,
+        tabs: deps.tabs,
+        activeTab$,
+        previewModeColumn$
     }
-} 
+}
