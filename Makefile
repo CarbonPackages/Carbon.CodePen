@@ -6,7 +6,7 @@ PLUGIN = Resources/Private/Plugin
 
 install:
 	cd ${PLUGIN} && . ${NVM_DIR}/nvm.sh && nvm use
-	cd ${PLUGIN} && pnpm install
+	cd ${PLUGIN} && pnpm install --frozen-lockfile
 
 build:
 	cd ${PLUGIN} && pnpm run build
