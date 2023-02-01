@@ -102,8 +102,8 @@ type Props = {
 };
 
 export const CodePenWindow = (props: Props) => {
-    const codePenContainer = useRef<HTMLElement | null>(null);
-    const monacoContainer = useRef<HTMLElement | null>(null);
+    const codePenContainer = useRef<HTMLDivElement | null>(null);
+    const monacoContainer = useRef<HTMLDivElement | null>(null);
     const iframePreview = useRef<HTMLIFrameElement | null>(null);
 
     const state = useLatestValueFrom(props.codePenPresenter.state$, initalState);
@@ -126,7 +126,7 @@ export const CodePenWindow = (props: Props) => {
     }, [])
 
     return (
-        <CodePenContainer ref={(el) => (codePenContainer.current = el)}>
+        <CodePenContainer ref={codePenContainer}>
             <TabNavigation>
                 <TabItem
                     active={state.previewModeColumn}
@@ -165,7 +165,7 @@ export const CodePenWindow = (props: Props) => {
             <EditorAndPreviewContainer
                 column={state.previewModeColumn}
             >
-                <div ref={(el) => (monacoContainer.current = el)} />
+                <div ref={monacoContainer} />
                 <div>
                     <iframe
                         style={{
@@ -174,10 +174,8 @@ export const CodePenWindow = (props: Props) => {
                             background: "#fff",
                             border: "none",
                         }}
-                        ref={(el) => (iframePreview.current = el)}
-                        // if we would put the uri into a setState,
-                        // it wouldnt be set initially which leads to our window iframe api not working,
-                        // as the source would change again and it reloads
+                        ref={iframePreview}
+                        // src must be immediately set
                         src={props.codePenPresenter.staticIframePreviewUri}
                     ></iframe>
                 </div>
