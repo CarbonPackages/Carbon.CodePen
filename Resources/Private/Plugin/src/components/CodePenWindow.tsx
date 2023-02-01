@@ -107,7 +107,7 @@ export const CodePenWindow = (props: Props) => {
     const iframePreview = useRef<HTMLIFrameElement | null>(null);
 
     const activeTab = useLatestValueFrom(props.codePenPresenter.activeTab$);
-    const previewModeColumn = useLatestValueFrom(props.codePenPresenter.previewModeColumn$);
+    const previewLayoutHorizontal = useLatestValueFrom(props.codePenPresenter.previewLayoutHorizontal$);
 
 
     useEffect(() => {
@@ -129,11 +129,11 @@ export const CodePenWindow = (props: Props) => {
         <CodePenContainer ref={codePenContainer}>
             <TabNavigation>
                 <TabItem
-                    active={previewModeColumn ?? false}
+                    active={previewLayoutHorizontal ?? false}
                     role="presentation"
                 >
                     <TabButton
-                        onClick={props.codePenPresenter.togglePreviewModeColumn}
+                        onClick={props.codePenPresenter.togglePreviewLayoutHorizontal}
                     >
                         <TabIcon icon="window-maximize" />
                     </TabButton>
@@ -163,7 +163,7 @@ export const CodePenWindow = (props: Props) => {
             </TabNavigation>
 
             <EditorAndPreviewContainer
-                column={previewModeColumn ?? false}
+                column={previewLayoutHorizontal ?? false}
             >
                 <div ref={monacoContainer} />
                 <div>
