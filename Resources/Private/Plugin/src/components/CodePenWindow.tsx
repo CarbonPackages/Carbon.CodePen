@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { CodePenPresenter, initalState } from "../presenter/CodePenPresenter";
+import { CodePenPresenter } from "../presenter/CodePenPresenter";
 import { useLatestValueFrom } from "../utils/useLatestValueFrom";
 import { Icon } from "@neos-project/react-ui-components";
 import styled, { css } from "styled-components";
@@ -106,7 +106,9 @@ export const CodePenWindow = (props: Props) => {
     const monacoContainer = useRef<HTMLDivElement | null>(null);
     const iframePreview = useRef<HTMLIFrameElement | null>(null);
 
-    const state = useLatestValueFrom(props.codePenPresenter.state$, initalState);
+    const activeTab = useLatestValueFrom(props.codePenPresenter.activeTab$);
+    const previewModeColumn = useLatestValueFrom(props.codePenPresenter.previewModeColumn$);
+
 
     useEffect(() => {
         if (!monacoContainer.current || !codePenContainer.current || !iframePreview.current) {
@@ -129,7 +131,7 @@ export const CodePenWindow = (props: Props) => {
         <CodePenContainer ref={codePenContainer}>
             <TabNavigation>
                 <TabItem
-                    active={state.previewModeColumn}
+                    active={previewModeColumn ?? false}
                     role="presentation"
                 >
                     <TabButton
@@ -139,9 +141,9 @@ export const CodePenWindow = (props: Props) => {
                     </TabButton>
                 </TabItem>
 
-                {state?.tabs.map((tab) => (
+                {props.codePenPresenter.tabs.map((tab) => (
                     <TabItem
-                        active={tab.id === state.activeTab?.id}
+                        active={tab.id === activeTab?.id}
                         role="presentation"
                         key={tab.id}
                         style={{ padding: "0 16px" }}
@@ -163,7 +165,7 @@ export const CodePenWindow = (props: Props) => {
             </TabNavigation>
 
             <EditorAndPreviewContainer
-                column={state.previewModeColumn}
+                column={previewModeColumn ?? false}
             >
                 <div ref={monacoContainer} />
                 <div>
@@ -176,7 +178,7 @@ export const CodePenWindow = (props: Props) => {
                         }}
                         ref={iframePreview}
                         // src must be immediately set
-                        src={props.codePenPresenter.staticIframePreviewUri}
+                        src={props.codePenPresenter.iFramePreviewUri}
                     ></iframe>
                 </div>
             </EditorAndPreviewContainer>

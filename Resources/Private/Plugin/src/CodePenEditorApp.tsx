@@ -107,8 +107,7 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                 node,
                 tabs,
                 nodeTabProperty: props.identifier,
-                tabValues$
-            }, {
+                tabValues$,
                 toggleCodePenWindow,
                 applyTabValues,
                 commitTabValues,
