@@ -68,9 +68,11 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
 
                     let tabs: Tab[];
                     try {
-                        tabs = transformTabsConfiguration(props.options.tabs);
+                        tabs = transformTabsConfiguration(props.options?.tabs);
                     } catch (e) {
+                        const { message } = e as Error;
                         console.error((e as Error).message);
+                        deps.store.dispatch(actions.UI.FlashMessages.add("CARBON_CODEPEN", message, "error"))
                         return;
                     }
 
@@ -129,7 +131,7 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
             <div>
                 <CodePenButton
                     className={props.className}
-                    disabled={props.options.disabled}
+                    disabled={props.options?.disabled}
                     label={props.label}
                     onClick={handleClick}
                 />
