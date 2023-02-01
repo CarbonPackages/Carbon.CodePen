@@ -1,10 +1,9 @@
 import { Store } from "@neos-project/neos-ui";
 import { selectors } from "@neos-project/neos-ui-redux-store";
-import { distinctUntilChanged, map, Observable } from "rxjs";
+import { distinctUntilChanged, map, Observable, shareReplay } from "rxjs";
 
 export const makeCreateValueStreamFromNodeProperty = (deps: { store: Store }) => {
     const createValueStreamFromNodeProperty = <T>(propertyId: string) => {
-        
         const neosStoreChange$ = new Observable<void>((subscriber) => {
             subscriber.next();
             const unsubscribe = deps.store.subscribe(() => {
@@ -25,7 +24,11 @@ export const makeCreateValueStreamFromNodeProperty = (deps: { store: Store }) =>
                     return possiblyUpdatedNode.properties[propertyId] as T
                 }
             }),
-            distinctUntilChanged()
+            distinctUntilChanged(),
+            shareReplay({
+                refCount: true, // unsubscribe at the end
+                bufferSize: 1
+            })
         )
 
         return values$;
