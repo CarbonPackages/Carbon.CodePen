@@ -23,7 +23,7 @@ export interface CodePenPresenter {
         monacoContainer: HTMLElement,
         codePenContainer: HTMLElement
     ): void;
-    codePenWindowDidClose(): void;
+    dispose(): void;
     iFramePreviewUri: string;
     tabs: Tab[];
     activeTab$: Observable<Tab>;
@@ -72,7 +72,7 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
         return `/neos/codePen/${action}?${query}`;
     }
 
-    const codePenWindowDidClose = () => {
+    const dispose = () => {
         for (const disposeable of codePenWindowDisposables) {
             disposeable?.dispose();
         }
@@ -318,7 +318,7 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
         configureAndRenderMonaco,
         changeToTab,
         togglePreviewModeColumn,
-        codePenWindowDidClose,
+        dispose,
         configureIframePreviewBeforeLoad,
         iFramePreviewUri,
         tabs: deps.tabs,

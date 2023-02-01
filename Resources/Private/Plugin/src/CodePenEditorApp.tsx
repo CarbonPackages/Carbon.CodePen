@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { selectors, actions } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ts-interfaces";
 import { PackageFrontendConfiguration } from "./manifest";
@@ -48,81 +48,88 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
     })
 
     const CodePenEditorApp = (props: Props) => {
+        const SecondaryInspector = () => {
+            const [codePenPresenter, setCodePenPresenter] = useState<CodePenPresenter>();
+                
+            const node = useMemo(() => selectors.CR.Nodes.focusedSelector(deps.store.getState())!, [])
+
+            useEffect(() => {
+                (async () => {
+                    const {monaco, monacoTailwindCss} = await retrieveMonacoEditorAndPlugins({
+                        frontendConfiguration: deps.frontendConfiguration
+                    });
+
+                    const applyTabValues = props.onEnterKey
+
+                    // nope its not commit(null); to reset, but will be treated as null.
+                    const resetTabValues = () => props.commit("");
+
+                    const commitTabValues = props.commit;
+
+                    const requestLogin = () => deps.store.dispatch(actions.System.authenticationTimeout());
+
+                    let tabs: Tab[];
+                    try {
+                        tabs = transformTabsConfiguration(props.options.tabs);
+                    } catch (e) {
+                        console.error((e as Error).message);
+                        return;
+                    }
+
+                    const tabValues$ = neosStoreTick$.pipe(
+                        throttleTime(50),
+                        takeWhile(() => selectors.CR.Nodes.focusedSelector(deps.store.getState())?.contextPath === node.contextPath),
+                        map(() => {
+                            // same logic as how the value will normally be acquired:
+                            // https://github.com/neos/neos-ui/blob/6aa5c74e75e4813ffd798905811d099df30d5705/packages/neos-ui/src/Containers/RightSideBar/Inspector/InspectorEditorEnvelope/index.js#L81
+                            const transientValuesByPropertyId = selectors.UI.Inspector.transientValues(deps.store.getState());
+                            if (transientValuesByPropertyId && props.identifier in transientValuesByPropertyId) {
+                                return transientValuesByPropertyId[props.identifier].value as TabValues;
+                            } else {
+                                const possiblyUpdatedNode = selectors.CR.Nodes.focusedSelector(deps.store.getState())!;
+                                return possiblyUpdatedNode.properties[props.identifier] as TabValues
+                            }
+                        }),
+                        distinctUntilChanged(),
+                        shareReplay(1)
+                    )
+
+                    const createMonacoEditorModel = makeCreateMonacoEditorModel({monaco, cacheIdPrefix: node.contextPath + props.identifier});
+
+                    setCodePenPresenter(
+                        createCodePenPresenter({
+                            node,
+                            tabs,
+                            nodeTabProperty: props.identifier,
+                            tabValues$,
+                            toggleCodePenWindow: handleClick,
+                            applyTabValues,
+                            commitTabValues,
+                            resetTabValues,
+                            requestLogin,
+                            monaco,
+                            monacoTailwindCss,
+                            createMonacoEditorModel,
+                        })
+                    )
+                })()
+
+                return () => codePenPresenter?.dispose()
+            }, [])
+
+            if (!codePenPresenter) {
+                return <div>...</div>
+            }
+            
+            return <CodePenWindow codePenPresenter={codePenPresenter} />
+        }
 
         usePreventAccidentalExit();
 
-        const codePenPresenter = useRef<CodePenPresenter>()
-
-        // will not change and update its properties
-        const node = useMemo(() => selectors.CR.Nodes.focusedSelector(deps.store.getState())!, [])
-
-        const createCodePenPresenterFromContext = async (): Promise<CodePenPresenter | undefined> => {
-            const {monaco, monacoTailwindCss} = await retrieveMonacoEditorAndPlugins({
-                frontendConfiguration: deps.frontendConfiguration
-            });
-
-            const applyTabValues = props.onEnterKey
-
-            // nope its not commit(null); to reset, but will be treated as null.
-            const resetTabValues = () => props.commit("");
-
-            const commitTabValues = props.commit;
-
-            const requestLogin = () => deps.store.dispatch(actions.System.authenticationTimeout());
-
-            const toggleCodePenWindow = () => props.renderSecondaryInspector(
-                "CARBON_CODEPEN_WINDOW",
-                () => <CodePenWindow codePenPresenter={codePenPresenter.current!} />
-            );
-    
-            let tabs: Tab[];
-            try {
-                tabs = transformTabsConfiguration(props.options.tabs);
-            } catch (e) {
-                console.error((e as Error).message);
-                return;
-            }
-
-            const tabValues$ = neosStoreTick$.pipe(
-                throttleTime(50),
-                takeWhile(() => selectors.CR.Nodes.focusedSelector(deps.store.getState())?.contextPath === node.contextPath),
-                map(() => {
-                    // same logic as how the value will normally be acquired:
-                    // https://github.com/neos/neos-ui/blob/6aa5c74e75e4813ffd798905811d099df30d5705/packages/neos-ui/src/Containers/RightSideBar/Inspector/InspectorEditorEnvelope/index.js#L81
-                    const transientValuesByPropertyId = selectors.UI.Inspector.transientValues(deps.store.getState());
-                    if (transientValuesByPropertyId && props.identifier in transientValuesByPropertyId) {
-                        return transientValuesByPropertyId[props.identifier].value as TabValues;
-                    } else {
-                        const possiblyUpdatedNode = selectors.CR.Nodes.focusedSelector(deps.store.getState())!;
-                        return possiblyUpdatedNode.properties[props.identifier] as TabValues
-                    }
-                }),
-                distinctUntilChanged(),
-                shareReplay(1)
-            )
-
-            const createMonacoEditorModel = makeCreateMonacoEditorModel({monaco, cacheIdPrefix: node.contextPath + props.identifier});
-
-            return createCodePenPresenter({
-                node,
-                tabs,
-                nodeTabProperty: props.identifier,
-                tabValues$,
-                toggleCodePenWindow,
-                applyTabValues,
-                commitTabValues,
-                resetTabValues,
-                requestLogin,
-                monaco,
-                monacoTailwindCss,
-                createMonacoEditorModel,
-            });
-        }
-
-        const handleClick = useCallback(async () => {
-            codePenPresenter.current ??= await createCodePenPresenterFromContext();
-            codePenPresenter.current?.toggleCodePenWindow();
-        }, [])
+        const handleClick = useCallback(() => props.renderSecondaryInspector(
+            "CARBON_CODEPEN_WINDOW",
+            () => <SecondaryInspector />
+        ), [])
 
         return (
             <div>

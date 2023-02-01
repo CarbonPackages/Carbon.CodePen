@@ -123,8 +123,6 @@ export const CodePenWindow = (props: Props) => {
         props.codePenPresenter.configureIframePreviewBeforeLoad(
             iframePreview.current
         );
-
-        return props.codePenPresenter.codePenWindowDidClose
     }, [])
 
     return (
