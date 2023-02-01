@@ -60,9 +60,9 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
 
     let editor: monacoEditor.IStandaloneCodeEditor;
 
-    let activeTabDisposables: (IDisposable|undefined)[] = [];
+    let disposables: IDisposable[] = [];
 
-    let codePenWindowDisposables: (IDisposable | undefined)[] = [];
+    let activeTabDisposables: IDisposable[] = [];
 
     const activeTab$ = new BehaviorSubject(deps.tabs[0])
 
@@ -73,8 +73,8 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
     }
 
     const dispose = () => {
-        for (const disposeable of codePenWindowDisposables) {
-            disposeable?.dispose();
+        for (const disposeable of disposables) {
+            disposeable.dispose();
         }
     }
 
@@ -112,11 +112,13 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
         editor.updateOptions(getEditorConfigForLanguage(activeTab.language));
 
         for (const disposeable of activeTabDisposables) {
-            disposeable?.dispose();
+            disposeable.dispose();
         }
+
+        /** @ts-expect-error */
         activeTabDisposables = [
             registerCompletionForTab(deps.monaco, deps.node, activeTab),
-        ];
+        ].filter(Boolean);
     }
 
     const configureAndRenderMonaco = async (
@@ -131,12 +133,6 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
                 automaticLayout: true,
             }
         );
-
-        const subscription1 = activeTab$.pipe(
-            withLatestFrom(
-                deps.tabValues$
-            ),
-        ).subscribe(([activeTab, tabValues]) => monacoChangeEditorToTab(activeTab, tabValues[activeTab.id]))
 
         editor.addCommand(
             monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd,
@@ -168,6 +164,12 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
             run: () => codePenContainer!.requestFullscreen(),
         });
 
+        const changeTabSubscription = activeTab$.pipe(
+            withLatestFrom(
+                deps.tabValues$
+            ),
+        ).subscribe(([activeTab, tabValues]) => monacoChangeEditorToTab(activeTab, tabValues[activeTab.id]))
+
         const modelContent$ = new Observable<string>((subscribe) => {
             const { dispose } = editor.onDidChangeModelContent(() => {
                 subscribe.next(editor.getValue())
@@ -182,15 +184,15 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
             )
         )
 
-        const subscription2 = modelContentWithActiveTabAndTabValues$.subscribe(([modelContent, activeTab, tabValues]) => {
+        const commitValuesSubscription = modelContentWithActiveTabAndTabValues$.subscribe(([modelContent, activeTab, tabValues]) => {
             mutateValueOfTab(activeTab, modelContent, tabValues);
         })
 
-        codePenWindowDisposables = [
-            ...codePenWindowDisposables,
+        disposables = [
+            ...disposables,
             editor,
-            { dispose: () => subscription1.unsubscribe() },
-            { dispose: () => subscription2.unsubscribe() }
+            { dispose: () => changeTabSubscription.unsubscribe() },
+            { dispose: () => commitValuesSubscription.unsubscribe() }
         ];
     }
 
@@ -248,7 +250,7 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
 
         bootstrap(codePenContext);
 
-        const subscription = deps.tabValues$.pipe(
+        const reloadIFrameSubscription = deps.tabValues$.pipe(
             withLatestFrom(
                 activeTab$
             ),
@@ -257,8 +259,8 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
             tabValues
         }))
 
-        codePenWindowDisposables = [...codePenWindowDisposables, {
-            dispose: () => subscription.unsubscribe()
+        disposables = [...disposables, {
+            dispose: () => reloadIFrameSubscription.unsubscribe()
         }]
     }
 
