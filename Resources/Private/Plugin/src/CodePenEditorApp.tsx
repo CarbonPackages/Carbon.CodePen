@@ -12,6 +12,8 @@ import { CodePenWindow } from "./components/CodePenWindow";
 import { makeCreateMonacoEditorModel } from "./services/makeCreateMonacoEditorModel";
 import { Store } from "@neos-project/neos-ui";
 import { usePreventAccidentalExit } from "./utils/usePreventAccidentalExit";
+import { Icon } from "@neos-project/react-ui-components";
+import styled from "styled-components";
 
 const transformTabsConfiguration = (rawTabConfig: CodePenEditorOptions["tabs"]) => {
     if (!rawTabConfig) {
@@ -118,7 +120,15 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
             }, [])
 
             if (!codePenPresenter) {
-                return <div>...</div>
+                const LoadingContainer = styled.div`
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                `
+                return <LoadingContainer>
+                    <Icon icon="spinner" spin={true} size="2x" />
+                </LoadingContainer>
             }
             
             return <CodePenWindow codePenPresenter={codePenPresenter} />
