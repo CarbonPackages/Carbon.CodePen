@@ -16,7 +16,7 @@ import { objectIsEmpty } from "../utils/helper";
 
 export interface CodePenPresenter {
     changeToTab(tab: Tab): void;
-    togglePreviewModeColumn(): void;
+    togglePreviewLayoutHorizontal(): void;
     configureIframePreviewBeforeLoad(iframe: HTMLIFrameElement): void;
     toggleCodePenWindow(): void;
     configureAndRenderMonaco(
@@ -27,7 +27,7 @@ export interface CodePenPresenter {
     iFramePreviewUri: string;
     tabs: Tab[];
     activeTab$: Observable<Tab>;
-    previewModeColumn$: Observable<boolean>;
+    previewLayoutHorizontal$: Observable<boolean>;
 }
 
 type Deps = {
@@ -48,7 +48,7 @@ type Deps = {
     createMonacoEditorModel(tab: Tab, currentTabValue: string | undefined): monacoEditor.ITextModel;
 }
 
-const previewModeColumn$ = new BehaviorSubject(false);
+const previewLayoutHorizontal$ = new BehaviorSubject(false);
 
 type PropertyValue = Record<string, string>;
 
@@ -103,8 +103,8 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
         deps.commitTabValues(newValue);
     }
 
-    const togglePreviewModeColumn = () => {
-        previewModeColumn$.next(!previewModeColumn$.getValue());
+    const togglePreviewLayoutHorizontal = () => {
+        previewLayoutHorizontal$.next(!previewLayoutHorizontal$.getValue());
     }
 
     const monacoChangeEditorToTab = (activeTab: Tab, currentTabValue: string | undefined) => {
@@ -319,12 +319,12 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
         toggleCodePenWindow: deps.toggleCodePenWindow,
         configureAndRenderMonaco,
         changeToTab,
-        togglePreviewModeColumn,
+        togglePreviewLayoutHorizontal,
         dispose,
         configureIframePreviewBeforeLoad,
         iFramePreviewUri,
         tabs: deps.tabs,
         activeTab$,
-        previewModeColumn$
+        previewLayoutHorizontal$
     }
 }
