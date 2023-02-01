@@ -1,9 +1,11 @@
-import { test } from "./fixture"
+import { sleep, test } from "./fixture"
 
 test("afxTagCompletion", async ({ neos }) => {
     await neos.withSharedDocument(async ({document}) => {
         await document.withContentElement("Carbon.TestSite:AfxFeaturesCodePen", async ({contentElement}) => {
             await contentElement.withCodePen(async ({codePen}) => {
+                await sleep(500)
+
                 await codePen.type("Loop")
                 await codePen.pressTab()
 

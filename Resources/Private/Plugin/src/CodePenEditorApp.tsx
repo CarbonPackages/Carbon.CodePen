@@ -6,7 +6,7 @@ import { CodePenEditorOptions, Tab } from "./types";
 import { CodePenButton } from "./components/CodePenButton";
 import { retrieveMonacoEditorAndPlugins } from "./dependencyLoader";
 import { afxMappedLanguageId } from "./services/afxMappedLanguageId";
-import { distinctUntilChanged, map, Observable, shareReplay } from "rxjs";
+import { distinctUntilChanged, map, Observable } from "rxjs";
 import { CodePenPresenter, createCodePenPresenter } from "./presenter/CodePenPresenter";
 import { CodePenWindow } from "./components/CodePenWindow";
 import { makeCreateMonacoEditorModel } from "./services/makeCreateMonacoEditorModel";
@@ -93,10 +93,6 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                             }
                         }),
                         distinctUntilChanged(),
-                        shareReplay({
-                            bufferSize: 1,
-                            refCount: true, // unsubscribe at end
-                        })
                     )
 
                     const createMonacoEditorModel = makeCreateMonacoEditorModel({monaco, cacheIdPrefix: node.contextPath + props.identifier});
