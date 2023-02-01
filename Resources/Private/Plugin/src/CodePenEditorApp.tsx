@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { selectors, actions } from "@neos-project/neos-ui-redux-store";
 import { EditorProps } from "@neos-project/neos-ts-interfaces";
 import { PackageFrontendConfiguration } from "./manifest";
@@ -6,7 +6,7 @@ import { CodePenEditorOptions, Tab } from "./types";
 import { CodePenButton } from "./components/CodePenButton";
 import { retrieveMonacoEditorAndPlugins } from "./dependencyLoader";
 import { afxMappedLanguageId } from "./services/afxMappedLanguageId";
-import { distinctUntilChanged, map, Observable, shareReplay, takeWhile, throttleTime } from "rxjs";
+import { distinctUntilChanged, map, Observable, shareReplay } from "rxjs";
 import { CodePenPresenter, createCodePenPresenter } from "./presenter/CodePenPresenter";
 import { CodePenWindow } from "./components/CodePenWindow";
 import { makeCreateMonacoEditorModel } from "./services/makeCreateMonacoEditorModel";
@@ -41,18 +41,12 @@ type TabValues = Record<string, string>;
 type Props = EditorProps<CodePenEditorOptions, TabValues>;
 
 export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguration: PackageFrontendConfiguration}) => {
-    const neosStoreTick$ = new Observable<void>((subscriber) => {
-        subscriber.next();
-        const unsubscribe = deps.store.subscribe(() => {
-            subscriber.next();
-        });
-        return unsubscribe;
-    })
-
     const CodePenEditorApp = (props: Props) => {
-        const SecondaryInspector = () => {
-            const [codePenPresenter, setCodePenPresenter] = useState<CodePenPresenter>();
-                
+        const SecondaryInspector = useCallback(() => {
+            const [loading, setLoading] = useState(true);
+
+            const codePenPresenter = useRef<CodePenPresenter>()
+
             const node = useMemo(() => selectors.CR.Nodes.focusedSelector(deps.store.getState())!, [])
 
             useEffect(() => {
@@ -78,9 +72,15 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                         return;
                     }
 
+                    const neosStoreTick$ = new Observable<void>((subscriber) => {
+                        subscriber.next();
+                        const unsubscribe = deps.store.subscribe(() => {
+                            subscriber.next();
+                        });
+                        return unsubscribe;
+                    })
+
                     const tabValues$ = neosStoreTick$.pipe(
-                        throttleTime(50),
-                        takeWhile(() => selectors.CR.Nodes.focusedSelector(deps.store.getState())?.contextPath === node.contextPath),
                         map(() => {
                             // same logic as how the value will normally be acquired:
                             // https://github.com/neos/neos-ui/blob/6aa5c74e75e4813ffd798905811d099df30d5705/packages/neos-ui/src/Containers/RightSideBar/Inspector/InspectorEditorEnvelope/index.js#L81
@@ -93,33 +93,38 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                             }
                         }),
                         distinctUntilChanged(),
-                        shareReplay(1)
+                        shareReplay({
+                            bufferSize: 1,
+                            refCount: true, // unsubscribe at end
+                        })
                     )
 
                     const createMonacoEditorModel = makeCreateMonacoEditorModel({monaco, cacheIdPrefix: node.contextPath + props.identifier});
 
-                    setCodePenPresenter(
-                        createCodePenPresenter({
-                            node,
-                            tabs,
-                            nodeTabProperty: props.identifier,
-                            tabValues$,
-                            toggleCodePenWindow: handleClick,
-                            applyTabValues,
-                            commitTabValues,
-                            resetTabValues,
-                            requestLogin,
-                            monaco,
-                            monacoTailwindCss,
-                            createMonacoEditorModel,
-                        })
-                    )
+                    codePenPresenter.current = createCodePenPresenter({
+                        node,
+                        tabs,
+                        nodeTabProperty: props.identifier,
+                        tabValues$,
+                        toggleCodePenWindow: handleClick,
+                        applyTabValues,
+                        commitTabValues,
+                        resetTabValues,
+                        requestLogin,
+                        monaco,
+                        monacoTailwindCss,
+                        createMonacoEditorModel,
+                    })
+
+                    setLoading(false)
                 })()
 
-                return () => codePenPresenter?.dispose()
+                return () => {
+                    codePenPresenter.current?.dispose();
+                }
             }, [])
 
-            if (!codePenPresenter) {
+            if (loading) {
                 const LoadingContainer = styled.div`
                     display: flex;
                     align-items: center;
@@ -130,16 +135,18 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                     <Icon icon="spinner" spin={true} size="2x" />
                 </LoadingContainer>
             }
-            
-            return <CodePenWindow codePenPresenter={codePenPresenter} />
-        }
+
+            return <CodePenWindow codePenPresenter={codePenPresenter.current!} />
+        }, [])
 
         usePreventAccidentalExit();
 
-        const handleClick = useCallback(() => props.renderSecondaryInspector(
-            "CARBON_CODEPEN_WINDOW",
-            () => <SecondaryInspector />
-        ), [])
+        const handleClick = useCallback(() => {
+            props.renderSecondaryInspector(
+                "CARBON_CODEPEN_WINDOW",
+                () => <SecondaryInspector />
+            )
+        }, [])
 
         return (
             <div>
