@@ -45,7 +45,7 @@ type Deps = {
 
     monaco: typeof import("monaco-editor");
     monacoTailwindCss?: MonacoTailwindcss;
-    retrieveOrCreateMonacoEditorModel(tab: Tab, currentTabValue: string | undefined): monacoEditor.ITextModel;
+    createMonacoEditorModel(tab: Tab, currentTabValue: string | undefined): monacoEditor.ITextModel;
 }
 
 const previewModeColumn$ = new BehaviorSubject(false);
@@ -108,7 +108,7 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
     }
 
     const monacoChangeEditorToTab = (activeTab: Tab, currentTabValue: string | undefined) => {
-        editor.setModel(deps.retrieveOrCreateMonacoEditorModel(activeTab, currentTabValue));
+        editor.setModel(deps.createMonacoEditorModel(activeTab, currentTabValue));
         editor.updateOptions(getEditorConfigForLanguage(activeTab.language));
 
         for (const disposeable of activeTabDisposables) {
