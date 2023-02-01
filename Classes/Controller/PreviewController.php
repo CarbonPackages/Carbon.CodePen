@@ -6,7 +6,6 @@ namespace Carbon\CodePen\Controller;
 use Neos\ContentRepository\Domain\Model\Node;
 use Neos\Flow\Mvc\Controller\ActionController;
 use Neos\Neos\View\FusionView;
-use Neos\Flow\Annotations as Flow;
 use Carbon\CodePen\VirtualNodeWithProperty;
 
 /**
@@ -18,12 +17,6 @@ class PreviewController extends ActionController
      * @var string
      */
     protected $defaultViewObjectName = FusionView::class;
-
-    /**
-     * @Flow\InjectConfiguration("preview.fusionRootPath")
-     * @var string
-     */
-    protected $fusionRootPath;
 
     public function renderVirtualNodeAction(Node $node, string $additionalPropertyName, string $additionalPropertyValue)
     {
