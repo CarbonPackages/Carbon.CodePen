@@ -3,7 +3,6 @@ import { Tab } from "../types";
 
 const activeCachedModels: Record<string, editor.ITextModel> = {};
 
-// make
 export const makeCreateMonacoEditorModel = (deps: {cacheIdPrefix: string, monaco: typeof import("monaco-editor")}) => {
     const createMonacoEditorModel = (tab: Tab, currentTabValue: string | undefined) => {
         const { language } = tab;
