@@ -3,12 +3,12 @@ import { Tab } from "../types";
 
 const activeCachedModels: Record<string, editor.ITextModel> = {};
 
-export const makeCreateMonacoEditorModel = (deps: {cacheIdPrefix: string, monaco: typeof import("monaco-editor")}) => {
-    const createMonacoEditorModel = (tab: Tab, currentTabValue: string | undefined) => {
+export const makeCreateMonacoEditorModel = (deps: {monaco: typeof import("monaco-editor")}) => {
+    const createMonacoEditorModel = (tab: Tab, currentTabValue: string | undefined, cacheIdPrefix: string) => {
         const { language } = tab;
         const value = currentTabValue ?? '';
 
-        const cacheIdentifier = deps.cacheIdPrefix + tab.id;
+        const cacheIdentifier = cacheIdPrefix + tab.id;
 
         const cachedModel = activeCachedModels[cacheIdentifier];
 

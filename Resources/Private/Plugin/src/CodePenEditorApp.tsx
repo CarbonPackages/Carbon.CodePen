@@ -8,7 +8,6 @@ import { retrieveMonacoEditorAndPlugins } from "./dependencyLoader";
 import { afxMappedLanguageId } from "./services/afxMappedLanguageId";
 import { CodePenPresenter, createCodePenPresenter } from "./presenter/CodePenPresenter";
 import { CodePenWindow } from "./components/CodePenWindow";
-import { makeCreateMonacoEditorModel } from "./services/createMonacoEditorModel";
 import { Store } from "@neos-project/neos-ui";
 import { usePreventAccidentalExit } from "./utils/usePreventAccidentalExit";
 import { Icon } from "@neos-project/react-ui-components";
@@ -75,8 +74,6 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
 
             const tabValues$ = createValueStreamFromNodeProperty<TabValues>(props.identifier);
 
-            const createMonacoEditorModel = makeCreateMonacoEditorModel({monaco, cacheIdPrefix: node.contextPath + props.identifier});
-
             return createCodePenPresenter({
                 node,
                 tabs,
@@ -89,7 +86,6 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                 requestLogin,
                 monaco,
                 monacoTailwindCss,
-                createMonacoEditorModel,
             })
         }, [])
 
