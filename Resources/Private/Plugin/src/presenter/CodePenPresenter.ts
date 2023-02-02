@@ -68,6 +68,11 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
 
     const activeTab$ = new BehaviorSubject(deps.tabs[0])
 
+    disposables = [
+        ...disposables,
+        { dispose: () => activeTab$.complete() }
+    ]
+
     const createIframePreviewUriForNode = (node: Node) => {
         const action = "renderPreviewFrame";
         const query = `node=${node.contextPath}`;
@@ -75,6 +80,9 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
     }
 
     const dispose = () => {
+        for (const disposeable of activeTabDisposables) {
+            disposeable.dispose();
+        }
         for (const disposeable of disposables) {
             disposeable.dispose();
         }
@@ -157,7 +165,7 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
 
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ, deps.toggleCodePenWindow);
 
-        editor.addAction({
+        const fullscreenActionDisposable = editor.addAction({
             id: "carbon.fullscreen",
             label: "Fullscreen",
             keybindings: [monaco.KeyCode.F11],
@@ -179,22 +187,21 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
             return dispose;
         })
 
-        const modelContentWithActiveTabAndTabValues$ = modelContent$.pipe(
+        const commitValuesSubscription = modelContent$.pipe(
             withLatestFrom(
                 activeTab$,
                 deps.tabValues$
             )
-        )
-
-        const commitValuesSubscription = modelContentWithActiveTabAndTabValues$.subscribe(([modelContent, activeTab, tabValues]) => {
+        ).subscribe(([modelContent, activeTab, tabValues]) => {
             mutateValueOfTab(activeTab, modelContent, tabValues);
         })
 
         disposables = [
             ...disposables,
-            editor,
-            { dispose: () => changeTabSubscription.unsubscribe() },
-            { dispose: () => commitValuesSubscription.unsubscribe() }
+           { dispose: () => changeTabSubscription.unsubscribe() },
+           { dispose: () => commitValuesSubscription.unsubscribe() },
+           fullscreenActionDisposable,
+           editor
         ];
     }
 
