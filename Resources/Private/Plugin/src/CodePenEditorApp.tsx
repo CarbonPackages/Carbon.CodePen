@@ -133,12 +133,6 @@ const SecondaryInspector = (props: { createCodePenPresenter: () => Promise<CodeP
     }, [])
 
     if (loading) {
-        const LoadingContainer = styled.div`
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        `
         return <LoadingContainer>
             <Icon icon="spinner" spin={true} size="2x" />
         </LoadingContainer>
@@ -146,3 +140,10 @@ const SecondaryInspector = (props: { createCodePenPresenter: () => Promise<CodeP
 
     return <CodePenWindow codePenPresenter={codePenPresenter.current!} />
 }
+
+const LoadingContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+`
