@@ -4,6 +4,7 @@ import debounce from "lodash.debounce";
 import { editor as monacoEditor, IDisposable } from "monaco-editor";
 import { MonacoTailwindcss } from "monaco-tailwindcss";
 import { BehaviorSubject, first, lastValueFrom, Observable, withLatestFrom } from "rxjs";
+import { makeCreateMonacoEditorModel } from "../services/createMonacoEditorModel";
 import { getEditorConfigForLanguage } from "../services/editorConfig";
 import { registerCompletionForTab } from "../services/registerCompletionForTab";
 import {
@@ -45,7 +46,6 @@ type Deps = {
 
     monaco: typeof import("monaco-editor");
     monacoTailwindCss?: MonacoTailwindcss;
-    createMonacoEditorModel(tab: Tab, currentTabValue: string | undefined): monacoEditor.ITextModel;
 }
 
 const previewLayoutHorizontal$ = new BehaviorSubject(false);
@@ -57,6 +57,8 @@ type TabValues = Record<string, string>;
 
 export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
     const { monaco } = deps;
+
+    const createMonacoEditorModel = makeCreateMonacoEditorModel({ monaco });
 
     let editor: monacoEditor.IStandaloneCodeEditor;
 
@@ -108,7 +110,7 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
     }
 
     const monacoChangeEditorToTab = (activeTab: Tab, currentTabValue: string | undefined) => {
-        editor.setModel(deps.createMonacoEditorModel(activeTab, currentTabValue));
+        editor.setModel(createMonacoEditorModel(activeTab, currentTabValue, deps.node.contextPath + deps.nodeTabProperty));
         editor.updateOptions(getEditorConfigForLanguage(activeTab.language));
 
         for (const disposeable of activeTabDisposables) {
