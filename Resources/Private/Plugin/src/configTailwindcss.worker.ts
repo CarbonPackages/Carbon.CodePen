@@ -44,13 +44,13 @@ const handleJsScriptConfig = (tailwindConfigUri: string) => {
         );
     }
 
-    if (!(self as any).tailwindConfig) {
+    if (!(self as any).tailwindConfig && !(self as any).tailwind?.config) {
         console.error(
-            `Carbon.CodeEditor: 'tailwindcss.clientConfig' URI was fetched but it doesnt expose 'self.tailwindConfig'.`
+            `Carbon.CodeEditor: 'tailwindcss.clientConfig' URI was fetched but it doesnt expose 'self.tailwindConfig' or 'self.tailwind.config'.`
         );
     }
 
-    return (self as any).tailwindConfig;
+    return (self as any).tailwindConfig || (self as any).tailwind.config;
 };
 
 const handleJsonConfig = (tailwindConfig: string) => {
