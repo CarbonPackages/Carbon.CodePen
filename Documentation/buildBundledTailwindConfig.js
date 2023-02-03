@@ -15,7 +15,8 @@ esbuild.build({
     stdin: {
         contents: `
         import config from "./tailwind.config.js";
-        self.tailwindConfig = config;
+        self.tailwind = self.tailwind || {};
+        self.tailwind.config = config;
         `,
         resolveDir: __dirname,
     },
