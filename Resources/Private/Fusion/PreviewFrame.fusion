@@ -37,8 +37,12 @@ prototype(Carbon.CodePen:PreviewFrame) < prototype(Neos.Fusion:Http.Message) {
 
     closingHeadTag = '</head>'
 
-    // the body is empty, since it will be filled via javascript.
-    body = '<body></body>'
+    // The element with the id "carbon-codepen-preview" is used by the default preview handler
+    // If not found, the body tag is used instead
+    body = Neos.Fusion:Tag {
+        tagName = 'body'
+        attributes.id = 'carbon-codepen-preview'
+    }
 
     closingHtmlTag = '</html>'
 

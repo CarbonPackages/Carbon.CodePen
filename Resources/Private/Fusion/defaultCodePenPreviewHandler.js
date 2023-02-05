@@ -8,16 +8,16 @@ window.configureCodePenPreview((codePenContext) => {
     codePenContext.onContentDidChange(async ({ tabValues, tabId }) => {
         // render component server side
         codePenContext.renderComponentOutOfBand().then((content) => {
-            document.body.innerHTML = content;
-            return content;
-        }).then((content) => {
+            const element = document.getElementById("carbon-codepen-preview") || document.body;
+            element.innerHTML = content;
+        }).then(() => {
             // generate tailwind styles
             codePenContext.library
                 .generateTailwindStylesFromContent?.(
                     `@tailwind base;
                     @tailwind components;
                     @tailwind utilities;`,
-                    [content]
+                    [document.body.outerHTML]
                 )
                 .then((css) => {
                     const style = document.getElementById("_codePenTwStyle");
