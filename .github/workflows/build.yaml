@@ -40,7 +40,7 @@ jobs:
           if [ $? -eq 0 ]
           then
               set -e
-              git add -f Resources/Public/**/*
+              git add -f Resources/Public
               git commit -m "Update: Build frontend files"
               git push
           else
