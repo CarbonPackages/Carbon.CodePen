@@ -11,7 +11,7 @@ async function downloadTailwindCDN(outfile, version) {
     await downloadFile(CDN + version, outfile);
 }
 
-async function downloadFile(url, targetFile) {
+async function downloadFile(url, outfile) {
     return await new Promise((resolve, reject) => {
         https
             .get(url, (response) => {
@@ -23,21 +23,24 @@ async function downloadFile(url, targetFile) {
 
                 // handle redirects
                 if (code > 300 && code < 400 && !!response.headers.location) {
-                    return resolve(downloadFile(CDN + response.headers.location, targetFile));
+                    return resolve(downloadFile(CDN + response.headers.location, outfile));
                 }
 
                 // save the file to disk
-                const fileWriter = fs.createWriteStream(targetFile);
+                const fileWriter = fs.createWriteStream(outfile);
                 fileWriter.on("finish", () => {
                     fileWriter.close();
 
                     // Check if the file is a Tailwind error message
-                    const data = fs.readFileSync(targetFile, "utf8");
+                    const data = fs.readFileSync(outfile, "utf8");
                     if (data.startsWith('console.error("Unknown Tailwind version:')) {
                         throw new Error("Unknown Tailwind version");
                     }
 
-                    console.log(`Download of ${url} completed`);
+                    console.log("");
+                    console.log(`Wrote ${url} to`);
+                    console.log(outfile);
+                    console.log("");
                     resolve();
                 });
 
