@@ -12,11 +12,11 @@ downloadTailwindCDN(DIRECTORY + "TailwindCDN.js");
 buildTailwindConfig(DIRECTORY + "TailwindConfig.js");
 ```
 
-To set a specic version, you can add the version like this: `downloadTailwindCDN(DIRECTORY + "TailwindCDN.js", "3.2.4");`
+To set a specific version, you can add the version like this: `downloadTailwindCDN(DIRECTORY + "TailwindCDN.js", "3.2.4");`
 
 Please adjust the constant `DIRECTORY` to your needs. You can call later this script with node: `node ./codepen.js`
 
-To enable the tailwindcss in codepen add following setting:
+To enable tailwindcss in codepen add following setting:
 
 ```yaml
 Neos:
