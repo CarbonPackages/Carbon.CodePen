@@ -1,0 +1,52 @@
+const https = require("https");
+const fs = require("fs");
+
+const CDN = "https://cdn.tailwindcss.com";
+
+async function downloadTailwindCDN(outfile, version) {
+    if (!outfile) {
+        throw new Error("No outfile specified in function downloadTailwindCDN");
+    }
+    version = version ? `/${version}` : "";
+    await downloadFile(CDN + version, outfile);
+}
+
+async function downloadFile(url, targetFile) {
+    return await new Promise((resolve, reject) => {
+        https
+            .get(url, (response) => {
+                const code = response.statusCode ?? 0;
+
+                if (code >= 400) {
+                    return reject(new Error(response.statusMessage));
+                }
+
+                // handle redirects
+                if (code > 300 && code < 400 && !!response.headers.location) {
+                    return resolve(downloadFile(CDN + response.headers.location, targetFile));
+                }
+
+                // save the file to disk
+                const fileWriter = fs.createWriteStream(targetFile);
+                fileWriter.on("finish", () => {
+                    fileWriter.close();
+
+                    // Check if the file is a Tailwind error message
+                    const data = fs.readFileSync(targetFile, "utf8");
+                    if (data.startsWith('console.error("Unknown Tailwind version:')) {
+                        throw new Error("Unknown Tailwind version");
+                    }
+
+                    console.log(`Download of ${url} completed`);
+                    resolve();
+                });
+
+                response.pipe(fileWriter);
+            })
+            .on("error", (error) => {
+                reject(error);
+            });
+    });
+}
+
+module.exports = downloadTailwindCDN;
