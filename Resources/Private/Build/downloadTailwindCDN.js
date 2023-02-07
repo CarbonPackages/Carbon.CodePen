@@ -29,8 +29,7 @@ async function downloadFile(url, outfile) {
                 // save the file to disk
                 const fileWriter = fs.createWriteStream(outfile);
                 fileWriter.on("finish", () => {
-                    fileWriter.close();
-
+                    fileWriter.close(() => {
                     // Check if the file is a Tailwind error message
                     const data = fs.readFileSync(outfile, "utf8");
                     if (data.startsWith('console.error("Unknown Tailwind version:')) {
@@ -42,6 +41,7 @@ async function downloadFile(url, outfile) {
                     console.log(outfile);
                     console.log("");
                     resolve();
+                    });
                 });
 
                 response.pipe(fileWriter);
