@@ -21,10 +21,7 @@ function buildTailwindConfig(outfile) {
         bundle: true,
         minify: true,
     });
-    console.log("");
-    console.log("Wrote tailwind config to");
-    console.log(outfile);
-    console.log("");
+    console.log(`\nWrote tailwind config to\n${outfile}\n`);
 }
 
 module.exports = buildTailwindConfig;
