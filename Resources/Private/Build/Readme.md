@@ -14,6 +14,9 @@ buildTailwindConfig(DIRECTORY + "TailwindConfig.js");
 
 To set a specific version, you can add the version like this: `downloadTailwindCDN(DIRECTORY + "TailwindCDN.js", "3.2.4");`
 
+> If can occur that the download script can have problems to write files. In that case, you can use `curl`:  
+`curl -o DistributionPackages/Vendor.Package/Resources/Public/Scripts/TailwindCDN.js https://cdn.tailwindcss.com -L;`
+
 Please adjust the constant `DIRECTORY` to your needs. You can call later this script with node: `node ./codepen.js`
 
 To enable tailwindcss in codepen add following setting:
