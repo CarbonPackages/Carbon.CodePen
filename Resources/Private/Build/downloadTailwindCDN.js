@@ -30,17 +30,19 @@ async function downloadFile(url, outfile) {
                 const fileWriter = fs.createWriteStream(outfile);
                 fileWriter.on("finish", () => {
                     fileWriter.close(() => {
-                    // Check if the file is a Tailwind error message
-                    const data = fs.readFileSync(outfile, "utf8");
-                    if (data.startsWith('console.error("Unknown Tailwind version:')) {
-                        throw new Error("Unknown Tailwind version");
-                    }
-
-                    console.log("");
-                    console.log(`Wrote ${url} to`);
-                    console.log(outfile);
-                    console.log("");
-                    resolve();
+                        try {
+                            // Check if the file is a Tailwind error message
+                            const data = fs.readFileSync(outfile, "utf8");
+                            if (data.startsWith('console.error("Unknown Tailwind version:')) {
+                                throw new Error("Unknown Tailwind version");
+                            }
+                        } catch (err) {
+                            console.error(err);
+                        }
+                        console.log("");
+                        console.log(`Wrote ${url} to`);
+                        console.log(outfile);
+                        resolve();
                     });
                 });
 
