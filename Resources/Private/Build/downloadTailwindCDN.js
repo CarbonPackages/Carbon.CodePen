@@ -39,10 +39,7 @@ async function downloadFile(url, outfile) {
                         } catch (err) {
                             console.error(err);
                         }
-                        console.log("");
-                        console.log(`Wrote ${url} to`);
-                        console.log(outfile);
-                        resolve();
+                        resolve(console.log(`\nWrote ${url} to\n${outfile}\n`));
                     });
                 });
 
