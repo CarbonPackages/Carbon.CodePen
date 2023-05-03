@@ -27,7 +27,6 @@ class PreviewController extends ActionController
         $mockedNode = $this->getMockedNodeWithProperty($node, $additionalPropertyName, $propertyValueDecoded);
         $this->view->setFusionPath('codePenVirtualNode');
         $this->view->assign('value', $mockedNode);
-        $this->view->assign('site', $node->getContext()->getCurrentSiteNode());
     }
 
     public function renderPreviewFrameAction(Node $node)
