@@ -2,6 +2,7 @@
     "name": "carbon/codepen",
     "type": "neos-carbon",
     "description": "Code alongside a live preview rendered by Fusion. You can configure it further to use Javascript to preview or inject JS and styles via Fusion",
+    "license": "GPL-3.0-or-later",
     "require": {
         "neos/neos-ui": "^7.0 || ^8.0",
         "mhsdesign/proposal-neos-ui-esm-plugin-loader": "^1.0"
