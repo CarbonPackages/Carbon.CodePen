@@ -3,7 +3,7 @@ const path = require("node:path");
 
 const resolveDir = path.join(__dirname, "../../../../../..");
 
-function buildTailwindConfig(outfile) {
+function buildTailwindConfig(outfile, configFile = "./Tailwind") {
     if (!outfile) {
         throw new Error("No outfile specified in function buildTailwindConfig");
     }
@@ -12,7 +12,7 @@ function buildTailwindConfig(outfile) {
         format: "iife",
         stdin: {
             contents: `
-            import config from "./Tailwind";
+            import config from "${configFile}";
             self.tailwind = self.tailwind || {};
             self.tailwind.config = config;
             `,
