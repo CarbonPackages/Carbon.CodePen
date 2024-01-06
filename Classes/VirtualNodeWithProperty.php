@@ -12,7 +12,8 @@ class VirtualNodeWithProperty extends Node
     private string $propertyName;
     private $propertyValue;
 
-    public function __construct(NodeData $nodeData, Context $context, string $propertyName, $propertyValue) {
+    public function __construct(NodeData $nodeData, Context $context, string $propertyName, $propertyValue)
+    {
         $this->propertyName = $propertyName;
         $this->propertyValue = $propertyValue;
         parent::__construct($nodeData, $context);
