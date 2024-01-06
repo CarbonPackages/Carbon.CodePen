@@ -1,4 +1,11 @@
 codePenPreviewFrame = Neos.Fusion:Case {
+    previewFrameFromEditorSettings {
+        condition = Neos.Fusion:CanRender {
+            @if.set = ${editPreviewMode}
+            type = ${editPreviewMode}
+        }
+        type = ${editPreviewMode}
+    }
     nodeSpecificPreviewFrame {
         condition = Neos.Fusion:CanRender {
             type = ${node.nodeType + '.PreviewFrame'}
@@ -22,8 +29,16 @@ codePenVirtualNode = Neos.Neos:ContentCase {
         @if.render = false
     }
 
-    nodeSpecificComponent {
+    specificComponentFromEditorSettings {
         @position = "start 1000"
+        condition = Neos.Fusion:CanRender {
+            @if.set = ${editPreviewMode}
+            type = ${editPreviewMode}
+        }
+        type = ${editPreviewMode}
+    }
+    nodeSpecificComponent {
+        @position = "after specificComponentFromEditorSettings"
         condition = Neos.Fusion:CanRender {
             type = ${node.nodeType + '.CodePen'}
         }

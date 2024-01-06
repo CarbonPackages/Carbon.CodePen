@@ -2,6 +2,8 @@
 export type RawCompletion = string | string[];
 
 export type CodePenEditorOptions = Readonly<{
+    previewFrame?: string;
+    nodeRenderer?: string;
     tabs?: {
         [id: string]: {
             label?: string;

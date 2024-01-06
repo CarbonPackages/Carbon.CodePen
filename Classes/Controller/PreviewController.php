@@ -18,7 +18,7 @@ class PreviewController extends ActionController
      */
     protected $defaultViewObjectName = FusionView::class;
 
-    public function renderVirtualNodeAction(Node $node, string $additionalPropertyName, string $additionalPropertyValue)
+    public function renderVirtualNodeAction(Node $node, string $additionalPropertyName, string $additionalPropertyValue, string $nodeRenderer)
     {
         $propertyValueDecoded = json_decode($additionalPropertyValue, true, 512, JSON_THROW_ON_ERROR);
         if ($propertyValueDecoded === '' || $propertyValueDecoded === []) {
@@ -26,12 +26,18 @@ class PreviewController extends ActionController
         }
         $mockedNode = $this->getMockedNodeWithProperty($node, $additionalPropertyName, $propertyValueDecoded);
         $this->view->setFusionPath('codePenVirtualNode');
+        if ($nodeRenderer) {
+            $this->view->assign('editPreviewMode', $nodeRenderer);
+        }
         $this->view->assign('value', $mockedNode);
     }
 
-    public function renderPreviewFrameAction(Node $node)
+    public function renderPreviewFrameAction(Node $node, ?string $previewFrame = '')
     {
         $this->view->setFusionPath('codePenPreviewFrame');
+        if ($previewFrame) {
+            $this->view->assign('editPreviewMode', $previewFrame);
+        }
         $this->view->assign('value', $node);
     }
 

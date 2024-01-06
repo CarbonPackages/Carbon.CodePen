@@ -72,11 +72,16 @@ export const createCodePenEditorApp = (deps: {store: Store, frontendConfiguratio
                 return;
             }
 
+            const previewFrame = props.options?.previewFrame;
+            const nodeRenderer = props.options?.nodeRenderer;
+
             const tabValues$ = createValueStreamFromNodeProperty<TabValues>(props.identifier);
 
             return createCodePenPresenter({
                 node,
                 tabs,
+                previewFrame,
+                nodeRenderer,
                 nodeTabProperty: props.identifier,
                 tabValues$,
                 toggleCodePenWindow: handleClick,

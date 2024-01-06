@@ -36,6 +36,8 @@ type Deps = {
     nodeTabProperty: string;
     tabValues$: Observable<TabValues>;
     tabs: Tab[];
+    previewFrame?: string;
+    nodeRenderer?: string;
 
     toggleCodePenWindow(): void;
 
@@ -76,7 +78,9 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
     const createIframePreviewUriForNode = (node: Node) => {
         const action = "renderPreviewFrame";
         const query = `node=${node.contextPath}`;
-        return `/neos/codePen/${action}?${query}`;
+        let { previewFrame } = deps;
+        previewFrame = previewFrame ? `&previewFrame=${previewFrame}` : "";
+        return `/neos/codePen/${action}?${query}${previewFrame}`;
     }
 
     const dispose = () => {
@@ -285,6 +289,7 @@ export const createCodePenPresenter = (deps: Deps): CodePenPresenter => {
             additionalPropertyValue: JSON.stringify(
                 tabValues
             ),
+            nodeRenderer: deps.nodeRenderer || "",
         });
     }
 
