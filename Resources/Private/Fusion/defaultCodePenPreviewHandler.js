@@ -25,7 +25,7 @@ window.configureCodePenPreview((codePenContext) => {
                     newStyle.id = "_codePenTwStyle";
                     newStyle.innerHTML = css;
                     if (!style) {
-                        document.head.append(newStyle);
+                        document.head.prepend(newStyle);
                         return;
                     }
                     style.parentNode.replaceChild(newStyle, style);
