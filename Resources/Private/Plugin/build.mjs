@@ -22,6 +22,7 @@ const includedLanguages = [
     "typescript",
     "xml",
     "markdown",
+    "php",
 ];
 
 esbuild
