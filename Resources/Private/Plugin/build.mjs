@@ -18,7 +18,7 @@ const includedLanguages = [
     "scss",
     "less",
     "ini",
-    "js",
+    "javascript",
     "typescript",
     "xml",
     "markdown",
