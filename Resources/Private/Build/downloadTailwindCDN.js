@@ -26,6 +26,12 @@ async function downloadFile(url, outfile) {
                     return resolve(downloadFile(CDN + response.headers.location, outfile));
                 }
 
+                // create the directory if it doesn't exist
+                const dir = outfile.substring(0, outfile.lastIndexOf("/"));
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir, { recursive: true });
+                }
+
                 // save the file to disk
                 const fileWriter = fs.createWriteStream(outfile);
                 fileWriter.on("finish", () => {
