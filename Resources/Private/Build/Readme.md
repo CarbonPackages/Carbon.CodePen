@@ -3,13 +3,43 @@
 In order to write the custom config for tailwindcss, you can add a file (e.g. `codepen.js`) to the root of your installation
 
 ```js
-const buildTailwindConfig = require("./Packages/Carbon/Carbon.CodePen/Resources/Private/Build/buildTailwindConfig.js");
-const downloadTailwindCDN = require("./Packages/Carbon/Carbon.CodePen/Resources/Private/Build/downloadTailwindCDN.js");
+const fs = require("fs");
 
+const PATH = "./Packages/Carbon/Carbon.CodePen/Resources/Private/Build/";
 const DIRECTORY = "./DistributionPackages/Vendor.Package/Resources/Public/Scripts/";
+const CONFIG_FILE = "./tailwind.config.js";
 
-downloadTailwindCDN(DIRECTORY + "TailwindCDN.js");
-buildTailwindConfig(DIRECTORY + "TailwindConfig.js");
+fs.access(`${PATH}downloadTailwindCDN.js`, fs.F_OK, (error) => {
+    if (error) {
+        console.warn("Carbon.CodePen is not installed");
+        return;
+    }
+    const downloadTailwindCDN = require(`${PATH}downloadTailwindCDN.js`);
+    const buildTailwindConfig = require(`${PATH}buildTailwindConfig.js`);
+    downloadTailwindCDN(DIRECTORY + "TailwindCDN.js");
+    buildTailwindConfig(DIRECTORY + "TailwindConfig.js", CONFIG_FILE);
+});
+```
+
+or, if you want to use modules:
+
+```js
+import fs from "fs";
+
+const PATH = "./Packages/Carbon/Carbon.CodePen/Resources/Private/Build/";
+const DIRECTORY = "./DistributionPackages/Vendor.Package/Resources/Public/Scripts/";
+const CONFIG_FILE = "./tailwind.config.mjs";
+
+fs.access(`${PATH}downloadTailwindCDN.js`, fs.F_OK, async (error) => {
+    if (error) {
+        console.warn("Carbon.CodePen is not installed");
+        return;
+    }
+    const { downloadTailwindCDN } = await import(`${PATH}downloadTailwindCDN.mjs`);
+    const { buildTailwindConfig } = await import(`${PATH}buildTailwindConfig.mjs`);
+    downloadTailwindCDN(DIRECTORY + "TailwindCDN.js");
+    buildTailwindConfig(DIRECTORY + "TailwindConfig.js", CONFIG_FILE);
+});
 ```
 
 To set a specific version, you can add the version like this: `downloadTailwindCDN(DIRECTORY + "TailwindCDN.js", "3.2.4");`

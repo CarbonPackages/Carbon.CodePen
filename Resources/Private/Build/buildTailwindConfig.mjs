@@ -1,0 +1,28 @@
+import esbuild from "esbuild";
+import path from "node:path";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const resolveDir = path.join(__dirname, "../../../../../..");
+
+export function buildTailwindConfig(outfile, configFile = "./Tailwind") {
+    if (!outfile) {
+        throw new Error("No outfile specified in function buildTailwindConfig");
+    }
+    esbuild.build({
+        outfile,
+        format: "iife",
+        stdin: {
+            contents: `
+            import config from "${configFile}";
+            self.tailwind = self.tailwind || {};
+            self.tailwind.config = config;
+            `,
+            resolveDir,
+        },
+        bundle: true,
+        minify: true,
+    });
+    console.log(`\nWrote tailwind config to\n${outfile}\n`);
+}
