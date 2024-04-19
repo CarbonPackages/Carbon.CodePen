@@ -1,15 +1,29 @@
 # Build custom tailwindcss config
 
 In order to write the custom config for tailwindcss, you can add a file (e.g. `codepen.js`) to the root of your installation
+The config file must be a version without the `content` config. Your `tailwind.config.js` may look like this:
+
+```js
+import config from "./Tailwind";
+import content from "./Build/Carbon.Pipeline/content";
+
+/** @type {import('tailwindcss').Config} */
+export default {
+    content,
+    ...config,
+};
+```
+
+If you use common js:
 
 ```js
 const fs = require("fs");
 
 const PATH = "./Packages/Carbon/Carbon.CodePen/Resources/Private/Build/";
 const DIRECTORY = "./DistributionPackages/Vendor.Package/Resources/Public/Scripts/";
-const CONFIG_FILE = "./tailwind.config.js";
+const CONFIG_FILE = "./Tailwind";
 
-fs.access(`${PATH}downloadTailwindCDN.js`, fs.F_OK, (error) => {
+fs.access(`${PATH}buildTailwindConfig.js`, fs.F_OK, (error) => {
     if (error) {
         console.warn("Carbon.CodePen is not installed");
         return;
@@ -28,9 +42,9 @@ import fs from "fs";
 
 const PATH = "./Packages/Carbon/Carbon.CodePen/Resources/Private/Build/";
 const DIRECTORY = "./DistributionPackages/Vendor.Package/Resources/Public/Scripts/";
-const CONFIG_FILE = "./tailwind.config.mjs";
+const CONFIG_FILE = "./Tailwind";
 
-fs.access(`${PATH}downloadTailwindCDN.js`, fs.F_OK, async (error) => {
+fs.access(`${PATH}buildTailwindConfig.mjs`, fs.F_OK, async (error) => {
     if (error) {
         console.warn("Carbon.CodePen is not installed");
         return;
@@ -42,9 +56,31 @@ fs.access(`${PATH}downloadTailwindCDN.js`, fs.F_OK, async (error) => {
 });
 ```
 
+You can also pass the config as function and pass custom settings to it:
+
+```js
+import fs from "fs";
+import settings from "./tailwind.custom.mjs";
+
+const PATH = "./Packages/Carbon/Carbon.CodePen/Resources/Private/Build/";
+const DIRECTORY = "./DistributionPackages/Vendor.Package/Resources/Public/Scripts/";
+const CONFIG_FILE = "./Tailwind";
+
+fs.access(`${PATH}buildTailwindConfig.mjs`, fs.F_OK, async (error) => {
+    if (error) {
+        console.warn("Carbon.CodePen is not installed");
+        return;
+    }
+    const { downloadTailwindCDN } = await import(`${PATH}downloadTailwindCDN.mjs`);
+    const { buildTailwindConfig } = await import(`${PATH}buildTailwindConfig.mjs`);
+    downloadTailwindCDN(DIRECTORY + "TailwindCDN.js");
+    buildTailwindConfig(DIRECTORY + "TailwindConfig.js", CONFIG_FILE, settings);
+});
+```
+
 To set a specific version, you can add the version like this: `downloadTailwindCDN(DIRECTORY + "TailwindCDN.js", "3.2.4");`
 
-> If can occur that the download script can have problems to write files. In that case, you can use `curl`:  
+> If can occur that the download script can have problems to write files. In that case, you can use `curl`:
 `curl -o DistributionPackages/Vendor.Package/Resources/Public/Scripts/TailwindCDN.js https://cdn.tailwindcss.com -L;`
 
 Please adjust the constant `DIRECTORY` to your needs. You can call later this script with node: `node ./codepen.js`

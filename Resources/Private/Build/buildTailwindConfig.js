@@ -3,19 +3,24 @@ const path = require("node:path");
 
 const resolveDir = path.join(__dirname, "../../../../../..");
 
-function buildTailwindConfig(outfile, configFile = "./Tailwind") {
+function buildTailwindConfig(
+    outfile,
+    configFile = "./Tailwind",
+    settings,
+) {
     if (!outfile) {
         throw new Error("No outfile specified in function buildTailwindConfig");
     }
+    const contents = `
+    import config from "${configFile}";
+    self.tailwind = self.tailwind || {};
+    self.tailwind.config = config${settings ? `(${JSON.stringify(settings)})` : ""};
+    `;
     esbuild.build({
         outfile,
         format: "iife",
         stdin: {
-            contents: `
-            import config from "${configFile}";
-            self.tailwind = self.tailwind || {};
-            self.tailwind.config = config;
-            `,
+            contents,
             resolveDir,
         },
         bundle: true,

@@ -6,19 +6,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const resolveDir = path.join(__dirname, "../../../../../..");
 
-export function buildTailwindConfig(outfile, configFile = "./Tailwind") {
+export function buildTailwindConfig(
+    outfile,
+    configFile = "./Tailwind",
+    settings,
+) {
     if (!outfile) {
         throw new Error("No outfile specified in function buildTailwindConfig");
     }
+    const contents = `
+    import config from "${configFile}";
+    self.tailwind = self.tailwind || {};
+    self.tailwind.config = config${settings ? `(${JSON.stringify(settings)})` : ""};
+    `;
     esbuild.build({
         outfile,
         format: "iife",
         stdin: {
-            contents: `
-            import config from "${configFile}";
-            self.tailwind = self.tailwind || {};
-            self.tailwind.config = config;
-            `,
+            contents,
             resolveDir,
         },
         bundle: true,
