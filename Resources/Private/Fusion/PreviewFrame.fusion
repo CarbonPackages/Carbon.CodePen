@@ -1,4 +1,8 @@
-prototype(Carbon.CodePen:PreviewFrame) < prototype(Neos.Fusion:Http.Message) {
+// You can expand the preview frame by adding your own head content, stylesheets and javascripts.
+prototype(Carbon.CodePen:PreviewFrame) < prototype(Carbon.CodePen:RawPreviewFrame)
+
+// Please don't override the RawPreviewFrame prototype in your project, it's meant to be used as a base for other preview frames.
+prototype(Carbon.CodePen:RawPreviewFrame) < prototype(Neos.Fusion:Http.Message) {
     doctype = '<!DOCTYPE html>'
 
     htmlTag = Neos.Fusion:Tag {
